@@ -1,0 +1,21 @@
+# Lulo Bank - Notificaciones reales de ejemplo
+
+## Ingreso - Abono
+Abono de $ 500.000 en tu cuenta Lulo
+Lulo Bank
+
+## Ingreso - Recibiste
+Recibiste $ 150.000 de transferencia
+Lulo Bank
+
+## Egreso - Compra
+Compra de $ 80.000 en Mercado Libre
+Lulo Bank
+
+## Egreso - Pago QR
+Pago QR de $ 25.000 en Café Central
+Lulo Bank
+
+## Egreso - Retiro
+Retiro de $ 100.000 en cajero
+Lulo Bank

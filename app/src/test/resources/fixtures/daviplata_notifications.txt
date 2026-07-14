@@ -1,0 +1,17 @@
+# Daviplata - Notificaciones reales de ejemplo
+
+## Ingreso - Recibiste
+Recibiste $ 75.000 de 3156677889
+Daviplata
+
+## Ingreso - Recarga
+Te recargaron $ 200.000
+Daviplata
+
+## Egreso - Enviaste
+Enviaste $ 30.000 a 3112233445
+Daviplata
+
+## Egreso - Pago
+Pagaste $ 45.000 en Drogueria La Rebaja
+Daviplata

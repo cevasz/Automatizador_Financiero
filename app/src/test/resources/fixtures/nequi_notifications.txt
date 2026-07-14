@@ -1,0 +1,21 @@
+# Nequi - Notificaciones reales de ejemplo
+
+## Ingreso - Transferencia recibida
+Recibiste $ 50.000 de 3204567890
+Nequi
+
+## Ingreso - Recarga
+Te recargaron $ 100.000
+Nequi
+
+## Egreso - Transferencia enviada
+Enviaste $ 25.000 a 3109876543
+Nequi
+
+## Egreso - Pago en comercio
+Pagaste $ 15.500 en Supermercado La 14
+Nequi
+
+## Egreso - Retiro
+Retiraste $ 50.000 en cajero
+Nequi

@@ -1,0 +1,21 @@
+# Bancolombia - Notificaciones reales de ejemplo
+
+## Ingreso - Abono a cuenta
+Abono a su cuenta ****1234 por $ 500.000
+Bancolombia
+
+## Ingreso - Transferencia recibida
+Transferencia recibida por $ 1.200.000 en su cuenta ****5678
+Bancolombia
+
+## Egreso - Compra con tarjeta
+Compra realizada por $ 85.000 en Exito
+Bancolombia
+
+## Egreso - Pago de servicios
+Pago de factura por $ 120.000
+Bancolombia
+
+## Egreso - Transferencia enviada
+Transferencia enviada por $ 200.000 desde su cuenta ****1234
+Bancolombia

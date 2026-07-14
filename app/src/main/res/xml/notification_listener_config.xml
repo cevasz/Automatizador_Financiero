@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<notification-listener-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <notification-listener-include-filter>
+        <package name="com.nequi.app" />
+        <package name="com.bancolombia.certipersonas" />
+        <package name="com.daviplata.daviplata" />
+        <package name="co.nubank" />
+        <package name="com.lulobank.app" />
+    </notification-listener-include-filter>
+</notification-listener-config>

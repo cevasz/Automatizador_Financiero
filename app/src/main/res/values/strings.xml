@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Finanzas Automática</string>
+    <string name="notification_listener_label">Lector de Notificaciones Bancarias</string>
+    <string name="permission_notification_listener_desc">Permite a la app leer notificaciones de apps bancarias para registrar tus movimientos automáticamente</string>
+    <string name="settings_notification_listener">Configurar acceso a notificaciones</string>
+    <string name="notification_access_denied">Se necesita acceso a notificaciones para capturar movimientos bancarios</string>
+    <string name="open_notification_settings">Abrir configuración</string>
+</resources>

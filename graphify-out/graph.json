@@ -1,0 +1,910 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "claude",
+      "community": 2,
+      "norm_label": "claude.md"
+    },
+    {
+      "label": "Contexto del proyecto \u2014 App de Contabilidad Financiera Autom\u00e1tica (Colombia)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "community": 2,
+      "norm_label": "contexto del proyecto \u2014 app de contabilidad financiera automatica (colombia)"
+    },
+    {
+      "label": "Qu\u00e9 es",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "claude_qu\u00e9_es",
+      "community": 2,
+      "norm_label": "que es"
+    },
+    {
+      "label": "Decisiones de alcance ya tomadas (no reabrir sin discutirlo expl\u00edcitamente)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "claude_decisiones_de_alcance_ya_tomadas_no_reabrir_sin_discutirlo_expl\u00edcitamente",
+      "community": 2,
+      "norm_label": "decisiones de alcance ya tomadas (no reabrir sin discutirlo explicitamente)"
+    },
+    {
+      "label": "Arquitectura interna (dentro de la app Android)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "claude_arquitectura_interna_dentro_de_la_app_android",
+      "community": 2,
+      "norm_label": "arquitectura interna (dentro de la app android)"
+    },
+    {
+      "label": "Convenciones de c\u00f3digo",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "claude_convenciones_de_c\u00f3digo",
+      "community": 2,
+      "norm_label": "convenciones de codigo"
+    },
+    {
+      "label": "Entidades bancarias soportadas en el MVP",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "claude_entidades_bancarias_soportadas_en_el_mvp",
+      "community": 2,
+      "norm_label": "entidades bancarias soportadas en el mvp"
+    },
+    {
+      "label": "Qu\u00e9 NO hacer",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "claude_qu\u00e9_no_hacer",
+      "community": 2,
+      "norm_label": "que no hacer"
+    },
+    {
+      "label": "SDD_App_Finanzas_827bd26c.md",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "community": 0,
+      "norm_label": "sdd_app_finanzas_827bd26c.md"
+    },
+    {
+      "label": "Tabla de contenido",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_tabla_de_contenido",
+      "community": 0,
+      "norm_label": "tabla de contenido"
+    },
+    {
+      "label": "1. Resumen ejecutivo",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_1_resumen_ejecutivo",
+      "community": 0,
+      "norm_label": "1. resumen ejecutivo"
+    },
+    {
+      "label": "2. Problema y contexto",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_problema_y_contexto",
+      "community": 3,
+      "norm_label": "2. problema y contexto"
+    },
+    {
+      "label": "2.1 El problema",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_1_el_problema",
+      "community": 3,
+      "norm_label": "2.1 el problema"
+    },
+    {
+      "label": "2.2 Contexto regulatorio (Colombia, 2026)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_2_contexto_regulatorio_colombia_2026",
+      "community": 3,
+      "norm_label": "2.2 contexto regulatorio (colombia, 2026)"
+    },
+    {
+      "label": "2.3 Restricciones t\u00e9cnicas de plataforma",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_3_restricciones_t\u00e9cnicas_de_plataforma",
+      "community": 3,
+      "norm_label": "2.3 restricciones tecnicas de plataforma"
+    },
+    {
+      "label": "3. Visi\u00f3n del producto y propuesta de valor",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_3_visi\u00f3n_del_producto_y_propuesta_de_valor",
+      "community": 7,
+      "norm_label": "3. vision del producto y propuesta de valor"
+    },
+    {
+      "label": "3.1 Propuesta de valor diferencial",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_3_1_propuesta_de_valor_diferencial",
+      "community": 7,
+      "norm_label": "3.1 propuesta de valor diferencial"
+    },
+    {
+      "label": "4. Decisiones de alcance del MVP",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_4_decisiones_de_alcance_del_mvp",
+      "community": 0,
+      "norm_label": "4. decisiones de alcance del mvp"
+    },
+    {
+      "label": "5. Arquitectura general del sistema",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_arquitectura_general_del_sistema",
+      "community": 4,
+      "norm_label": "5. arquitectura general del sistema"
+    },
+    {
+      "label": "5.1 Componentes principales",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_1_componentes_principales",
+      "community": 4,
+      "norm_label": "5.1 componentes principales"
+    },
+    {
+      "label": "5.2 Principio de captura multi-fuente",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_2_principio_de_captura_multi_fuente",
+      "community": 4,
+      "norm_label": "5.2 principio de captura multi-fuente"
+    },
+    {
+      "label": "5.3 Flujo de un movimiento",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_3_flujo_de_un_movimiento",
+      "community": 4,
+      "norm_label": "5.3 flujo de un movimiento"
+    },
+    {
+      "label": "6. M\u00f3dulos funcionales",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "community": 1,
+      "norm_label": "6. modulos funcionales"
+    },
+    {
+      "label": "6.1 Captura autom\u00e1tica de movimientos",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_1_captura_autom\u00e1tica_de_movimientos",
+      "community": 1,
+      "norm_label": "6.1 captura automatica de movimientos"
+    },
+    {
+      "label": "6.2 Agenda financiera",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_2_agenda_financiera",
+      "community": 8,
+      "norm_label": "6.2 agenda financiera"
+    },
+    {
+      "label": "Refuerzo: aprendizaje comunitario opt-in",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_refuerzo_aprendizaje_comunitario_opt_in",
+      "community": 8,
+      "norm_label": "refuerzo: aprendizaje comunitario opt-in"
+    },
+    {
+      "label": "6.3 Clasificaci\u00f3n autom\u00e1tica",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_3_clasificaci\u00f3n_autom\u00e1tica",
+      "community": 1,
+      "norm_label": "6.3 clasificacion automatica"
+    },
+    {
+      "label": "6.4 Dashboard y cronolog\u00eda",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_4_dashboard_y_cronolog\u00eda",
+      "community": 1,
+      "norm_label": "6.4 dashboard y cronologia"
+    },
+    {
+      "label": "6.5 Metas de ahorro",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_5_metas_de_ahorro",
+      "community": 1,
+      "norm_label": "6.5 metas de ahorro"
+    },
+    {
+      "label": "6.6 Presupuestos por categor\u00eda",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_6_presupuestos_por_categor\u00eda",
+      "community": 1,
+      "norm_label": "6.6 presupuestos por categoria"
+    },
+    {
+      "label": "6.7 Alertas y detecci\u00f3n de patrones",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_7_alertas_y_detecci\u00f3n_de_patrones",
+      "community": 1,
+      "norm_label": "6.7 alertas y deteccion de patrones"
+    },
+    {
+      "label": "6.8 Escaneo de comprobantes (OCR)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_8_escaneo_de_comprobantes_ocr",
+      "community": 1,
+      "norm_label": "6.8 escaneo de comprobantes (ocr)"
+    },
+    {
+      "label": "6.9 Exportaci\u00f3n",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_9_exportaci\u00f3n",
+      "community": 1,
+      "norm_label": "6.9 exportacion"
+    },
+    {
+      "label": "6.10 Confirmaci\u00f3n ligera de movimientos",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_10_confirmaci\u00f3n_ligera_de_movimientos",
+      "community": 1,
+      "norm_label": "6.10 confirmacion ligera de movimientos"
+    },
+    {
+      "label": "7. Modelo de datos (entidades principales)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_7_modelo_de_datos_entidades_principales",
+      "community": 0,
+      "norm_label": "7. modelo de datos (entidades principales)"
+    },
+    {
+      "label": "8. Seguridad y privacidad",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L84",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_seguridad_y_privacidad",
+      "community": 5,
+      "norm_label": "8. seguridad y privacidad"
+    },
+    {
+      "label": "8.1 Principios de privacidad por dise\u00f1o",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_1_principios_de_privacidad_por_dise\u00f1o",
+      "community": 5,
+      "norm_label": "8.1 principios de privacidad por diseno"
+    },
+    {
+      "label": "8.2 Cumplimiento normativo",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L92",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_2_cumplimiento_normativo",
+      "community": 5,
+      "norm_label": "8.2 cumplimiento normativo"
+    },
+    {
+      "label": "9. Modelo de sostenibilidad y financiaci\u00f3n",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_modelo_de_sostenibilidad_y_financiaci\u00f3n",
+      "community": 6,
+      "norm_label": "9. modelo de sostenibilidad y financiacion"
+    },
+    {
+      "label": "9.1 Aportes voluntarios con recompensa",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L99",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_1_aportes_voluntarios_con_recompensa",
+      "community": 6,
+      "norm_label": "9.1 aportes voluntarios con recompensa"
+    },
+    {
+      "label": "9.2 Capas premium no esenciales (fase posterior al MVP)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L102",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_2_capas_premium_no_esenciales_fase_posterior_al_mvp",
+      "community": 6,
+      "norm_label": "9.2 capas premium no esenciales (fase posterior al mvp)"
+    },
+    {
+      "label": "10. Stack tecnol\u00f3gico propuesto",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_10_stack_tecnol\u00f3gico_propuesto",
+      "community": 0,
+      "norm_label": "10. stack tecnologico propuesto"
+    },
+    {
+      "label": "11. Roadmap por fases",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L109",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_11_roadmap_por_fases",
+      "community": 0,
+      "norm_label": "11. roadmap por fases"
+    },
+    {
+      "label": "12. Riesgos y mitigaciones",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L111",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_12_riesgos_y_mitigaciones",
+      "community": 0,
+      "norm_label": "12. riesgos y mitigaciones"
+    },
+    {
+      "label": "13. M\u00e9tricas de \u00e9xito del MVP",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L113",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_13_m\u00e9tricas_de_\u00e9xito_del_mvp",
+      "community": 0,
+      "norm_label": "13. metricas de exito del mvp"
+    },
+    {
+      "label": "14. Pr\u00f3ximos pasos",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L119",
+      "_origin": "ast",
+      "id": "graphify_out_converted_sdd_app_finanzas_827bd26c_14_pr\u00f3ximos_pasos",
+      "community": 0,
+      "norm_label": "14. proximos pasos"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "claude",
+      "target": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_arquitectura_interna_dentro_de_la_app_android",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_convenciones_de_c\u00f3digo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_decisiones_de_alcance_ya_tomadas_no_reabrir_sin_discutirlo_expl\u00edcitamente",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_entidades_bancarias_soportadas_en_el_mvp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_qu\u00e9_es",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "claude_contexto_del_proyecto_app_de_contabilidad_financiera_autom\u00e1tica_colombia",
+      "target": "claude_qu\u00e9_no_hacer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_10_stack_tecnol\u00f3gico_propuesto",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_11_roadmap_por_fases",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_12_riesgos_y_mitigaciones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_13_m\u00e9tricas_de_\u00e9xito_del_mvp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_14_pr\u00f3ximos_pasos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_1_resumen_ejecutivo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_problema_y_contexto",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_3_visi\u00f3n_del_producto_y_propuesta_de_valor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_4_decisiones_de_alcance_del_mvp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_arquitectura_general_del_sistema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_7_modelo_de_datos_entidades_principales",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_seguridad_y_privacidad",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_modelo_de_sostenibilidad_y_financiaci\u00f3n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_tabla_de_contenido",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_problema_y_contexto",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_1_el_problema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_problema_y_contexto",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_2_contexto_regulatorio_colombia_2026",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_problema_y_contexto",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_2_3_restricciones_t\u00e9cnicas_de_plataforma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_3_visi\u00f3n_del_producto_y_propuesta_de_valor",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_3_1_propuesta_de_valor_diferencial",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_arquitectura_general_del_sistema",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_1_componentes_principales",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_arquitectura_general_del_sistema",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_2_principio_de_captura_multi_fuente",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_arquitectura_general_del_sistema",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_5_3_flujo_de_un_movimiento",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_10_confirmaci\u00f3n_ligera_de_movimientos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_1_captura_autom\u00e1tica_de_movimientos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_2_agenda_financiera",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_3_clasificaci\u00f3n_autom\u00e1tica",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_4_dashboard_y_cronolog\u00eda",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_5_metas_de_ahorro",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_6_presupuestos_por_categor\u00eda",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_7_alertas_y_detecci\u00f3n_de_patrones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_8_escaneo_de_comprobantes_ocr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_m\u00f3dulos_funcionales",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_9_exportaci\u00f3n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_6_2_agenda_financiera",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_refuerzo_aprendizaje_comunitario_opt_in",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_seguridad_y_privacidad",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_1_principios_de_privacidad_por_dise\u00f1o",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_seguridad_y_privacidad",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_8_2_cumplimiento_normativo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_modelo_de_sostenibilidad_y_financiaci\u00f3n",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_1_aportes_voluntarios_con_recompensa",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/converted/SDD_App_Finanzas_827bd26c.md",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_modelo_de_sostenibilidad_y_financiaci\u00f3n",
+      "target": "graphify_out_converted_sdd_app_finanzas_827bd26c_9_2_capas_premium_no_esenciales_fase_posterior_al_mvp",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}

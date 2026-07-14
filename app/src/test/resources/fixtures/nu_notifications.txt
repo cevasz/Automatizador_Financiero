@@ -1,0 +1,21 @@
+# Nu Colombia - Notificaciones reales de ejemplo
+
+## Ingreso - Transferencia recibida
+Recibiste una transferencia de $ 300.000 COP
+Nu Colombia
+
+## Ingreso - Devolución
+Devolución de $ 50.000 COP en tu compra
+Nu Colombia
+
+## Egreso - Compra
+Pagaste $ 120.000 COP en Rappi
+Nu Colombia
+
+## Egreso - Transferencia
+Enviaste $ 100.000 COP a Juan Pérez
+Nu Colombia
+
+## Egreso - Suscripción
+Pago de suscripción $ 29.900 COP en Netflix
+Nu Colombia

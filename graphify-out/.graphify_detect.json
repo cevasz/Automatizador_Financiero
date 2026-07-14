@@ -1,0 +1,21 @@
+{
+  "files": {
+    "code": [],
+    "document": [
+      "/home/sebas/Documentos/New/CLAUDE.md",
+      "/home/sebas/Documentos/New/graphify-out/converted/SDD_App_Finanzas_827bd26c.md"
+    ],
+    "paper": [],
+    "image": [],
+    "video": []
+  },
+  "total_files": 2,
+  "total_words": 3367,
+  "needs_graph": false,
+  "warning": "Corpus is ~3,367 words - fits in a single context window. You may not need a graph.",
+  "skipped_sensitive": [],
+  "unclassified": [],
+  "walk_errors": [],
+  "graphifyignore_patterns": 0,
+  "scan_root": "/home/sebas/Documentos/New"
+}
