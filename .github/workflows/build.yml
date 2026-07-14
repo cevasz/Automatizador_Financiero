@@ -25,13 +25,6 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          api-level: 34
-          ndk-version: r26c
-          build-tools-version: 34.0.0
-
-      - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.7
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -46,7 +39,7 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
 
-      - name: Upload APK info
+      - name: Show APK info
         run: |
           ls -la app/build/outputs/apk/debug/
           echo "APK size: $(du -h app/build/outputs/apk/debug/app-debug.apk | cut -f1)"
