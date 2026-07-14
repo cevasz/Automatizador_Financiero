@@ -1,0 +1,51 @@
+# ===========================
+# Android
+# ===========================
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# ===========================
+# Gradle
+# ===========================
+gradle-8.7/
+gradle-8.7-bin.zip
+gradle-*.zip
+.gradle/
+
+# ===========================
+# SDK / Tools locales (CI usa sus propias instalaciones)
+# ===========================
+.tools/
+android-sdk/
+jdk-17/
+cmdline-tools-extract/
+downloads/
+
+# ===========================
+# Build outputs
+# ===========================
+app/build/
+build/
+
+# ===========================
+# IDE
+# ===========================
+.idea/
+*.iml
+.vscode/
+
+# ===========================
+# Misc
+# ===========================
+*.log
