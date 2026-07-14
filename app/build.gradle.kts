@@ -24,7 +24,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     packaging {
@@ -52,21 +52,26 @@ android {
 }
 
 dependencies {
-    // Core Android
-    val activityComposeVersion = "1.9.0"
-    val lifecycleVersion = "2.8.0"
-    val material3Version = "1.3.0"
+    // ── Compose BOM (gestiona todas las versiones de Compose automáticamente) ──
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
+    // Core Android
+    val lifecycleVersion = "2.8.4"
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
-    implementation("androidx.activity:activity-compose:$activityComposeVersion")
-    implementation("androidx.compose.material3:material3:$material3Version")
-    implementation("androidx.compose.material3:material3-window-size-class:$material3Version")
-    implementation("androidx.compose.material:material-icons-extended:1.6.10")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.10")
-    implementation("androidx.compose.ui:ui-graphics:1.6.10")
-    implementation("androidx.compose.foundation:foundation:1.6.10")
+    implementation("androidx.activity:activity-compose:1.9.0")
+
+    // Compose UI (versiones gestionadas por BOM)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3-window-size-class")
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Room
     val roomVersion = "2.6.1"
@@ -82,7 +87,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
-    // Serialization (for JSON parsing if needed)
+    // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Testing
@@ -92,10 +97,10 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.10")
-    androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.6.10")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Debug/Tools
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.10")
-    debugImplementation("androidx.compose.ui:ui-tooling-data:1.6.10")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-tooling-data")
 }
