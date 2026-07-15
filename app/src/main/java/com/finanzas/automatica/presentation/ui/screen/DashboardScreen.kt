@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,7 +55,7 @@ fun DashboardScreen(
         // Top Bar
         TopAppBar(
             title = { Text("Finanzas Automática") },
-            navigationIcon = { IconButton(onClick = onMenuClick) { Icon(Icons.Outlined.Menu, contentDescription = "Menú") } },
+            navigationIcon = { IconButton(onClick = onMenuClick) { Icon(Icons.Default.Menu, contentDescription = "Menú") } },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         )
 
@@ -80,11 +80,11 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.PendingActions, contentDescription = "", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.PendingActions, contentDescription = "", tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.size(8.dp))
                         Text("Por confirmar (3)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
-                    Icon(Icons.Outlined.ChevronRight, contentDescription = "")
+                    Icon(Icons.Default.ChevronRight, contentDescription = "")
                 }
                 
                 // Items pendientes
@@ -110,7 +110,10 @@ fun DashboardScreen(
 @Composable
 fun SummaryCard(title: String, amount: String, icon: ImageVector, color: Color, subtitle: String) {
     Card(
-        modifier = Modifier.weight(1f).height(100.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .height(100.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
         )
@@ -148,7 +151,7 @@ fun PendingItem(merchant: String, detail: String, isFirst: Boolean) {
                 Text("Confirmar", fontSize = 12.sp)
             }
             IconButton(onClick = { }) {
-                Icon(Icons.Outlined.Close, contentDescription = "Rechazar", tint = MaterialTheme.colorScheme.error)
+                Icon(Icons.Default.Close, contentDescription = "Rechazar", tint = MaterialTheme.colorScheme.error)
             }
         }
     }

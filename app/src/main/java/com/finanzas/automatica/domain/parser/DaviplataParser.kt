@@ -1,5 +1,6 @@
 package com.finanzas.automatica.domain.parser
 
+import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.PaymentMethod

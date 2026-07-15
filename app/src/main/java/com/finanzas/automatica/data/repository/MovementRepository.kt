@@ -74,15 +74,15 @@ class MovementRepositoryImpl(
         return dao.getTotalExpense(startDate, endDate)
     }
 
-    suspend fun getExpensesByCategory(startDate: Long, endDate: Long): List<MovementDao.CategoryTotal> {
+    suspend fun getExpensesByCategory(startDate: Long, endDate: Long): List<CategoryTotal> {
         return dao.getExpensesByCategory(startDate, endDate)
     }
 
-    suspend fun getMonthlyExpenseTotals(): List<MovementDao.MonthlyTotal> {
+    suspend fun getMonthlyExpenseTotals(): List<MonthlyTotal> {
         return dao.getMonthlyExpenseTotals()
     }
 
-    suspend fun getMonthlyIncomeTotals(): List<MovementDao.MonthlyTotal> {
+    suspend fun getMonthlyIncomeTotals(): List<MonthlyTotal> {
         return dao.getMonthlyIncomeTotals()
     }
 

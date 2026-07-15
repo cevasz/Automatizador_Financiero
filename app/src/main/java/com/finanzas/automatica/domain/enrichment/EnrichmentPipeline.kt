@@ -19,6 +19,7 @@ import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.RawMovement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.Instant
 
 class EnrichmentPipeline(
     private val database: FinanzasDatabase
@@ -128,7 +129,7 @@ class EnrichmentPipeline(
             else 
                 ConfirmationState.CONFIRMED.name,
             bankEntity = enriched.rawMovement.bankEntity.name,
-            rawNotificationText = enriched.rawMovement.rawText
+            rawText = enriched.rawMovement.rawText
         )
 
         movementRepository.insert(movement)
@@ -142,8 +143,8 @@ fun AgendaEntryEntity.toDomain(): AgendaEntry = AgendaEntry(
     defaultCategoryId = defaultCategoryId,
     color = color,
     origin = AgendaOrigin.valueOf(origin),
-    createdAt = createdAt,
-    updatedAt = updatedAt
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt)
 )
 
 fun CategoryEntity.toDomain(): Category = Category(
@@ -154,5 +155,5 @@ fun CategoryEntity.toDomain(): Category = Category(
     isCustom = isCustom,
     parentCategoryId = parentCategoryId,
     sortOrder = sortOrder,
-    createdAt = createdAt
+    createdAt = Instant.ofEpochMilli(createdAt)
 )

@@ -1,6 +1,7 @@
 package com.finanzas.automatica.domain.enrichment
 
 import com.finanzas.automatica.data.local.entity.CategoryEntity
+import com.finanzas.automatica.data.local.entity.ClassificationRuleEntity
 
 data class ClassificationResult(
     val category: CategoryEntity?,

@@ -7,36 +7,28 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val Terracota = Color(0xFF8D6E63)
-private val TerracotaLight = Color(0xFFA1887F)
-private val TerracotaDark = Color(0xFF6D4C41)
-private val Ocre = Color(0xFFD4A843)
-private val OcreLight = Color(0xFFE6C87A)
-private val SurfaceLight = Color(0xFFFDFBF7)
-private val SurfaceDark = Color(0xFF1E1E1E)
-
 private val LightColorScheme = lightColorScheme(
-    primary = Terracota,
-    primaryContainer = TerracotaLight.copy(alpha = 0.2f),
+    primary = TerracottaPrimary,
+    primaryContainer = TerracottaSecondary.copy(alpha = 0.2f),
     secondary = Ocre,
     secondaryContainer = OcreLight.copy(alpha = 0.2f),
-    tertiary = TerracotaDark,
-    surface = SurfaceLight,
-    background = SurfaceLight,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onSurface = Color.Black,
-    onBackground = Color.Black,
+    tertiary = TerracottaDark,
+    surface = OcreSurface,
+    background = OcreSurface,
+    onPrimary = TerracottaOnPrimary,
+    onSecondary = OcreOnSurface,
+    onSurface = OcreOnSurface,
+    onBackground = OcreOnSurface,
     error = Color(0xFFB00020),
     outline = Color(0xFF757575)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = TerracotaLight,
-    primaryContainer = TerracotaDark,
+    primary = TerracottaSecondary,
+    primaryContainer = TerracottaDark,
     secondary = OcreLight,
     secondaryContainer = Ocre,
-    tertiary = TerracotaLight,
+    tertiary = TerracottaSecondary,
     surface = SurfaceDark,
     background = SurfaceDark,
     onPrimary = Color.Black,
