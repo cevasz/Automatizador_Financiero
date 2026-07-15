@@ -12,9 +12,6 @@ data class Category(
     val iconName: String, // Nombre del icono Material
     val isCustom: Boolean = false,
     val parentCategoryId: Long? = null,
+    val sortOrder: Int = 0,
     val createdAt: Instant = Instant.now()
 )
-
-enum class MovementType {
-    INCOME, EXPENSE
-}

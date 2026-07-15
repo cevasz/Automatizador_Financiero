@@ -1,55 +1,42 @@
 package com.finanzas.automatica.domain.parser
 
-import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.PaymentMethod
 import com.finanzas.automatica.domain.model.RawMovement
 import java.time.Instant
+import java.util.Locale
 import java.util.regex.Pattern
 
-class NuParser : BankParser {
-    override val bankEntity = BankEntity.NU
-    override val supportedPackageNames = listOf("co.nubank", "br.com.nubank")
+class NuParser : BaseBankParser(
+    bankEntity = BankEntity.NU,
+    supportedPackageNames = listOf("co.nubank", "br.com.nubank")
+) {
 
     override fun parse(notificationText: String): ParseResult {
-        val lowerText = notificationText.lowercase()
-        val isIncome = lowerText.contains("recibiste") || lowerText.contains("pix recibido") || lowerText.contains("transferencia recibida")
-        val isExpense = lowerText.contains("pagaste") || lowerText.contains("pix enviado") || lowerText.contains("compra") || lowerText.contains("transferencia enviada")
+        val lowerText = notificationText.lowercase(Locale.getDefault())
+        val type = when {
+            lowerText.contains("recibiste") || lowerText.contains("pix recibido") || lowerText.contains("transferencia recibida") -> MovementType.INCOME
+            lowerText.contains("pagaste") || lowerText.contains("pix enviado") || lowerText.contains("compra") || lowerText.contains("transferencia enviada") -> MovementType.EXPENSE
+            else -> determineType(lowerText)
+        }
 
-        val amount = extractAmount(lowerText)
+        val amount = parseAmount(notificationText)
             ?: return ParseResult.Failure("No se pudo extraer monto", notificationText)
 
         val counterparty = extractCounterparty(lowerText)
         val paymentMethod = if (lowerText.contains("pix")) PaymentMethod.PSE else PaymentMethod.NU
+        val date = parseDate(notificationText) ?: Instant.now()
 
-        return ParseResult.Success(RawMovement(
-            type = if (isIncome) MovementType.INCOME else MovementType.EXPENSE,
+        return buildRawMovement(
+            type = type,
             amount = amount,
             paymentMethod = paymentMethod,
             counterpartyRaw = counterparty,
-            date = Instant.now(),
-            bankEntity = BankEntity.NU,
+            date = date,
             rawText = notificationText,
             confidence = 0.8
-        ))
-    }
-
-    private fun extractAmount(text: String): Long? {
-        // Nu Colombia: "COP 50.000" o "$ 50.000"
-        val patterns = listOf(
-            Pattern.compile("COP\\s*([\\d.,]+)"),
-            Pattern.compile("\\$\\s*([\\d.,]+)"),
-            Pattern.compile("([\\d]{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2})?)"),
         )
-        for (pattern in patterns) {
-            val matcher = pattern.matcher(text)
-            if (matcher.find()) {
-                val amountStr = matcher.group(1).replace(",", "").replace(".", "")
-                return try { amountStr.toLong() } catch (e: NumberFormatException) { null }
-            }
-        }
-        return null
     }
 
     private fun extractCounterparty(text: String): String {

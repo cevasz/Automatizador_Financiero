@@ -2,6 +2,7 @@ package com.finanzas.automatica.data.repository
 
 import com.finanzas.automatica.data.local.entity.CategoryEntity
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
+import com.finanzas.automatica.data.local.FinanzasDatabase
 
 object DefaultCategories {
 
@@ -61,7 +62,7 @@ object DefaultCategories {
         CategoryEntity(0, "Otros ingresos", "INCOME", "add_circle", false, null, 990),
     )
 
-    fun seed(database: FinanzasDatabase): List<Long> {
+    suspend fun seed(database: FinanzasDatabase): List<Long> {
         val repo = CategoryRepositoryImpl(database)
         val allCategories = expenseCategories + incomeCategories
         return repo.insertAll(allCategories)

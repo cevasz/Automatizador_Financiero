@@ -9,9 +9,14 @@ import com.finanzas.automatica.data.local.entity.CategoryEntity
 import com.finanzas.automatica.data.local.entity.ClassificationRuleEntity
 import com.finanzas.automatica.data.local.entity.MovementEntity
 import com.finanzas.automatica.data.repository.MovementRepositoryImpl
+import com.finanzas.automatica.domain.model.AgendaEntry
+import com.finanzas.automatica.domain.model.AgendaOrigin
+import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
+import com.finanzas.automatica.domain.model.EnrichedMovement
 import com.finanzas.automatica.domain.model.MovementSource
-import com.finanzas.automatica.domain.parser.ParseResult
+import com.finanzas.automatica.domain.model.MovementType
+import com.finanzas.automatica.domain.model.RawMovement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +24,7 @@ class EnrichmentPipeline(
     private val database: FinanzasDatabase
 ) {
 
-    private val movementRepository = MovementRepositoryImpl(database.movementDao())
+    private val movementRepository = MovementRepositoryImpl(database)
     private val agendaDao = database.agendaDao()
     private val categoryDao = database.categoryDao()
     private val ruleDao = database.classificationRuleDao()
@@ -70,7 +75,6 @@ class EnrichmentPipeline(
         // Tercero: buscar por palabras clave en categorías existentes
         val categories = categoryDao.getByType(rawMovement.type.name)
         for (category in categories) {
-            // Podríamos tener palabras clave en el nombre o icono
             if (rawMovement.rawText.lowercase().contains(category.name.lowercase())) {
                 return category
             }
@@ -122,7 +126,7 @@ class EnrichmentPipeline(
             confirmationState = if (enriched.needsConfirmation) 
                 ConfirmationState.PENDING.name 
             else 
-                ConfirmationState.AUTO_CONFIRMED.name,
+                ConfirmationState.CONFIRMED.name,
             bankEntity = enriched.rawMovement.bankEntity.name,
             rawNotificationText = enriched.rawMovement.rawText
         )
@@ -131,44 +135,13 @@ class EnrichmentPipeline(
     }
 }
 
-// Modelo de dominio para enriquecimiento
-data class EnrichedMovement(
-    val rawMovement: RawMovement,
-    val agendaEntry: AgendaEntry? = null,
-    val suggestedCategory: Category? = null,
-    val confidence: Double = 0.8,
-    val needsConfirmation: Boolean = true
-)
-
-data class AgendaEntry(
-    val id: Long,
-    val accountIdentifier: String,
-    val displayName: String,
-    val defaultCategoryId: Long?,
-    val color: Int,
-    val origin: String,
-    val createdAt: Long,
-    val updatedAt: Long
-)
-
-data class Category(
-    val id: Long,
-    val name: String,
-    val type: String,
-    val iconName: String,
-    val isCustom: Boolean,
-    val parentCategoryId: Long?,
-    val sortOrder: Int,
-    val createdAt: Long
-)
-
 fun AgendaEntryEntity.toDomain(): AgendaEntry = AgendaEntry(
     id = id,
     accountIdentifier = accountIdentifier,
     displayName = displayName,
     defaultCategoryId = defaultCategoryId,
     color = color,
-    origin = origin,
+    origin = AgendaOrigin.valueOf(origin),
     createdAt = createdAt,
     updatedAt = updatedAt
 )
@@ -176,7 +149,7 @@ fun AgendaEntryEntity.toDomain(): AgendaEntry = AgendaEntry(
 fun CategoryEntity.toDomain(): Category = Category(
     id = id,
     name = name,
-    type = type,
+    type = MovementType.valueOf(type),
     iconName = iconName,
     isCustom = isCustom,
     parentCategoryId = parentCategoryId,

@@ -26,7 +26,7 @@ data class AgendaEntryEntity(
     val accountIdentifier: String,
     val displayName: String,
     val defaultCategoryId: Long? = null,
-    val color: Int = 0xFF8D6E63,
+    val color: Int = 0xFF8D6E63.toInt(),
     val origin: String = "MANUAL",
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()

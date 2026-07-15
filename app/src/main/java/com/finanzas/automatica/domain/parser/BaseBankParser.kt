@@ -44,28 +44,35 @@ abstract class BaseBankParser(
     protected fun parseDate(text: String): Instant? {
         // Patrones de fecha comunes en notificaciones colombianas
         val patterns = listOf(
-            // "hoy", "ayer"
-            Pair(Pattern.compile("\\bhoy\\b", Pattern.CASE_INSENSITIVE), 0),
-            Pair(Pattern.compile("\\bayer\\b", Pattern.CASE_INSENSITIVE), -1),
-            // "dd/mm/yyyy" o "dd/mm/yy"
-            Pattern.compile("(\\d{1,2})[/-](\\d{1,2})[/-](\\d{2,4})"),
-            // "dd de mes de yyyy"
-            Pattern.compile("(\\d{1,2})\\s+de\\s+(\\w+)\\s+de\\s+(\\d{4})", Pattern.CASE_INSENSITIVE)
+            DatePattern(Pattern.compile("\\bhoy\\b", Pattern.CASE_INSENSITIVE), DatePatternType.TODAY),
+            DatePattern(Pattern.compile("\\bayer\\b", Pattern.CASE_INSENSITIVE), DatePatternType.YESTERDAY),
+            DatePattern(Pattern.compile("(\\d{1,2})[/-](\\d{1,2})[/-](\\d{2,4})"), DatePatternType.DMY),
+            DatePattern(Pattern.compile("(\\d{1,2})\\s+de\\s+(\\w+)\\s+de\\s+(\\d{4})", Pattern.CASE_INSENSITIVE), DatePatternType.DAY_MONTH_YEAR)
         )
 
         for (pattern in patterns) {
-            val matcher = pattern.second.matcher(text)
+            val matcher = pattern.pattern.matcher(text)
             if (matcher.find()) {
-                return when (pattern.first) {
-                    0 -> Instant.now() // hoy
-                    -1 -> Instant.now().minusSeconds(86400) // ayer
-                    else -> {
+                return when (pattern.type) {
+                    DatePatternType.TODAY -> Instant.now()
+                    DatePatternType.YESTERDAY -> Instant.now().minusSeconds(86400)
+                    DatePatternType.DMY -> {
                         try {
                             val day = matcher.group(1).toInt()
-                            val month = when {
-                                matcher.groupCount() >= 2 && matcher.group(2).matches(Pattern.compile("\\d+")) -> matcher.group(2).toInt()
-                                else -> parseMonthName(matcher.group(2))
-                            }
+                            val month = matcher.group(2).toInt()
+                            val year = matcher.group(3).toInt()
+                            val fullYear = if (year < 100) year + 2000 else year
+                            LocalDateTime.of(fullYear, month, day, 12, 0)
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant()
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    DatePatternType.DAY_MONTH_YEAR -> {
+                        try {
+                            val day = matcher.group(1).toInt()
+                            val month = parseMonthName(matcher.group(2))
                             val year = matcher.group(3).toInt()
                             LocalDateTime.of(year, month, day, 12, 0)
                                 .atZone(ZoneId.systemDefault())
@@ -79,6 +86,15 @@ abstract class BaseBankParser(
         }
         return Instant.now() // Default a ahora si no se puede parsear
     }
+
+    private enum class DatePatternType {
+        TODAY, YESTERDAY, DMY, DAY_MONTH_YEAR
+    }
+
+    private data class DatePattern(
+        val pattern: Pattern,
+        val type: DatePatternType
+    )
 
     private fun parseMonthName(name: String): Int {
         return when (name.lowercase(Locale.getDefault()).take(3)) {

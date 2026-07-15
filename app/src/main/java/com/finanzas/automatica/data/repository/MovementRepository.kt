@@ -46,24 +46,20 @@ class MovementRepositoryImpl(
         return dao.getByConfirmationStateFlow(state)
     }
 
-    suspend fun getByType(type: String): List<MovementEntity> {
-        return dao.getByType(type)
+    suspend fun getByTypeAndDateRange(type: String, startDate: Long, endDate: Long): List<MovementEntity> {
+        return dao.getByTypeAndDateRange(type, startDate, endDate)
     }
 
     suspend fun getByCounterparty(counterpartyId: Long): List<MovementEntity> {
         return dao.getByCounterparty(counterpartyId)
     }
 
-    suspend fun getByCategory(categoryId: Long): List<MovementEntity> {
-        return dao.getByCategory(categoryId)
+    suspend fun getByCategoryAndDateRange(categoryId: Long, startDate: Long, endDate: Long): List<MovementEntity> {
+        return dao.getByCategoryAndDateRange(categoryId, startDate, endDate)
     }
 
     suspend fun getByBankEntity(bankEntity: String): List<MovementEntity> {
         return dao.getByBankEntity(bankEntity)
-    }
-
-    suspend fun count(): Int {
-        return dao.count()
     }
 
     suspend fun countPending(): Int {
@@ -71,11 +67,11 @@ class MovementRepositoryImpl(
     }
 
     suspend fun getTotalIncome(startDate: Long, endDate: Long): Long? {
-        return dao.sumIncome(startDate, endDate)
+        return dao.getTotalIncome(startDate, endDate)
     }
 
     suspend fun getTotalExpense(startDate: Long, endDate: Long): Long? {
-        return dao.sumExpense(startDate, endDate)
+        return dao.getTotalExpense(startDate, endDate)
     }
 
     suspend fun getExpensesByCategory(startDate: Long, endDate: Long): List<MovementDao.CategoryTotal> {
@@ -92,9 +88,5 @@ class MovementRepositoryImpl(
 
     suspend fun deleteById(id: Long): Int {
         return dao.deleteById(id)
-    }
-
-    suspend fun deleteOlderThan(beforeDate: Long): Int {
-        return dao.deleteOlderThan(beforeDate)
     }
 }

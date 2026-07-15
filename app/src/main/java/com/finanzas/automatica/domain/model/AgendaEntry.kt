@@ -26,7 +26,7 @@ data class AgendaEntry(
     val accountIdentifier: String, // Número de teléfono, email, o número de cuenta
     val displayName: String, // Nombre del comercio/persona
     val defaultCategoryId: Long? = null,
-    val color: Int = 0xFF8D6E63, // Terracota por defecto
+    val color: Int = 0xFF8D6E63.toInt(), // Terracota por defecto
     val origin: AgendaOrigin = AgendaOrigin.MANUAL,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now()

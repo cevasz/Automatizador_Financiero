@@ -12,7 +12,7 @@ import com.finanzas.automatica.data.local.entity.*
 @Database(
     entities = [
         MovementEntity::class,
-        AgendaEntry::class,
+        AgendaEntryEntity::class,
         CategoryEntity::class,
         BudgetEntity::class,
         SavingsGoalEntity::class,

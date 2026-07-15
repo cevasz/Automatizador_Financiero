@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.fillMaxSize
 import com.finanzas.automatica.presentation.ui.screen.DashboardScreen
 import com.finanzas.automatica.presentation.ui.theme.FinanzasAutomaticaTheme
 

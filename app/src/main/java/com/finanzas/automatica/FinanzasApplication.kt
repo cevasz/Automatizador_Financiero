@@ -1,6 +1,7 @@
 package com.finanzas.automatica
 
 import android.app.Application
+import androidx.room.RoomDatabase
 import androidx.room.Room
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.DefaultCategories

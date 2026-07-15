@@ -7,14 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleService
 import com.finanzas.automatica.R
 import com.finanzas.automatica.presentation.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MovementProcessorService : LifecycleService() {
+class MovementProcessorService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private val NOTIFICATION_ID = 1001

@@ -5,35 +5,35 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.finanzas.automatica.data.local.entity.AgendaEntry
+import com.finanzas.automatica.data.local.entity.AgendaEntryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AgendaDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(entry: AgendaEntry): Long
+    suspend fun insert(entry: AgendaEntryEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(entries: List<AgendaEntry>): List<Long>
+    suspend fun insertAll(entries: List<AgendaEntryEntity>): List<Long>
 
     @Update
-    suspend fun update(entry: AgendaEntry): Int
+    suspend fun update(entry: AgendaEntryEntity): Int
 
     @Query("SELECT * FROM agenda_entries WHERE id = :id")
-    suspend fun getById(id: Long): AgendaEntry?
+    suspend fun getById(id: Long): AgendaEntryEntity?
 
     @Query("SELECT * FROM agenda_entries WHERE accountIdentifier = :identifier")
-    suspend fun getByIdentifier(identifier: String): AgendaEntry?
+    suspend fun getByIdentifier(identifier: String): AgendaEntryEntity?
 
     @Query("SELECT * FROM agenda_entries ORDER BY displayName ASC")
-    suspend fun getAll(): List<AgendaEntry>
+    suspend fun getAll(): List<AgendaEntryEntity>
 
     @Query("SELECT * FROM agenda_entries ORDER BY displayName ASC")
-    fun getAllFlow(): Flow<List<AgendaEntry>>
+    fun getAllFlow(): Flow<List<AgendaEntryEntity>>
 
     @Query("SELECT * FROM agenda_entries WHERE defaultCategoryId = :categoryId")
-    suspend fun getByCategory(categoryId: Long): List<AgendaEntry>
+    suspend fun getByCategory(categoryId: Long): List<AgendaEntryEntity>
 
     @Query("DELETE FROM agenda_entries WHERE id = :id")
     suspend fun deleteById(id: Long): Int

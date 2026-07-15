@@ -10,10 +10,9 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.domain.enrichment.EnrichmentPipeline
-import com.finanzas.automatica.domain.enrichment.MovementRepository
 import com.finanzas.automatica.domain.model.MovementSource
+import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.parser.ParserRegistry
-import com.finanzas.automatica.domain.parser.ParseResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

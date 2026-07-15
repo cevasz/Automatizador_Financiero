@@ -35,17 +35,26 @@ interface MovementDao {
     @Query("SELECT * FROM movements WHERE type = :type AND date >= :startDate AND date <= :endDate ORDER BY date DESC")
     suspend fun getByTypeAndDateRange(type: String, startDate: Long, endDate: Long): List<MovementEntity>
 
+    @Query("SELECT * FROM movements WHERE type = :type ORDER BY date DESC")
+    suspend fun getByType(type: String): List<MovementEntity>
+
     @Query("SELECT * FROM movements WHERE bankEntity = :entity ORDER BY date DESC")
     suspend fun getByBankEntity(entity: String): List<MovementEntity>
 
     @Query("SELECT * FROM movements WHERE confirmationState = :state ORDER BY date DESC")
     suspend fun getByConfirmationState(state: String): List<MovementEntity>
 
+    @Query("SELECT * FROM movements WHERE confirmationState = :state ORDER BY date DESC")
+    fun getByConfirmationStateFlow(state: String): Flow<List<MovementEntity>>
+
     @Query("SELECT * FROM movements WHERE counterpartyId = :counterpartyId ORDER BY date DESC")
     suspend fun getByCounterparty(counterpartyId: Long): List<MovementEntity>
 
     @Query("SELECT * FROM movements WHERE categoryId = :categoryId AND date >= :startDate AND date <= :endDate ORDER BY date DESC")
     suspend fun getByCategoryAndDateRange(categoryId: Long, startDate: Long, endDate: Long): List<MovementEntity>
+
+    @Query("SELECT * FROM movements WHERE categoryId = :categoryId ORDER BY date DESC")
+    suspend fun getByCategory(categoryId: Long): List<MovementEntity>
 
     // Aggregations for dashboard
     @Query("SELECT SUM(amount) FROM movements WHERE type = 'INCOME' AND date >= :startDate AND date <= :endDate")
@@ -63,11 +72,17 @@ interface MovementDao {
     @Query("SELECT strftime('%Y-%m', date/1000, 'unixepoch') as month, SUM(amount) as total FROM movements WHERE type = 'INCOME' GROUP BY month ORDER BY month DESC LIMIT 12")
     suspend fun getMonthlyIncomeTotals(): List<MonthlyTotal>
 
+    @Query("SELECT COUNT(*) FROM movements")
+    suspend fun count(): Int
+
     @Query("SELECT COUNT(*) FROM movements WHERE confirmationState = 'PENDING'")
     suspend fun countPending(): Int
 
     @Query("DELETE FROM movements WHERE id = :id")
     suspend fun deleteById(id: Long): Int
+
+    @Query("DELETE FROM movements WHERE date < :beforeDate")
+    suspend fun deleteOlderThan(beforeDate: Long): Int
 }
 
 data class CategoryTotal(
