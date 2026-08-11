@@ -18,13 +18,16 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -58,6 +61,8 @@ fun SettingsScreen(
     onExportFormatChange: (String) -> Unit = {},
     onExportData: () -> Unit = {},
     onDeleteData: () -> Unit = {},
+    onAccountClick: () -> Unit = {},
+    onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -78,6 +83,16 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            },
+            navigationIcon = {
+                onOpenMenu?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -163,6 +178,21 @@ fun SettingsScreen(
                 SectionHeader(title = "Datos")
             }
             item {
+                SettingRow(
+                    icon = Icons.Outlined.Sync,
+                    iconTint = MaterialTheme.colorScheme.primary,
+                    title = "Cuenta y sincronizacion",
+                    subtitle = "Conectar el panel web y preparar el envio de datos",
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Outlined.OpenInNew,
+                            contentDescription = "Abrir cuenta"
+                        )
+                    },
+                    onClick = onAccountClick
+                )
+            }
+            item {
                 FinanceCard {
                     Text(
                         text = "Formato de exportacion",
@@ -175,7 +205,8 @@ fun SettingsScreen(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        listOf("CSV", "Excel", "PDF").forEach { format ->
+                        val exportFormats = listOf("CSV", "Excel", "PDF")
+                        exportFormats.forEach { format: String ->
                             FilterChip(
                                 selected = exportDataFormat == format,
                                 onClick = { onExportFormatChange(format) },
@@ -226,7 +257,7 @@ fun SettingsScreen(
                     iconTint = MaterialTheme.colorScheme.primary,
                     title = "Version",
                     subtitle = "1.0.0",
-                    trailing = {}
+                    trailing = { }
                 )
             }
         }

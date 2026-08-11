@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,6 +54,7 @@ fun BudgetsScreen(
     categories: List<Category>,
     onBudgetClick: (Budget) -> Unit = {},
     onAddBudget: () -> Unit = {},
+    onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = remember {
@@ -88,6 +90,16 @@ fun BudgetsScreen(
                         imageVector = Icons.Outlined.Add,
                         contentDescription = "Agregar presupuesto"
                     )
+                }
+            },
+            navigationIcon = {
+                onOpenMenu?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(

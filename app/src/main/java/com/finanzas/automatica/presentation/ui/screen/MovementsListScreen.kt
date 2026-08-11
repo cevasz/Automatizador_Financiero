@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.TrendingDown
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -77,6 +79,7 @@ fun MovementsListScreen(
     onMovementClick: (Movement) -> Unit = {},
     onConfirm: (Long) -> Unit = {},
     onReject: (Long) -> Unit = {},
+    onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = remember {
@@ -118,6 +121,16 @@ fun MovementsListScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            },
+            navigationIcon = {
+                onOpenMenu?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(

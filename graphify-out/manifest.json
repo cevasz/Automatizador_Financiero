@@ -1,0 +1,407 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1784174309.9584935,
+    "ast_hash": "c414457acc67eadba6fac2e6e35b0e1f",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/FinanzasApplication.kt": {
+    "mtime": 1786487218.660347,
+    "ast_hash": "08e1d42f1d8a0579069e7e6c7068e812",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/FinanzasDatabase.kt": {
+    "mtime": 1784100255.844368,
+    "ast_hash": "d7b63c34bc09361f8fde7ab53438d0fb",
+    "semantic_hash": "d7b63c34bc09361f8fde7ab53438d0fb"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/converters/Converters.kt": {
+    "mtime": 1784175625.4183552,
+    "ast_hash": "921f2895bb94d7e57b6ed9cefeca71ce",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/AgendaDao.kt": {
+    "mtime": 1786486943.9146461,
+    "ast_hash": "fc2b016512fbcea44f06b73533840a20",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/BudgetDao.kt": {
+    "mtime": 1786486944.2036467,
+    "ast_hash": "70695043ac46c8a27a23429d22d12db4",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/CategoryDao.kt": {
+    "mtime": 1786486944.0146463,
+    "ast_hash": "5474bf59d536346bff56267ba1635ebb",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/ClassificationRuleDao.kt": {
+    "mtime": 1786486944.1106465,
+    "ast_hash": "7c4fb6914c291d3e31462b6085225eee",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/MovementDao.kt": {
+    "mtime": 1786486943.813646,
+    "ast_hash": "5fce938c7a8c401457f403692fd2964f",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/dao/SavingsGoalDao.kt": {
+    "mtime": 1786486944.2986467,
+    "ast_hash": "8fff9f44237df230223ae2f480616367",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/AgendaEntryEntity.kt": {
+    "mtime": 1784100207.3352487,
+    "ast_hash": "7e759a378399f84f8437b02e6cb01f1b",
+    "semantic_hash": "7e759a378399f84f8437b02e6cb01f1b"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/BudgetEntity.kt": {
+    "mtime": 1784007232.1226392,
+    "ast_hash": "f0e2ec1448bfe1ef143351df0d498ead",
+    "semantic_hash": "f0e2ec1448bfe1ef143351df0d498ead"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/CategoryEntity.kt": {
+    "mtime": 1784140943.839824,
+    "ast_hash": "af4ad310ae8745364fba174ac5a3e6ca",
+    "semantic_hash": "af4ad310ae8745364fba174ac5a3e6ca"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/ClassificationRuleEntity.kt": {
+    "mtime": 1784007241.9556816,
+    "ast_hash": "c1f44a9fd3d6273f79df56410d10da9e",
+    "semantic_hash": "c1f44a9fd3d6273f79df56410d10da9e"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/MovementEntity.kt": {
+    "mtime": 1784007229.1696265,
+    "ast_hash": "6b5a974055f5b0108f7303ab8559cef7",
+    "semantic_hash": "6b5a974055f5b0108f7303ab8559cef7"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/local/entity/SavingsGoalEntity.kt": {
+    "mtime": 1784007237.3446615,
+    "ast_hash": "b7ca2aae8591c5440e249e9661a231e4",
+    "semantic_hash": "b7ca2aae8591c5440e249e9661a231e4"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/repository/DefaultCategories.kt": {
+    "mtime": 1784100229.4586391,
+    "ast_hash": "6eb1fa4de5d910170d86b08c575a23a6",
+    "semantic_hash": "6eb1fa4de5d910170d86b08c575a23a6"
+  },
+  "app/src/main/java/com/finanzas/automatica/data/repository/MovementRepository.kt": {
+    "mtime": 1786486944.396647,
+    "ast_hash": "b28d70f08693b9e64ad8724f38d0e1b7",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/data/repository/Repositories.kt": {
+    "mtime": 1784140680.1648157,
+    "ast_hash": "5ecc43a5ee4b2cbac948b4a9fb3c9170",
+    "semantic_hash": "5ecc43a5ee4b2cbac948b4a9fb3c9170"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/enrichment/AgendaRepository.kt": {
+    "mtime": 1784007334.496108,
+    "ast_hash": "02687903ad4e231306e2e5f2d5c20a81",
+    "semantic_hash": "02687903ad4e231306e2e5f2d5c20a81"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/enrichment/ClassificationEngine.kt": {
+    "mtime": 1786487129.76805,
+    "ast_hash": "9137c8d181f14cf7f37d2041f6d6cd6d",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/enrichment/ClassificationResult.kt": {
+    "mtime": 1784155359.1617336,
+    "ast_hash": "2dcea5bb0535888a97ff836eb363381a",
+    "semantic_hash": "2dcea5bb0535888a97ff836eb363381a"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/enrichment/EnrichmentPipeline.kt": {
+    "mtime": 1786487783.749173,
+    "ast_hash": "f6b2c258b94c22f7472cfffdb36f493f",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/model/AgendaEntry.kt": {
+    "mtime": 1784100209.5262773,
+    "ast_hash": "1ec7b48d78a13d27a37587463cc98593",
+    "semantic_hash": "1ec7b48d78a13d27a37587463cc98593"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/model/Category.kt": {
+    "mtime": 1784140948.5488417,
+    "ast_hash": "000bda705c87960b8a7e57bd372497c2",
+    "semantic_hash": "000bda705c87960b8a7e57bd372497c2"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/model/Movement.kt": {
+    "mtime": 1784175586.1169903,
+    "ast_hash": "25be4e638d8912f456f7e790fceaa045",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/model/RawMovement.kt": {
+    "mtime": 1784140584.3964462,
+    "ast_hash": "15beab3a9d00f43a4fbd25228a88fafc",
+    "semantic_hash": "15beab3a9d00f43a4fbd25228a88fafc"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/BancolombiaParser.kt": {
+    "mtime": 1784155394.004917,
+    "ast_hash": "c48e4cdd748b7885dafb9f06c33f6a15",
+    "semantic_hash": "c48e4cdd748b7885dafb9f06c33f6a15"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/BankParser.kt": {
+    "mtime": 1784140408.5927582,
+    "ast_hash": "ceb93efc8e61be4c3e69610d6e9bf3e9",
+    "semantic_hash": "ceb93efc8e61be4c3e69610d6e9bf3e9"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/BaseBankParser.kt": {
+    "mtime": 1784155448.5651994,
+    "ast_hash": "9bcee3a127fcaf9cb81af483ff41e8ac",
+    "semantic_hash": "9bcee3a127fcaf9cb81af483ff41e8ac"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/DaviplataParser.kt": {
+    "mtime": 1784155420.015052,
+    "ast_hash": "e5c447824da4e574454f5a4b9aee9c4d",
+    "semantic_hash": "e5c447824da4e574454f5a4b9aee9c4d"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/LuloParser.kt": {
+    "mtime": 1784006923.693693,
+    "ast_hash": "a58d7e47f993b879d1e71b811607de9b",
+    "semantic_hash": "a58d7e47f993b879d1e71b811607de9b"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/NequiParser.kt": {
+    "mtime": 1784155429.094099,
+    "ast_hash": "adae40628d5237d0219e0698be71559a",
+    "semantic_hash": "adae40628d5237d0219e0698be71559a"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/NuParser.kt": {
+    "mtime": 1784155437.2461412,
+    "ast_hash": "035fe612ba9f06724bbb3fd0053ed131",
+    "semantic_hash": "035fe612ba9f06724bbb3fd0053ed131"
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/parser/ParserRegistry.kt": {
+    "mtime": 1784006927.9826999,
+    "ast_hash": "43244fb74df087dddbd2c0276737a69c",
+    "semantic_hash": "43244fb74df087dddbd2c0276737a69c"
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/MainActivity.kt": {
+    "mtime": 1786418233.5353417,
+    "ast_hash": "eb623bf5dbc1f9b7f4639c3d8cca5906",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/DashboardScreen.kt": {
+    "mtime": 1786488572.0732882,
+    "ast_hash": "d45d38c82f7454f024b52516ad3c6517",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/theme/Color.kt": {
+    "mtime": 1786418168.555766,
+    "ast_hash": "47974c1bc20c87908d5b4127e452e5b1",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/theme/Theme.kt": {
+    "mtime": 1786418168.865769,
+    "ast_hash": "74d1f0b05115f4ad69dd2c290c606d55",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/theme/Type.kt": {
+    "mtime": 1786418169.2037718,
+    "ast_hash": "e48eabb1ed490f4e300ae9d41a7f3be1",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/service/BootReceiver.kt": {
+    "mtime": 1784007384.3923569,
+    "ast_hash": "373e3015cb22dc6e6e39e39c8c5cfe49",
+    "semantic_hash": "373e3015cb22dc6e6e39e39c8c5cfe49"
+  },
+  "app/src/main/java/com/finanzas/automatica/service/MovementProcessorService.kt": {
+    "mtime": 1786487098.5759602,
+    "ast_hash": "a04a92d526a816bb681ff12cdf2afbb7",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/service/NotificationCaptureService.kt": {
+    "mtime": 1784175400.16723,
+    "ast_hash": "9f1fff42c1676462e8d00ab8ba97e3fa",
+    "semantic_hash": ""
+  },
+  "build.gradle.kts": {
+    "mtime": 1784049019.8273559,
+    "ast_hash": "c4dc78cf4bfb15ef04b5331d9fe0d2f1",
+    "semantic_hash": "c4dc78cf4bfb15ef04b5331d9fe0d2f1"
+  },
+  "gradlew": {
+    "mtime": 1784048997.4620445,
+    "ast_hash": "f2cc5dea1e5914d55cee1ecf4f8d6038",
+    "semantic_hash": "f2cc5dea1e5914d55cee1ecf4f8d6038"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1784006667.4187374,
+    "ast_hash": "abd1a09edd0d2a8ab8829f666542706c",
+    "semantic_hash": "abd1a09edd0d2a8ab8829f666542706c"
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt": {
+    "mtime": 1786488837.1769552,
+    "ast_hash": "0dd4f094c55ac18f13d0d72b28d6504c",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/AgendaScreen.kt": {
+    "mtime": 1786488597.1294591,
+    "ast_hash": "809f9f4f0634601a0242e16831b3a4a1",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt": {
+    "mtime": 1786488597.24246,
+    "ast_hash": "b819daa06cd515ee642053461330acbe",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/MovementsListScreen.kt": {
+    "mtime": 1786488597.0244584,
+    "ast_hash": "4ca95926ed404037f36b749bb6cd8b7e",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt": {
+    "mtime": 1786488597.3484607,
+    "ast_hash": "a0ff178dc391bf6d492428ef7e072697",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SettingsScreen.kt": {
+    "mtime": 1786488597.4494615,
+    "ast_hash": "9a8e0725a74ae0aa03a04fe393aba6e5",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/AgendaViewModel.kt": {
+    "mtime": 1786487824.936419,
+    "ast_hash": "9be7f2bec3435e2e443d6a4c55fa01c6",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/BudgetsViewModel.kt": {
+    "mtime": 1786487825.0344198,
+    "ast_hash": "bb3463989228f0bfefaeb1f6893ef6fa",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/MovementViewModel.kt": {
+    "mtime": 1786487824.8384185,
+    "ast_hash": "44e644ea8114bdfd26fb1b31d31a6957",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SavingsGoalsViewModel.kt": {
+    "mtime": 1786487825.1454203,
+    "ast_hash": "279c6b1cfe115eeb9b3dd23db26d986a",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SettingsViewModel.kt": {
+    "mtime": 1786487047.09083,
+    "ast_hash": "36806e0c2ae19cd666eb8b8da8db07b8",
+    "semantic_hash": ""
+  },
+  "app/src/test/kotlin/com/finanzas/automatica/parser/BankParserTest.kt": {
+    "mtime": 1784175068.1978843,
+    "ast_hash": "7cee49f76375c4313a0d0a2884a8f1a8",
+    "semantic_hash": ""
+  },
+  "app/src/test/kotlin/com/finanzas/automatica/parser/SimpleTest.kt": {
+    "mtime": 1784173808.835852,
+    "ast_hash": "28c321560f0b9932e8fc0fd935e80cf0",
+    "semantic_hash": ""
+  },
+  ".github/workflows/build.yml": {
+    "mtime": 1784049036.2655773,
+    "ast_hash": "6a5518be6a91465e39ca107213a4ef51",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1786488845.6870084,
+    "ast_hash": "a8a7851ad79d4a1df395204211abd051",
+    "semantic_hash": ""
+  },
+  "app/src/test/resources/fixtures/bancolombia_notifications.txt": {
+    "mtime": 1784006978.585797,
+    "ast_hash": "fd32c4e59b9ad5f2c23442b1e61ab1b5",
+    "semantic_hash": ""
+  },
+  "app/src/test/resources/fixtures/daviplata_notifications.txt": {
+    "mtime": 1784006991.2908258,
+    "ast_hash": "bb28121e5cf709352934921af48fb8cc",
+    "semantic_hash": ""
+  },
+  "app/src/test/resources/fixtures/lulo_notifications.txt": {
+    "mtime": 1784006998.6658432,
+    "ast_hash": "2f76809a670c6b0cf96376fa1d126cf7",
+    "semantic_hash": ""
+  },
+  "app/src/test/resources/fixtures/nequi_notifications.txt": {
+    "mtime": 1784006934.4927108,
+    "ast_hash": "58621862233d1e6ea9624178c85a3b65",
+    "semantic_hash": ""
+  },
+  "app/src/test/resources/fixtures/nu_notifications.txt": {
+    "mtime": 1784006995.5198357,
+    "ast_hash": "ee2ce824e3477307efc790a14a962bd4",
+    "semantic_hash": ""
+  },
+  "graphify-out/converted/SDD_App_Finanzas_827bd26c.md": {
+    "mtime": 1784005212.2122953,
+    "ast_hash": "5a1214fa14c4b1347d0a616125160299",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1784049660.828021,
+    "ast_hash": "b49b82491fbaa2ac5057f24d4a859802",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
+    "mtime": 1784049660.8280385,
+    "ast_hash": "b49b82491fbaa2ac5057f24d4a859802",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1784049660.826106,
+    "ast_hash": "95a88d15e5dff15f5adda5ace47412fb",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
+    "mtime": 1784049660.8261294,
+    "ast_hash": "95a88d15e5dff15f5adda5ace47412fb",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1784049660.8312762,
+    "ast_hash": "86f89c176b6eefd6a92df15f84ca329f",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
+    "mtime": 1784049660.831313,
+    "ast_hash": "86f89c176b6eefd6a92df15f84ca329f",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1784049660.8389933,
+    "ast_hash": "722aacc57db62d4dbc4dbb13059ad3e6",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
+    "mtime": 1784049660.8390212,
+    "ast_hash": "722aacc57db62d4dbc4dbb13059ad3e6",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1784049660.8646178,
+    "ast_hash": "1cf2853bcf1a0a1475109873e574c3ee",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
+    "mtime": 1784049660.8646588,
+    "ast_hash": "1cf2853bcf1a0a1475109873e574c3ee",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt": {
+    "mtime": 1786487824.6454175,
+    "ast_hash": "2a6c6fb8e5447cd861522c396e782f72",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/domain/enrichment/ModelMappers.kt": {
+    "mtime": 1786487824.743418,
+    "ast_hash": "39da5f89d3b364d0cb9d6b2fca2b31e8",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/LoginScreen.kt": {
+    "mtime": 1786488825.2708814,
+    "ast_hash": "b6a7cc10b0a213f147ad870f25aa3df9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SessionViewModel.kt": {
+    "mtime": 1786488428.0853112,
+    "ast_hash": "8e25704dc6b413d6db4845f14403fbed",
+    "semantic_hash": ""
+  }
+}

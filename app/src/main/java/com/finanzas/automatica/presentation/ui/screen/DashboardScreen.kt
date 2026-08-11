@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PendingActions
 import androidx.compose.material.icons.outlined.Settings
@@ -71,7 +72,8 @@ fun DashboardScreen(
     movements: List<Movement> = emptyList(),
     pendingCount: Int = 0,
     onPendingClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onOpenMenu: (() -> Unit)? = null
 ) {
     val currencyFormat = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
@@ -126,6 +128,16 @@ fun DashboardScreen(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = "Ajustes"
                         )
+                    }
+                },
+                navigationIcon = {
+                    onOpenMenu?.let {
+                        IconButton(onClick = it) {
+                            Icon(
+                                imageVector = Icons.Outlined.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

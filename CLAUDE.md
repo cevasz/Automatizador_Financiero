@@ -10,8 +10,8 @@ ni acceder directamente a cuentas. Documento completo de diseño: `docs/SDD.md`.
   Share Extension — no vía lectura de notificaciones (Apple no lo permite).
 - Motor de clasificación: reglas + expresiones regulares. NADA de LLM ni servicios de IA
   externos en el MVP (evita costo variable y dependencia de red).
-- MVP sin backend: la app es 100% local (Room/SQLite) hasta la Fase 2. No construir
-  backend ni sincronización todavía aunque el SDD los mencione — se agregan después.
+- MVP local-first: la captura y la edición viven en Room/SQLite, pero ya existe una
+  cuenta web para preparar la sincronizacion con el panel y el backend.
 - Modelo de negocio: núcleo (registrar, ver, clasificar movimientos) siempre gratuito
   e ilimitado. No implementar ningún muro de pago sobre estas funciones.
 - Nunca solicitar usuario/clave bancario ni scraping de credenciales. Solo notificaciones
@@ -25,6 +25,17 @@ ni acceder directamente a cuentas. Documento completo de diseño: `docs/SDD.md`.
 4. Enriquecimiento: cruce de `contraparte` contra la tabla `Agenda` (número/cuenta → comercio).
 5. Clasificación: reglas de categoría por comercio conocido, palabra clave, o histórico.
 6. Persistencia local en Room.
+
+## Sincronizacion con la web
+- El inicio de sesion no es bancario: sirve para vincular la app Android con la cuenta
+  del panel web y preparar la sincronizacion de datos propios del usuario.
+- El backend y la web ya aparecen en el SDD como parte de la arquitectura objetivo,
+  incluyendo una sesion en la nube activa para sincronizar movimientos, agenda y
+  configuraciones.
+- Si la sesion web no existe, la app sigue funcionando localmente sin bloquear el uso
+  principal.
+- No guardar ni pedir credenciales de bancos. Solo correo, URL del backend y token de
+  acceso de la cuenta web.
 
 ## Convenciones de código
 - Kotlin idiomático, sin dependencias innecesarias.

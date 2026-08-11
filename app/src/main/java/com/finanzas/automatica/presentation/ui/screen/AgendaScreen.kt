@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,6 +63,7 @@ fun AgendaScreen(
     categories: List<Category> = emptyList(),
     onEntryClick: (AgendaEntry) -> Unit = {},
     onAddEntry: () -> Unit = {},
+    onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var query by remember { mutableStateOf("") }
@@ -105,6 +107,16 @@ fun AgendaScreen(
                         imageVector = Icons.Outlined.Add,
                         contentDescription = "Agregar contacto"
                     )
+                }
+            },
+            navigationIcon = {
+                onOpenMenu?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(

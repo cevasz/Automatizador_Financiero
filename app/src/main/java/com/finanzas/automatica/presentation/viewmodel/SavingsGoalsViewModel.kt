@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.local.dao.SavingsGoalDao
+import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toEntity
 import com.finanzas.automatica.domain.model.SavingsGoal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,7 +61,7 @@ class SavingsGoalsViewModel(
     
     fun addProgress(id: Long, amount: Long) {
         viewModelScope.launch {
-            goalDao.addProgress(id, amount)
+            goalDao.updateProgress(id, amount, System.currentTimeMillis())
             loadGoals()
         }
     }

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.local.dao.BudgetDao
+import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toEntity
 import com.finanzas.automatica.domain.model.Budget
 import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.MovementType
