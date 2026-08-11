@@ -26,6 +26,9 @@ interface MovementDao {
     @Query("SELECT * FROM movements ORDER BY date DESC LIMIT :limit OFFSET :offset")
     suspend fun getPaginated(limit: Int, offset: Int): List<MovementEntity>
 
+    @Query("SELECT * FROM movements ORDER BY date DESC")
+    suspend fun getAll(): List<MovementEntity>
+
     @Query("SELECT * FROM movements WHERE date >= :startDate AND date <= :endDate ORDER BY date DESC")
     suspend fun getByDateRange(startDate: Long, endDate: Long): List<MovementEntity>
 
@@ -49,6 +52,16 @@ interface MovementDao {
 
     @Query("SELECT * FROM movements WHERE counterpartyId = :counterpartyId ORDER BY date DESC")
     suspend fun getByCounterparty(counterpartyId: Long): List<MovementEntity>
+
+    @Query(
+        """
+        SELECT * FROM movements
+        WHERE counterpartyRaw = :counterpartyRaw
+           OR lower(trim(counterpartyRaw)) = lower(trim(:counterpartyRaw))
+        ORDER BY date DESC
+        """
+    )
+    suspend fun getByCounterpartyRaw(counterpartyRaw: String): List<MovementEntity>
 
     @Query("SELECT * FROM movements WHERE categoryId = :categoryId AND date >= :startDate AND date <= :endDate ORDER BY date DESC")
     suspend fun getByCategoryAndDateRange(categoryId: Long, startDate: Long, endDate: Long): List<MovementEntity>
@@ -81,8 +94,17 @@ interface MovementDao {
     @Query("DELETE FROM movements WHERE id = :id")
     suspend fun deleteById(id: Long): Int
 
+    @Query("DELETE FROM movements")
+    suspend fun deleteAll(): Int
+
     @Query("DELETE FROM movements WHERE date < :beforeDate")
     suspend fun deleteOlderThan(beforeDate: Long): Int
+
+    @Query("UPDATE movements SET confirmationState = :state, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateConfirmationState(id: Long, state: String, updatedAt: Long): Int
+
+    @Query("UPDATE movements SET categoryId = :categoryId, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateCategory(id: Long, categoryId: Long, updatedAt: Long): Int
 }
 
 data class CategoryTotal(

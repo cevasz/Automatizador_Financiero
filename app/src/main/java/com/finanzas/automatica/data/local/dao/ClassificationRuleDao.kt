@@ -35,6 +35,9 @@ interface ClassificationRuleDao {
     @Query("DELETE FROM classification_rules WHERE id = :id")
     suspend fun deleteById(id: Long): Int
 
+    @Query("DELETE FROM classification_rules")
+    suspend fun deleteAll(): Int
+
     @Query("UPDATE classification_rules SET isActive = :active WHERE id = :id")
     suspend fun setActive(id: Long, active: Boolean): Int
 }

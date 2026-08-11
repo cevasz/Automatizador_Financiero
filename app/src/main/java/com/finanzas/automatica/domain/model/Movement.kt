@@ -1,15 +1,9 @@
 package com.finanzas.automatica.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.finanzas.automatica.data.local.converters.Converters
 import java.time.Instant
 
-@Entity(tableName = "movements")
-@TypeConverters(Converters::class)
 data class Movement(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val id: Long = 0,
     val type: MovementType,
     val amount: Long, // En centavos (COP)
     val paymentMethod: PaymentMethod,
@@ -38,7 +32,7 @@ enum class MovementSource {
 }
 
 enum class ConfirmationState {
-    PENDING, CONFIRMED, CORRECTED, REJECTED
+    PENDING, CONFIRMED, REJECTED, AUTO_CONFIRMED
 }
 
 enum class BankEntity {

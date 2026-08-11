@@ -157,3 +157,37 @@ fun CategoryEntity.toDomain(): Category = Category(
     sortOrder = sortOrder,
     createdAt = Instant.ofEpochMilli(createdAt)
 )
+
+fun MovementEntity.toDomain(): Movement = Movement(
+    id = id,
+    type = MovementType.valueOf(type),
+    amount = amount,
+    paymentMethod = PaymentMethod.valueOf(paymentMethod),
+    counterpartyRaw = counterpartyRaw,
+    counterpartyId = counterpartyId,
+    categoryId = categoryId,
+    date = Instant.ofEpochMilli(date),
+    source = MovementSource.valueOf(source),
+    confirmationState = ConfirmationState.valueOf(confirmationState),
+    bankEntity = BankEntity.valueOf(bankEntity),
+    rawNotificationText = rawText,
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt)
+)
+
+fun Movement.toEntity(): MovementEntity = MovementEntity(
+    id = id,
+    type = type.name,
+    amount = amount,
+    paymentMethod = paymentMethod.name,
+    counterpartyRaw = counterpartyRaw,
+    counterpartyId = counterpartyId,
+    categoryId = categoryId,
+    date = date.toEpochMilli(),
+    source = source.name,
+    confirmationState = confirmationState.name,
+    bankEntity = bankEntity.name,
+    rawText = rawNotificationText,
+    createdAt = createdAt.toEpochMilli(),
+    updatedAt = updatedAt.toEpochMilli()
+)

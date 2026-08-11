@@ -38,6 +38,9 @@ interface AgendaDao {
     @Query("DELETE FROM agenda_entries WHERE id = :id")
     suspend fun deleteById(id: Long): Int
 
+    @Query("DELETE FROM agenda_entries")
+    suspend fun deleteAll(): Int
+
     @Query("SELECT COUNT(*) FROM agenda_entries")
     suspend fun count(): Int
 }

@@ -37,7 +37,7 @@ class NotificationCaptureService : NotificationListenerService() {
         val notification = sbn.notification
 
         // Verificar si es de un banco soportado
-        if (!parserRegistry.getSupportedPackages().contains(packageName)) {
+        if (!parserRegistry.getSupportedPackages().any { packageName.contains(it, ignoreCase = true) }) {
             return
         }
 

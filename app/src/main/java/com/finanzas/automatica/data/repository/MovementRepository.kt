@@ -2,8 +2,11 @@ package com.finanzas.automatica.data.repository
 
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.local.dao.MovementDao
+import com.finanzas.automatica.data.local.dao.CategoryTotal
+import com.finanzas.automatica.data.local.dao.MonthlyTotal
 import com.finanzas.automatica.data.local.entity.MovementEntity
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 class MovementRepositoryImpl(
     private val database: FinanzasDatabase
@@ -24,6 +27,10 @@ class MovementRepositoryImpl(
 
     suspend fun getById(id: Long): MovementEntity? {
         return dao.getById(id)
+    }
+
+    suspend fun getAll(): List<MovementEntity> {
+        return dao.getAll()
     }
 
     suspend fun getPaginated(limit: Int, offset: Int): List<MovementEntity> {
@@ -52,6 +59,10 @@ class MovementRepositoryImpl(
 
     suspend fun getByCounterparty(counterpartyId: Long): List<MovementEntity> {
         return dao.getByCounterparty(counterpartyId)
+    }
+
+    suspend fun getByCounterpartyRaw(counterpartyRaw: String): List<MovementEntity> {
+        return dao.getByCounterpartyRaw(counterpartyRaw)
     }
 
     suspend fun getByCategoryAndDateRange(categoryId: Long, startDate: Long, endDate: Long): List<MovementEntity> {
@@ -88,5 +99,13 @@ class MovementRepositoryImpl(
 
     suspend fun deleteById(id: Long): Int {
         return dao.deleteById(id)
+    }
+
+    suspend fun updateConfirmationState(id: Long, state: String) {
+        dao.updateConfirmationState(id, state, Instant.now().toEpochMilli())
+    }
+
+    suspend fun updateCategory(id: Long, categoryId: Long) {
+        dao.updateCategory(id, categoryId, Instant.now().toEpochMilli())
     }
 }

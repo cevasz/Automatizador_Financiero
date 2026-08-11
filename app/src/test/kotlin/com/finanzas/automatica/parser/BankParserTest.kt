@@ -5,17 +5,18 @@ import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.parser.*
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class BankParserTest {
 
     private val registry = ParserRegistry.createDefault()
+    private val fixtureDir = File("src/test/resources/fixtures")
 
     @Test
     fun `parse Nequi notifications from fixtures`() {
-        val fixture = File("app/src/test/resources/fixtures/nequi_notifications.txt").readText()
-        val lines = fixture.lines().filter { it.isNotBlank() && !it.startsWith("#") }.toList()
+        val fixture = File(fixtureDir, "nequi_notifications.txt").readText()
+        val lines = fixture.lines()
+            .filter { it.isNotBlank() && !it.startsWith("#") && it != "Nequi" }
+            .toList()
 
         lines.forEach { line ->
             val result = registry.parse("com.nequi.app", line)
@@ -27,11 +28,13 @@ class BankParserTest {
 
     @Test
     fun `parse Bancolombia notifications from fixtures`() {
-        val fixture = File("app/src/test/resources/fixtures/bancolombia_notifications.txt").readText()
-        val lines = fixture.lines().filter { it.isNotBlank() && !it.startsWith("#") }.toList()
+        val fixture = File(fixtureDir, "bancolombia_notifications.txt").readText()
+        val lines = fixture.lines()
+            .filter { it.isNotBlank() && !it.startsWith("#") && it != "Bancolombia" }
+            .toList()
 
         lines.forEach { line ->
-            val result = registry.parse("com.bancolombia.app", line)
+            val result = registry.parse("com.bancolombia.certipersonas", line)
             assert(result is ParseResult.Success) { "Failed to parse: $line -> $result" }
             val movement = (result as ParseResult.Success).movement
             println("Bancolombia: $line -> ${movement.type} ${movement.amount} ${movement.counterpartyRaw}")
@@ -40,8 +43,10 @@ class BankParserTest {
 
     @Test
     fun `parse Daviplata notifications from fixtures`() {
-        val fixture = File("app/src/test/resources/fixtures/daviplata_notifications.txt").readText()
-        val lines = fixture.lines().filter { it.isNotBlank() && !it.startsWith("#") }.toList()
+        val fixture = File(fixtureDir, "daviplata_notifications.txt").readText()
+        val lines = fixture.lines()
+            .filter { it.isNotBlank() && !it.startsWith("#") && it != "Daviplata" }
+            .toList()
 
         lines.forEach { line ->
             val result = registry.parse("com.daviplata.daviplata", line)
@@ -53,11 +58,13 @@ class BankParserTest {
 
     @Test
     fun `parse Nu notifications from fixtures`() {
-        val fixture = File("app/src/test/resources/fixtures/nu_notifications.txt").readText()
-        val lines = fixture.lines().filter { it.isNotBlank() && !it.startsWith("#") }.toList()
+        val fixture = File(fixtureDir, "nu_notifications.txt").readText()
+        val lines = fixture.lines()
+            .filter { it.isNotBlank() && !it.startsWith("#") && it != "Nu Colombia" }
+            .toList()
 
         lines.forEach { line ->
-            val result = registry.parse("com.nu.bank", line)
+            val result = registry.parse("co.nubank", line)
             assert(result is ParseResult.Success) { "Failed to parse: $line -> $result" }
             val movement = (result as ParseResult.Success).movement
             println("Nu: $line -> ${movement.type} ${movement.amount} ${movement.counterpartyRaw}")
@@ -66,8 +73,10 @@ class BankParserTest {
 
     @Test
     fun `parse Lulo notifications from fixtures`() {
-        val fixture = File("app/src/test/resources/fixtures/lulo_notifications.txt").readText()
-        val lines = fixture.lines().filter { it.isNotBlank() && !it.startsWith("#") }.toList()
+        val fixture = File(fixtureDir, "lulo_notifications.txt").readText()
+        val lines = fixture.lines()
+            .filter { it.isNotBlank() && !it.startsWith("#") && it != "Lulo Bank" }
+            .toList()
 
         lines.forEach { line ->
             val result = registry.parse("com.lulobank.app", line)

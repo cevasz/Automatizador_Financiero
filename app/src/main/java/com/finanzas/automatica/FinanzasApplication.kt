@@ -1,10 +1,12 @@
 package com.finanzas.automatica
 
 import android.app.Application
-import androidx.room.RoomDatabase
 import androidx.room.Room
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.DefaultCategories
+import com.finanzas.automatica.domain.enrichment.ClassificationRepositoryProvider
+import com.finanzas.automatica.domain.enrichment.RoomCategoryLookupRepository
+import com.finanzas.automatica.domain.enrichment.RoomMovementHistoryRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,16 +22,16 @@ class FinanzasApplication : Application() {
             FinanzasDatabase::class.java,
             "finanzas.db"
         ).fallbackToDestructiveMigration()
-            .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-                    super.onCreate(db)
-                    // Poblar categorías por defecto
-                    CoroutineScope(Dispatchers.IO).launch {
-                        DefaultCategories.seed(database!!)
-                    }
-                }
-            })
             .build()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            DefaultCategories.seed(database!!)
+        }
+
+        ClassificationRepositoryProvider.categoryLookupRepository =
+            RoomCategoryLookupRepository(database!!.categoryDao())
+        ClassificationRepositoryProvider.movementHistoryRepository =
+            RoomMovementHistoryRepository(database!!.movementDao())
     }
 
     fun getDatabase(): FinanzasDatabase = database!!

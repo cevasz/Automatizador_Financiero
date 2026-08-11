@@ -1,7 +1,12 @@
 package com.finanzas.automatica.data.local.converters
 
 import androidx.room.TypeConverter
-import com.finanzas.automatica.data.local.entity.*
+import com.finanzas.automatica.domain.model.AgendaOrigin
+import com.finanzas.automatica.domain.model.BankEntity
+import com.finanzas.automatica.domain.model.ConfirmationState
+import com.finanzas.automatica.domain.model.MovementSource
+import com.finanzas.automatica.domain.model.MovementType
+import com.finanzas.automatica.domain.model.PaymentMethod
 import java.time.Instant
 
 class Converters {
@@ -54,11 +59,3 @@ class Converters {
     @TypeConverter
     fun toAgendaOrigin(value: AgendaOrigin?): String? = value?.name
 }
-
-// Enums
-enum class MovementType { INCOME, EXPENSE }
-enum class PaymentMethod { NEQUI, BANCOLOMBIA, DAVIPLATA, NU, LULO, PSE, QR, CASH, CARD, OTHER }
-enum class MovementSource { NOTIFICATION, OCR, MANUAL, OPEN_FINANCE }
-enum class ConfirmationState { PENDING, CONFIRMED, REJECTED, AUTO_CONFIRMED }
-enum class BankEntity { NEQUI, BANCOLOMBIA, DAVIPLATA, NU, LULO, UNKNOWN }
-enum class AgendaOrigin { MANUAL, COMMUNITY_SUGGESTED, AUTO_DETECTED }
