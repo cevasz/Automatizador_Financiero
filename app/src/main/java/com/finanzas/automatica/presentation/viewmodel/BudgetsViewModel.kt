@@ -40,6 +40,9 @@ class BudgetsViewModel(
             _isLoading.value = true
             try {
                 _budgets.value = budgetDao.getAll().map { it.toDomain() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _budgets.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

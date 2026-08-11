@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/DashboardScreen.kt": {
-    "mtime": 1786488572.0732882,
-    "ast_hash": "d45d38c82f7454f024b52516ad3c6517",
+    "mtime": 1786489007.272032,
+    "ast_hash": "e386a75b507e5f720e9da7f737b1b406",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/theme/Color.kt": {
@@ -230,53 +230,53 @@
     "semantic_hash": "abd1a09edd0d2a8ab8829f666542706c"
   },
   "app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt": {
-    "mtime": 1786488837.1769552,
-    "ast_hash": "0dd4f094c55ac18f13d0d72b28d6504c",
+    "mtime": 1786488927.5855234,
+    "ast_hash": "858afae220c73b74a0902197560ec812",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/AgendaScreen.kt": {
-    "mtime": 1786488597.1294591,
-    "ast_hash": "809f9f4f0634601a0242e16831b3a4a1",
+    "mtime": 1786489007.4880333,
+    "ast_hash": "80128a9db2512318762bc70ab6606501",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt": {
-    "mtime": 1786488597.24246,
-    "ast_hash": "b819daa06cd515ee642053461330acbe",
+    "mtime": 1786489007.5860338,
+    "ast_hash": "76e982a1688ab14119981d4aae4edcf4",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/MovementsListScreen.kt": {
-    "mtime": 1786488597.0244584,
-    "ast_hash": "4ca95926ed404037f36b749bb6cd8b7e",
+    "mtime": 1786489007.3770325,
+    "ast_hash": "0397cca0a8289af0ceae8c87ef6fba80",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt": {
-    "mtime": 1786488597.3484607,
-    "ast_hash": "a0ff178dc391bf6d492428ef7e072697",
+    "mtime": 1786489007.6850345,
+    "ast_hash": "0c63633c9de58d8293486e16a4a72881",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SettingsScreen.kt": {
-    "mtime": 1786488597.4494615,
-    "ast_hash": "9a8e0725a74ae0aa03a04fe393aba6e5",
+    "mtime": 1786489007.7870352,
+    "ast_hash": "642d82c8a23938fb1c333ae81d7a62d7",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/AgendaViewModel.kt": {
-    "mtime": 1786487824.936419,
-    "ast_hash": "9be7f2bec3435e2e443d6a4c55fa01c6",
+    "mtime": 1786489455.7229896,
+    "ast_hash": "9e86d4b6b9c64524423f7548297332fc",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/BudgetsViewModel.kt": {
-    "mtime": 1786487825.0344198,
-    "ast_hash": "bb3463989228f0bfefaeb1f6893ef6fa",
+    "mtime": 1786489455.8259902,
+    "ast_hash": "06add0df4f713bb1046eab9b119963e3",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/MovementViewModel.kt": {
-    "mtime": 1786487824.8384185,
-    "ast_hash": "44e644ea8114bdfd26fb1b31d31a6957",
+    "mtime": 1786489455.622989,
+    "ast_hash": "1bc6f3e21bbbbe50c0a9459dc8228c6e",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SavingsGoalsViewModel.kt": {
-    "mtime": 1786487825.1454203,
-    "ast_hash": "279c6b1cfe115eeb9b3dd23db26d986a",
+    "mtime": 1786489455.9289908,
+    "ast_hash": "8b95614e5b699cf0b5f5b145f5d4ac8b",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SettingsViewModel.kt": {
@@ -395,8 +395,8 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/ui/screen/LoginScreen.kt": {
-    "mtime": 1786488825.2708814,
-    "ast_hash": "b6a7cc10b0a213f147ad870f25aa3df9",
+    "mtime": 1786488981.6308675,
+    "ast_hash": "f36740b7f92ff43672996f4cacd0599a",
     "semantic_hash": ""
   },
   "app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SessionViewModel.kt": {

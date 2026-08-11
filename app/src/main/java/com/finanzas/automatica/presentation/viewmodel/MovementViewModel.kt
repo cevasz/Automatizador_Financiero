@@ -46,8 +46,13 @@ class MovementViewModel(
 
     fun loadPendingCount() {
         viewModelScope.launch {
-            val count = repository.countPending()
-            _pendingCount.value = count
+            try {
+                val count = repository.countPending()
+                _pendingCount.value = count
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _pendingCount.value = 0
+            }
         }
     }
 

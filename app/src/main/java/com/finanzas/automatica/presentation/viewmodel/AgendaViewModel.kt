@@ -43,6 +43,9 @@ class AgendaViewModel(
             _isLoading.value = true
             try {
                 _entries.value = agendaRepo.findAll().map { it.toDomain() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _entries.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

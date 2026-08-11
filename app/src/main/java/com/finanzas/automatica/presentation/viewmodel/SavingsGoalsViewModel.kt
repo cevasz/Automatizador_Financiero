@@ -32,6 +32,9 @@ class SavingsGoalsViewModel(
             _isLoading.value = true
             try {
                 _goals.value = goalDao.getAll().map { it.toDomain() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _goals.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

@@ -1,16 +1,16 @@
 # Graph Report - New  (2026-08-11)
 
 ## Corpus Check
-- 65 files · ~22,555 words
+- 65 files · ~22,595 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 724 nodes · 1336 edges · 31 communities (29 shown, 2 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 65 edges (avg confidence: 0.8)
+- 722 nodes · 1353 edges · 31 communities (29 shown, 2 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 82 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b3db1625`
+- Built from commit: `cf69eeda`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -47,24 +47,24 @@
 2. `MovementDao` - 31 edges
 3. `CategoryEntity` - 26 edges
 4. `MovementRepositoryImpl` - 26 edges
-5. `SettingsViewModel` - 25 edges
+5. `SettingsViewModel` - 26 edges
 6. `AgendaEntryEntity` - 23 edges
-7. `Converters` - 15 edges
-8. `IconBadge()` - 15 edges
-9. `AgendaViewModel` - 15 edges
-10. `CategoryDao` - 14 edges
+7. `AppNavHost()` - 20 edges
+8. `IconBadge()` - 16 edges
+9. `AgendaViewModel` - 16 edges
+10. `Converters` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `AgendaEntryCard()` --calls--> `FinanceCard()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/AgendaScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
-- `BudgetCard()` --calls--> `FinanceCard()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
-- `BudgetDetailScreen()` --calls--> `FinanceCard()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
-- `SavingsGoalCard()` --calls--> `FinanceCard()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
-- `AgendaEntryCard()` --calls--> `FinanceTag()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/AgendaScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
+- `AppNavHost()` --calls--> `AgendaScreen()`  [INFERRED]
+  app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/screen/AgendaScreen.kt
+- `AppNavHost()` --calls--> `BudgetsScreen()`  [INFERRED]
+  app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt
+- `AppNavHost()` --calls--> `SavingsGoalsScreen()`  [INFERRED]
+  app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt
+- `AppNavHost()` --calls--> `AgendaViewModel`  [INFERRED]
+  app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt → app/src/main/java/com/finanzas/automatica/presentation/viewmodel/AgendaViewModel.kt
+- `AppNavHost()` --calls--> `BudgetsViewModel`  [INFERRED]
+  app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt → app/src/main/java/com/finanzas/automatica/presentation/viewmodel/BudgetsViewModel.kt
 
 ## Import Cycles
 - None detected.
@@ -92,7 +92,7 @@ Cohesion: 0.13
 Nodes (11): EnrichmentPipeline, Boolean, Double, toDomain(), EnrichedMovement, RawMovement, Notification, String (+3 more)
 
 ### Community 5 - "AgendaEntryEntity"
-Cohesion: 0.10
+Cohesion: 0.11
 Nodes (12): AgendaDao, Flow, Int, List, Long, String, AgendaEntryEntity, AgendaRepository (+4 more)
 
 ### Community 6 - "PaymentMethod"
@@ -112,7 +112,7 @@ Cohesion: 0.19
 Nodes (8): ClassificationRuleDao, Boolean, Flow, Int, List, Long, String, ClassificationRuleEntity
 
 ### Community 10 - "FinanzasDatabase"
-Cohesion: 0.18
+Cohesion: 0.15
 Nodes (6): FinanzasDatabase, getInstance(), Context, FinanzasApplication, Application, RoomDatabase
 
 ### Community 11 - "BudgetDao"
@@ -120,7 +120,7 @@ Cohesion: 0.23
 Nodes (6): BudgetDao, Flow, Int, List, Long, BudgetEntity
 
 ### Community 12 - "SavingsGoalDao"
-Cohesion: 0.16
+Cohesion: 0.18
 Nodes (8): Flow, Int, List, Long, SavingsGoalDao, SavingsGoalEntity, toDomain(), toEntity()
 
 ### Community 13 - "DashboardScreen"
@@ -133,7 +133,7 @@ Nodes (6): Int, Intent, Notification, MovementProcessorService, IBinder, Service
 
 ### Community 15 - "BankParser"
 Cohesion: 0.06
-Nodes (64): Movement, EmptyState(), FinanceCard(), FinanceTag(), IconBadge(), Color, ImageVector, Modifier (+56 more)
+Nodes (65): Movement, AppNavHost(), EmptyState(), FinanceCard(), FinanceTag(), IconBadge(), Color, ImageVector (+57 more)
 
 ### Community 16 - "BankParserTest"
 Cohesion: 0.27
@@ -156,8 +156,8 @@ Cohesion: 0.22
 Nodes (8): Arquitectura interna (dentro de la app Android), Contexto del proyecto — App de Contabilidad Financiera Automática (Colombia), Convenciones de código, Decisiones de alcance ya tomadas (no reabrir sin discutirlo explícitamente), Entidades bancarias soportadas en el MVP, Qué es, Qué NO hacer, Sincronizacion con la web
 
 ### Community 28 - "AppNavHost.kt"
-Cohesion: 0.22
-Nodes (12): Agenda, Budgets, Dashboard, databaseViewModel(), String, Login, Movements, navigateTo() (+4 more)
+Cohesion: 0.31
+Nodes (10): Agenda, Budgets, Dashboard, databaseViewModel(), Login, Movements, Savings, Screen (+2 more)
 
 ### Community 29 - "SessionViewModel"
 Cohesion: 0.29
@@ -175,12 +175,12 @@ Nodes (5): MainActivity, FinanzasAutomaticaTheme(), Boolean, Bundle, ComponentAc
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `RawMovement` connect `NotificationCaptureService` to `.buildRawMovement`, `.classify`?**
-  _High betweenness centrality (0.179) - this node is a cross-community bridge._
+- **Why does `AppNavHost()` connect `BankParser` to `PaymentMethod`, `FinanzasDatabase`, `DashboardScreen`, `BankParserTest`, `SettingsViewModel`, `AppNavHost.kt`, `SessionViewModel`, `MainActivity`?**
+  _High betweenness centrality (0.304) - this node is a cross-community bridge._
+- **Why does `FinanzasDatabase` connect `FinanzasDatabase` to `CategoryEntity`, `BankParser`?**
+  _High betweenness centrality (0.222) - this node is a cross-community bridge._
 - **Why does `MovementEntity` connect `MovementEntity` to `NotificationCaptureService`, `SavingsGoalDao`, `.classify`?**
-  _High betweenness centrality (0.175) - this node is a cross-community bridge._
-- **Why does `toEntity()` connect `SavingsGoalDao` to `MovementEntity`, `BudgetDao`, `AgendaEntryEntity`?**
-  _High betweenness centrality (0.160) - this node is a cross-community bridge._
+  _High betweenness centrality (0.153) - this node is a cross-community bridge._
 - **What connects `AGENDA`, `RULES`, `KEYWORDS` to the rest of the system?**
   _85 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `.buildRawMovement` be split into smaller, more focused modules?**

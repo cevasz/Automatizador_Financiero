@@ -26,5 +26,8 @@
   "24": "SettingsViewModel",
   "25": "BankParserTest",
   "26": "Contexto del proyecto — App de Contabilidad Financiera Automática (Colombia)",
-  "27": "SimpleTest"
+  "27": "SimpleTest",
+  "28": "AppNavHost.kt",
+  "29": "SessionViewModel",
+  "30": "MainActivity"
 }
