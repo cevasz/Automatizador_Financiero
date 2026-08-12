@@ -1,5 +1,11 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,11 +52,14 @@ import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
 import com.finanzas.automatica.domain.model.MovementType
+import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
 import com.finanzas.automatica.presentation.ui.components.SectionHeader
+import com.finanzas.automatica.presentation.ui.components.appearFromBelow
+import com.finanzas.automatica.presentation.ui.components.rememberAnimatedFloat
 import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
@@ -66,11 +75,13 @@ private enum class DashboardPeriod(val label: String) {
     Day("Hoy")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DashboardScreen(
     movements: List<Movement> = emptyList(),
     pendingCount: Int = 0,
+    notificationAccessEnabled: Boolean = true,
+    onEnableNotificationAccess: () -> Unit = {},
     onPendingClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onOpenMenu: (() -> Unit)? = null
@@ -158,6 +169,42 @@ fun DashboardScreen(
         }
 
         item {
+            if (!notificationAccessEnabled) {
+                FinanceCard(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    containerColor = WarningAmber.copy(alpha = 0.1f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconBadge(
+                            icon = Icons.Outlined.Notifications,
+                            contentDescription = "Captura desactivada",
+                            tint = WarningAmber
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Captura automatica desactivada",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = "La app no puede leer SMS, Gmail ni notificaciones bancarias. Activa el acceso una sola vez para que los movimientos se registren solos.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        TextButton(onClick = onEnableNotificationAccess) {
+                            Text("Activar", color = WarningAmber)
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,7 +223,9 @@ fun DashboardScreen(
 
         item {
             FinanceCard(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .appearFromBelow(delayMillis = 0),
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Row(
@@ -193,12 +242,12 @@ fun DashboardScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Text(
-                            text = currencyFormat.money(balance),
+                        AnimatedAmountText(
+                            target = balance,
+                            format = { currencyFormat.money(it) },
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -210,7 +259,7 @@ fun DashboardScreen(
                     )
                 }
                 LinearProgressIndicator(
-                    progress = spendingRatio,
+                    progress = rememberAnimatedFloat(spendingRatio),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp),
@@ -229,26 +278,30 @@ fun DashboardScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp)
+                    .appearFromBelow(delayMillis = 60),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 MetricCard(
                     title = "Ingresos",
-                    amount = currencyFormat.money(income),
+                    amount = income,
+                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.TrendingUp,
                     tint = IncomeGreen,
                     modifier = Modifier.weight(1f)
                 )
                 MetricCard(
                     title = "Gastos",
-                    amount = currencyFormat.money(expenses),
+                    amount = expenses,
+                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.TrendingDown,
                     tint = ExpenseRose,
                     modifier = Modifier.weight(1f)
                 )
                 MetricCard(
                     title = "Pendientes",
-                    amount = pendingCount.toString(),
+                    amount = pendingCount.toLong(),
+                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.PendingActions,
                     tint = WarningAmber,
                     modifier = Modifier.weight(1f)
@@ -259,7 +312,9 @@ fun DashboardScreen(
         item {
             SectionHeader(
                 title = "Por confirmar",
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .appearFromBelow(delayMillis = 120),
                 action = {
                     TextButton(onClick = onPendingClick) {
                         Text("Ver")
@@ -274,38 +329,49 @@ fun DashboardScreen(
 
         item {
             FinanceCard(
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .appearFromBelow(delayMillis = 160)
             ) {
-                if (pendingMovements.isEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        IconBadge(
-                            icon = Icons.Outlined.CheckCircle,
-                            contentDescription = "Sin pendientes",
-                            tint = IncomeGreen
-                        )
-                        Column {
-                            Text(
-                                text = "Todo esta confirmado",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = "Los movimientos nuevos apareceran aqui cuando requieran revision.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                AnimatedContent(
+                    targetState = pendingMovements.isEmpty(),
+                    transitionSpec = {
+                        (fadeIn() togetherWith fadeOut()).using(SizeTransform(clip = false))
                     }
-                } else {
-                    pendingMovements.forEach { movement ->
-                        PendingMovementRow(
-                            movement = movement,
-                            currencyFormat = currencyFormat
-                        )
+                ) { isEmpty ->
+                    if (isEmpty) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            IconBadge(
+                                icon = Icons.Outlined.CheckCircle,
+                                contentDescription = "Sin pendientes",
+                                tint = IncomeGreen
+                            )
+                            Column {
+                                Text(
+                                    text = "Todo esta confirmado",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Los movimientos nuevos apareceran aqui cuando requieran revision.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            pendingMovements.forEach { movement ->
+                                PendingMovementRow(
+                                    movement = movement,
+                                    currencyFormat = currencyFormat
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -314,7 +380,9 @@ fun DashboardScreen(
         item {
             SectionHeader(
                 title = "Ultimos movimientos",
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .appearFromBelow(delayMillis = 200)
             )
         }
 
@@ -328,11 +396,13 @@ fun DashboardScreen(
                 )
             }
         } else {
-            items(recentMovements.size) { index ->
+            items(recentMovements.size, key = { index -> recentMovements[index].id }) { index ->
                 MovementLine(
                     movement = recentMovements[index],
                     currencyFormat = currencyFormat,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .animateItemPlacement()
                 )
             }
         }
@@ -342,7 +412,8 @@ fun DashboardScreen(
 @Composable
 private fun MetricCard(
     title: String,
-    amount: String,
+    amount: Long,
+    currencyFormat: NumberFormat,
     icon: ImageVector,
     tint: Color,
     modifier: Modifier = Modifier
@@ -364,13 +435,13 @@ private fun MetricCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
-            Text(
-                text = amount,
+            AnimatedAmountText(
+                target = amount,
+                format = { value -> if (title == "Pendientes") value.toString() else currencyFormat.money(value) },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 1
             )
         }
     }

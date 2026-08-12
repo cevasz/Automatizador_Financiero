@@ -1,7 +1,7 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,10 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.SavingsGoal
+import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
+import com.finanzas.automatica.presentation.ui.components.pressFeedback
+import com.finanzas.automatica.presentation.ui.components.rememberAnimatedFloat
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
@@ -45,7 +48,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SavingsGoalsScreen(
     goals: List<SavingsGoal>,
@@ -126,7 +129,8 @@ fun SavingsGoalsScreen(
                     SavingsGoalCard(
                         goal = goal,
                         currencyFormat = currencyFormat,
-                        onClick = { onGoalClick(goal) }
+                        onClick = { onGoalClick(goal) },
+                        modifier = Modifier.animateItemPlacement()
                     )
                 }
             }
@@ -146,10 +150,11 @@ fun SavingsGoalCard(
     } else {
         0f
     }
+    val animatedProgress = rememberAnimatedFloat(progress)
     val isCompleted = goal.currentAmount >= goal.targetAmount
 
     FinanceCard(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.pressFeedback(onClick = onClick),
         containerColor = if (isCompleted) IncomeGreen.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
     ) {
         Row(
@@ -193,7 +198,7 @@ fun SavingsGoalCard(
         }
 
         LinearProgressIndicator(
-            progress = progress,
+            progress = animatedProgress,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),
@@ -205,8 +210,9 @@ fun SavingsGoalCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = currencyFormat.money(goal.currentAmount),
+            AnimatedAmountText(
+                target = goal.currentAmount,
+                format = { currencyFormat.money(it) },
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.primary

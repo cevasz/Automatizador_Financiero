@@ -1,7 +1,7 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,10 +34,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.Budget
 import com.finanzas.automatica.domain.model.Category
+import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
+import com.finanzas.automatica.presentation.ui.components.pressFeedback
+import com.finanzas.automatica.presentation.ui.components.rememberAnimatedFloat
 import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
@@ -47,7 +50,7 @@ import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BudgetsScreen(
     budgets: List<Budget>,
@@ -130,7 +133,8 @@ fun BudgetsScreen(
                         category = category,
                         spent = 0L,
                         currencyFormat = currencyFormat,
-                        onClick = { onBudgetClick(budget) }
+                        onClick = { onBudgetClick(budget) },
+                        modifier = Modifier.animateItemPlacement()
                     )
                 }
             }
@@ -146,9 +150,9 @@ fun BudgetCard(
     currencyFormat: NumberFormat,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-) {
-    val limit = budget.monthlyLimit
+) {    val limit = budget.monthlyLimit
     val progress = if (limit > 0) (spent.toFloat() / limit.toFloat()).coerceIn(0f, 1f) else 0f
+    val animatedProgress = rememberAnimatedFloat(progress)
     val isOverBudget = spent > limit
     val progressColor = when {
         isOverBudget -> ExpenseRose
@@ -157,7 +161,7 @@ fun BudgetCard(
     }
 
     FinanceCard(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.pressFeedback(onClick = onClick),
         containerColor = if (isOverBudget) ExpenseRose.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
     ) {
         Row(
@@ -202,7 +206,7 @@ fun BudgetCard(
 
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             LinearProgressIndicator(
-                progress = progress,
+                progress = animatedProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
@@ -213,8 +217,9 @@ fun BudgetCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = currencyFormat.money(spent),
+                AnimatedAmountText(
+                    target = spent,
+                    format = { currencyFormat.money(it) },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
