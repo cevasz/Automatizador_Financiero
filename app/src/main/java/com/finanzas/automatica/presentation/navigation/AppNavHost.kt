@@ -5,6 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.Contacts
@@ -52,6 +57,7 @@ import androidx.navigation.navArgument
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
+import com.finanzas.automatica.presentation.ui.components.rememberNotificationAccessEnabled
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
@@ -72,6 +78,7 @@ import com.finanzas.automatica.presentation.viewmodel.MovementViewModel
 import com.finanzas.automatica.presentation.viewmodel.SessionViewModel
 import com.finanzas.automatica.presentation.viewmodel.SavingsGoalsViewModel
 import com.finanzas.automatica.presentation.viewmodel.SettingsViewModel
+import com.finanzas.automatica.service.NotificationAccess
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -264,18 +271,36 @@ fun AppNavHost(database: FinanzasDatabase) {
             NavHost(
                 navController = navController,
                 startDestination = Screen.Dashboard.route,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
+                enterTransition = {
+                    fadeIn(animationSpec = tween(240)) +
+                        slideInVertically(animationSpec = tween(240)) { it / 24 }
+                },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(160))
+                },
+                popEnterTransition = {
+                    fadeIn(animationSpec = tween(240))
+                },
+                popExitTransition = {
+                    fadeOut(animationSpec = tween(160)) +
+                        slideOutVertically(animationSpec = tween(160)) { it / 24 }
+                }
             ) {
             composable(Screen.Dashboard.route) {
+                val context = LocalContext.current
                 val movementViewModel: MovementViewModel = databaseViewModel {
                     MovementViewModel(database)
                 }
                 val movements by movementViewModel.movements.collectAsState()
                 val pendingCount by movementViewModel.pendingCount.collectAsState()
+                val notificationAccessEnabled = rememberNotificationAccessEnabled()
 
                 DashboardScreen(
                     movements = movements,
                     pendingCount = pendingCount,
+                    notificationAccessEnabled = notificationAccessEnabled,
+                    onEnableNotificationAccess = { NotificationAccess.openSettings(context) },
                     onPendingClick = { navigateTo(Screen.Movements.pendingRoute) },
                     onSettingsClick = { navigateTo(Screen.Settings.route) },
                     onOpenMenu = ::openDrawer
@@ -304,6 +329,7 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onConfirm = movementViewModel::confirmMovement,
                     onReject = movementViewModel::rejectMovement,
                     onImportStatement = movementViewModel::importStatementText,
+                    onImportPdf = movementViewModel::importStatementPdf,
                     onOpenMenu = ::openDrawer
                 )
             }
@@ -382,17 +408,16 @@ fun AppNavHost(database: FinanzasDatabase) {
                 val settingsViewModel: SettingsViewModel = databaseViewModel {
                     SettingsViewModel(database, context)
                 }
-                val notificationsEnabled by settingsViewModel.notificationsEnabled.collectAsState()
                 val autoConfirmHighConfidence by settingsViewModel.autoConfirmHighConfidence.collectAsState()
                 val biometricEnabled by settingsViewModel.biometricEnabled.collectAsState()
                 val exportDataFormat by settingsViewModel.exportDataFormat.collectAsState()
 
                 SettingsScreen(
-                    notificationsEnabled = notificationsEnabled,
+                    notificationAccessEnabled = rememberNotificationAccessEnabled(),
                     autoConfirmHighConfidence = autoConfirmHighConfidence,
                     biometricEnabled = biometricEnabled,
                     exportDataFormat = exportDataFormat,
-                    onNotificationsChange = settingsViewModel::setNotificationsEnabled,
+                    onEnableNotificationAccess = { NotificationAccess.openSettings(context) },
                     onAutoConfirmChange = settingsViewModel::setAutoConfirmHighConfidence,
                     onBiometricChange = settingsViewModel::setBiometricEnabled,
                     onExportFormatChange = settingsViewModel::setExportFormat,

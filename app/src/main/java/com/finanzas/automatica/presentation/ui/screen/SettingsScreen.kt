@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -42,20 +43,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
+import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
 import com.finanzas.automatica.presentation.ui.components.SectionHeader
 import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
+import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    notificationsEnabled: Boolean = true,
+    notificationAccessEnabled: Boolean = false,
     autoConfirmHighConfidence: Boolean = true,
     biometricEnabled: Boolean = false,
     exportDataFormat: String = "CSV",
-    onNotificationsChange: (Boolean) -> Unit = {},
+    onEnableNotificationAccess: () -> Unit = {},
     onAutoConfirmChange: (Boolean) -> Unit = {},
     onBiometricChange: (Boolean) -> Unit = {},
     onExportFormatChange: (String) -> Unit = {},
@@ -109,17 +112,9 @@ fun SettingsScreen(
                 SectionHeader(title = "Captura automatica")
             }
             item {
-                SettingRow(
-                    icon = Icons.Outlined.Notifications,
-                    iconTint = InfoBlue,
-                    title = "Notificaciones bancarias",
-                    subtitle = "Registrar movimientos desde notificaciones autorizadas",
-                    trailing = {
-                        Switch(
-                            checked = notificationsEnabled,
-                            onCheckedChange = onNotificationsChange
-                        )
-                    }
+                NotificationAccessRow(
+                    enabled = notificationAccessEnabled,
+                    onEnable = onEnableNotificationAccess
                 )
             }
             item {
@@ -259,6 +254,68 @@ fun SettingsScreen(
                     subtitle = "1.0.0",
                     trailing = { }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationAccessRow(
+    enabled: Boolean,
+    onEnable: () -> Unit
+) {
+    FinanceCard(
+        containerColor = if (!enabled) WarningAmber.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconBadge(
+                    icon = Icons.Outlined.Notifications,
+                    contentDescription = "Acceso a notificaciones",
+                    tint = if (enabled) IncomeGreen else WarningAmber
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    Text(
+                        text = "Captura de notificaciones",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = if (enabled) {
+                            "Activo: la app registra movimientos desde SMS, Gmail y apps de bancos."
+                        } else {
+                            "Desactivado. Activa el acceso una sola vez en los ajustes de Android para que la app pueda leer SMS, Gmail y notificaciones bancarias."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            Row(modifier = Modifier.padding(start = 12.dp)) {
+                if (enabled) {
+                    FinanceTag(
+                        text = "Activo",
+                        color = IncomeGreen,
+                        containerColor = IncomeGreen.copy(alpha = 0.12f)
+                    )
+                } else {
+                    Button(onClick = onEnable) {
+                        Text("Habilitar")
+                    }
+                }
             }
         }
     }

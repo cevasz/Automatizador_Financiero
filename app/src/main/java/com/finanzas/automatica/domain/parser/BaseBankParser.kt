@@ -16,11 +16,14 @@ abstract class BaseBankParser(
     override val supportedPackageNames: List<String>
 ) : BankParser {
 
-    private val smsPackages = listOf(
+    private val messagingPackages = listOf(
         "com.google.android.apps.messaging",
         "com.samsung.android.messaging",
         "com.android.mms",
         "com.android.messaging",
+        "com.google.android.gm",
+        "com.samsung.android.email",
+        "mail",
         "messaging",
         "mms",
         "sms"
@@ -40,7 +43,7 @@ abstract class BaseBankParser(
             else -> false
         }
 
-        val isSmsApp = smsPackages.any { packageName.contains(it, ignoreCase = true) }
+        val isSmsApp = messagingPackages.any { packageName.contains(it, ignoreCase = true) }
         if (isSmsApp && bankKeywordMatches) {
             return true
         }

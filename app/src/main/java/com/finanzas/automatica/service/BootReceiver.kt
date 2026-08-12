@@ -8,9 +8,10 @@ import android.util.Log
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.i("BootReceiver", "Boot completed - reiniciando servicios")
-            // Reiniciar el NotificationListenerService si es necesario
-            context.startService(Intent(context, NotificationCaptureService::class.java))
+            Log.i("BootReceiver", "Boot completado - re-enlazando listener de notificaciones")
+            // Un NotificationListenerService no se inicia con startService: el sistema
+            // debe re-enlazarlo si el usuario mantiene habilitado el acceso a notificaciones.
+            NotificationAccess.requestRebind(context)
         }
     }
 }

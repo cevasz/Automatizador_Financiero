@@ -53,6 +53,17 @@ class BankParserTest {
     }
 
     @Test
+    fun `parse Bancolombia transfer arriving by Gmail`() {
+        val gmailText = "Bancolombia: Recibiste una transferencia por $100,000 de LUIS RINCON en tu cuenta **3463, el 11/08/2026 a las 18:43."
+        val result = registry.parse("com.google.android.gm", gmailText)
+        assert(result is ParseResult.Success) { "Failed to parse Gmail: $gmailText -> $result" }
+        val movement = (result as ParseResult.Success).movement
+        assert(movement.type == MovementType.INCOME)
+        assert(movement.amount == 10000000L)
+        assert(movement.counterpartyRaw == "LUIS RINCON")
+    }
+
+    @Test
     fun `parse Daviplata notifications from fixtures`() {
         val fixture = File(fixtureDir, "daviplata_notifications.txt").readText()
         val lines = fixture.lines()
