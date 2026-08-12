@@ -3,7 +3,7 @@
 ## Qué es
 App Android que lee notificaciones bancarias autorizadas (Nequi, Bancolombia, Daviplata, Nu,
 Lulo Bank) para construir un historial financiero automático, sin pedir nunca credenciales
-ni acceder directamente a cuentas. Documento completo de diseño: `docs/SDD.md`.
+ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
 
 ## Decisiones de alcance ya tomadas (no reabrir sin discutirlo explícitamente)
 - Plataforma: Android nativo (Kotlin) primero. iOS queda para una fase posterior vía
@@ -36,6 +36,10 @@ ni acceder directamente a cuentas. Documento completo de diseño: `docs/SDD.md`.
   principal.
 - No guardar ni pedir credenciales de bancos. Solo correo, URL del backend y token de
   acceso de la cuenta web.
+
+## Documentos vivos
+- `docs/guia.md`: resumen operativo de arquitectura, sincronizacion y alcance.
+- `graphify-out/GRAPH_REPORT.md`: mapa de dependencias generado por `graphify`.
 
 ## Convenciones de código
 - Kotlin idiomático, sin dependencias innecesarias.

@@ -110,13 +110,24 @@ fun DashboardScreen(
             TopAppBar(
                 title = {
                     Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "Kakebo",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            FinanceTag(
+                                text = "Finanzas en Armonía",
+                                color = WarningAmber,
+                                containerColor = WarningAmber.copy(alpha = 0.15f)
+                            )
+                        }
                         Text(
-                            text = "Finanzas Automatica",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = "Resumen local de tus movimientos",
+                            text = "Hola, Kakebo está listo para ayudarte con tu control financiero",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

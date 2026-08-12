@@ -12,6 +12,10 @@ class ParserRegistry(private val parsers: List<BankParser>) {
         return parser.parse(notificationText)
     }
 
+    fun canParseAny(packageName: String, notificationText: String): Boolean {
+        return parsers.any { it.canParse(packageName, notificationText) }
+    }
+
     fun getSupportedPackages(): List<String> = parsers.flatMap { it.supportedPackageNames }.distinct()
 
     companion object {

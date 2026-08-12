@@ -56,15 +56,18 @@ import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 import com.finanzas.automatica.data.local.FinanzasDatabase
+import androidx.compose.material.icons.outlined.ReceiptLong
 import com.finanzas.automatica.presentation.ui.screen.AgendaScreen
 import com.finanzas.automatica.presentation.ui.screen.LoginScreen
 import com.finanzas.automatica.presentation.ui.screen.BudgetsScreen
 import com.finanzas.automatica.presentation.ui.screen.DashboardScreen
+import com.finanzas.automatica.presentation.ui.screen.InvoiceScreen
 import com.finanzas.automatica.presentation.ui.screen.MovementsListScreen
 import com.finanzas.automatica.presentation.ui.screen.SavingsGoalsScreen
 import com.finanzas.automatica.presentation.ui.screen.SettingsScreen
 import com.finanzas.automatica.presentation.viewmodel.AgendaViewModel
 import com.finanzas.automatica.presentation.viewmodel.BudgetsViewModel
+import com.finanzas.automatica.presentation.viewmodel.InvoiceViewModel
 import com.finanzas.automatica.presentation.viewmodel.MovementViewModel
 import com.finanzas.automatica.presentation.viewmodel.SessionViewModel
 import com.finanzas.automatica.presentation.viewmodel.SavingsGoalsViewModel
@@ -114,6 +117,18 @@ fun AppNavHost(database: FinanzasDatabase) {
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    Text(
+                        text = "Kakebo",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Método japonés de conciencia financiera",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
                     FinanceCard(containerColor = MaterialTheme.colorScheme.primaryContainer) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -167,6 +182,13 @@ fun AppNavHost(database: FinanzasDatabase) {
                         selected = currentRoute.startsWith(Screen.Movements.selectedPrefix),
                         onClick = { navigateTo(Screen.Movements.route) },
                         icon = { Icon(Icons.Outlined.FormatListBulleted, contentDescription = null) },
+                        colors = NavigationDrawerItemDefaults.colors()
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Facturas y Deudas") },
+                        selected = currentRoute.startsWith(Screen.Invoices.selectedPrefix),
+                        onClick = { navigateTo(Screen.Invoices.route) },
+                        icon = { Icon(Icons.Outlined.ReceiptLong, contentDescription = null) },
                         colors = NavigationDrawerItemDefaults.colors()
                     )
                     NavigationDrawerItem(
@@ -281,6 +303,29 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onMovementClick = {},
                     onConfirm = movementViewModel::confirmMovement,
                     onReject = movementViewModel::rejectMovement,
+                    onImportStatement = movementViewModel::importStatementText,
+                    onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(Screen.Invoices.route) {
+                val invoiceViewModel: InvoiceViewModel = databaseViewModel {
+                    InvoiceViewModel(database)
+                }
+                val invoices by invoiceViewModel.invoices.collectAsState()
+                val debtSummaries by invoiceViewModel.debtSummaries.collectAsState()
+                val allDebts by invoiceViewModel.allDebts.collectAsState()
+                val contacts by invoiceViewModel.contacts.collectAsState()
+
+                InvoiceScreen(
+                    invoices = invoices,
+                    debtSummaries = debtSummaries,
+                    allDebts = allDebts,
+                    contacts = contacts,
+                    onSaveInvoice = invoiceViewModel::saveInvoice,
+                    onMarkDebtPaid = invoiceViewModel::markDebtAsPaid,
+                    onDeleteInvoice = invoiceViewModel::deleteInvoice,
+                    onSimulateScan = invoiceViewModel::createSampleParsedInvoice,
                     onOpenMenu = ::openDrawer
                 )
             }
@@ -411,6 +456,7 @@ sealed class Screen(
         const val routePattern = "movements?filter={filter}"
         const val pendingRoute = "movements?filter=pending"
     }
+    object Invoices : Screen("invoices", "invoices", "Facturas", Icons.Outlined.ReceiptLong)
     object Agenda : Screen("agenda", "agenda", "Agenda", Icons.Outlined.Contacts)
     object Budgets : Screen("budgets", "budgets", "Planes", Icons.Outlined.AccountBalance)
     object Savings : Screen("savings", "savings", "Metas", Icons.Outlined.Savings)
@@ -418,6 +464,7 @@ sealed class Screen(
     object Settings : Screen("settings", "settings", "Ajustes", Icons.Outlined.Settings)
 
     companion object {
-        val bottomItems = listOf(Dashboard, Movements, Agenda, Budgets, Savings)
+        val bottomItems: List<Screen>
+            get() = listOf(Dashboard, Movements, Invoices, Agenda, Budgets)
     }
 }

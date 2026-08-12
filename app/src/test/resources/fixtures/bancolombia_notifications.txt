@@ -19,3 +19,7 @@ Bancolombia
 ## Egreso - Transferencia enviada
 Transferencia enviada por $ 200.000 desde su cuenta ****1234
 Bancolombia
+
+## Ingreso SMS - Transferencia bancaria recibida
+Bancolombia: Recibiste una transferencia por $100,000 de LUIS RINCON en tu cuenta **3463, el 11/08/2026 a las 18:43. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.
+Bancolombia

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,6 +80,7 @@ fun MovementsListScreen(
     onMovementClick: (Movement) -> Unit = {},
     onConfirm: (Long) -> Unit = {},
     onReject: (Long) -> Unit = {},
+    onImportStatement: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -90,6 +92,8 @@ fun MovementsListScreen(
     var selectedFilter by remember(initialFilter) {
         mutableStateOf(MovementFilter.fromRoute(initialFilter))
     }
+    var showImportDialog by remember { mutableStateOf(false) }
+
     val filteredMovements = remember(movements, selectedFilter) {
         movements
             .filter { movement ->
@@ -101,6 +105,18 @@ fun MovementsListScreen(
                 }
             }
             .sortedByDescending { it.date }
+    }
+
+    if (showImportDialog) {
+        ImportStatementDialog(
+            currencyFormat = currencyFormat,
+            onDismiss = { showImportDialog = false },
+            onImport = { text, bank, onComplete ->
+                onImportStatement(text, bank) { summary ->
+                    onComplete(summary)
+                }
+            }
+        )
     }
 
     Column(
@@ -121,6 +137,16 @@ fun MovementsListScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            },
+            actions = {
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { showImportDialog = true },
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    Icon(imageVector = Icons.Outlined.ReceiptLong, contentDescription = null)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Importar Extracto")
                 }
             },
             navigationIcon = {
@@ -166,10 +192,12 @@ fun MovementsListScreen(
                         icon = if (movements.isEmpty()) Icons.Outlined.ReceiptLong else Icons.Outlined.Tune,
                         title = if (movements.isEmpty()) "Sin movimientos" else "Sin resultados",
                         message = if (movements.isEmpty()) {
-                            "La captura automatica agregara aqui los movimientos detectados en notificaciones bancarias."
+                            "Presiona 'Importar Extracto' para cargar movimientos de los ultimos 2 meses en CSV/Texto o espera notificaciones."
                         } else {
                             "Cambia el filtro para revisar otros movimientos."
-                        }
+                        },
+                        actionLabel = if (movements.isEmpty()) "Importar Extracto" else null,
+                        onAction = if (movements.isEmpty()) { { showImportDialog = true } } else null
                     )
                 }
             } else {
@@ -185,6 +213,100 @@ fun MovementsListScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ImportStatementDialog(
+    currencyFormat: NumberFormat,
+    onDismiss: () -> Unit,
+    onImport: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit
+) {
+    var selectedBank by remember { mutableStateOf(com.finanzas.automatica.domain.model.BankEntity.BANCOLOMBIA) }
+    var inputText by remember { mutableStateOf("") }
+    var summaryResult by remember { mutableStateOf<com.finanzas.automatica.domain.importer.ImportSummary?>(null) }
+    var isImported by remember { mutableStateOf(false) }
+
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Importar Extracto de Banco", fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    "Pega las lineas de tu extracto bancario (CSV o texto plano de ultimos 2 meses):",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
+                    com.finanzas.automatica.domain.model.BankEntity.entries.filter { it != com.finanzas.automatica.domain.model.BankEntity.UNKNOWN }.forEach { bank ->
+                        FilterChip(
+                            selected = selectedBank == bank,
+                            onClick = { selectedBank = bank },
+                            label = { Text(bank.name) }
+                        )
+                    }
+                }
+
+                androidx.compose.material3.OutlinedTextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
+                    label = { Text("Texto o renglones del extracto") },
+                    placeholder = { Text("11/08/2026,Transferencia LUIS RINCON,100000\n10/08/2026,Compra Exito,-45000") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp),
+                    maxLines = 6
+                )
+
+                TextButton(onClick = {
+                    inputText = """
+                        11/08/2026, Transferencia LUIS RINCON, 100000
+                        08/08/2026, Compra Supermercado Exito, -45000
+                        01/08/2026, Pago Servicios EPM, -120000
+                        25/07/2026, Abono de Nomina, 2500000
+                        15/07/2026, Transferencia Nequi recibida, 80000
+                    """.trimIndent()
+                }) {
+                    Text("Cargar ejemplo de los ultimos 2 meses")
+                }
+
+                summaryResult?.let { summary ->
+                    FinanceCard(containerColor = IncomeGreen.copy(alpha = 0.1f)) {
+                        Text("Resumen de importacion:", fontWeight = FontWeight.Bold)
+                        Text("• Transacciones analizadas: ${summary.totalCount}")
+                        Text("• Ingresos (${summary.incomeCount}): ${currencyFormat.format(summary.totalIncomeAmount / 100.0)}")
+                        Text("• Egresos (${summary.expenseCount}): ${currencyFormat.format(summary.totalExpenseAmount / 100.0)}")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.Button(
+                onClick = {
+                    if (isImported) {
+                        onDismiss()
+                    } else if (inputText.isNotBlank()) {
+                        onImport(inputText, selectedBank) { summary ->
+                            summaryResult = summary
+                            isImported = true
+                        }
+                    }
+                },
+                enabled = inputText.isNotBlank()
+            ) {
+                Text(if (isImported) "Listo" else "Procesar e Importar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
 
 @Composable

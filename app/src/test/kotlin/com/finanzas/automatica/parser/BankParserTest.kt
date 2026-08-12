@@ -42,6 +42,17 @@ class BankParserTest {
     }
 
     @Test
+    fun `parse Bancolombia SMS transfer from SMS app package`() {
+        val smsText = "Bancolombia: Recibiste una transferencia por $100,000 de LUIS RINCON en tu cuenta **3463, el 11/08/2026 a las 18:43. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado."
+        val result = registry.parse("com.google.android.apps.messaging", smsText)
+        assert(result is ParseResult.Success) { "Failed to parse SMS: $smsText -> $result" }
+        val movement = (result as ParseResult.Success).movement
+        assert(movement.type == MovementType.INCOME)
+        assert(movement.amount == 10000000L) // $100.000 COP en centavos
+        assert(movement.counterpartyRaw == "LUIS RINCON")
+    }
+
+    @Test
     fun `parse Daviplata notifications from fixtures`() {
         val fixture = File(fixtureDir, "daviplata_notifications.txt").readText()
         val lines = fixture.lines()

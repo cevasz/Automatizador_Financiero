@@ -36,14 +36,14 @@ class NotificationCaptureService : NotificationListenerService() {
         val packageName = sbn.packageName
         val notification = sbn.notification
 
-        // Verificar si es de un banco soportado
-        if (!parserRegistry.getSupportedPackages().any { packageName.contains(it, ignoreCase = true) }) {
-            return
-        }
-
         // Extraer texto de la notificación
         val text = extractNotificationText(notification)
         if (text.isNullOrBlank()) {
+            return
+        }
+
+        // Verificar si es de un banco o SMS bancario soportado
+        if (!parserRegistry.canParseAny(packageName, text)) {
             return
         }
 

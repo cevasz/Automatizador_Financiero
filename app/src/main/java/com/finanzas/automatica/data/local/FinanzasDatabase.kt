@@ -16,9 +16,11 @@ import com.finanzas.automatica.data.local.entity.*
         CategoryEntity::class,
         BudgetEntity::class,
         SavingsGoalEntity::class,
-        ClassificationRuleEntity::class
+        ClassificationRuleEntity::class,
+        InvoiceEntity::class,
+        InvoiceItemEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -30,6 +32,7 @@ abstract class FinanzasDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun savingsGoalDao(): SavingsGoalDao
     abstract fun classificationRuleDao(): ClassificationRuleDao
+    abstract fun invoiceDao(): InvoiceDao
 
     companion object {
         @Volatile

@@ -17,15 +17,23 @@ class BancolombiaParser : BaseBankParser(
     override fun parse(notificationText: String): ParseResult {
         val lowerText = notificationText.lowercase(Locale.getDefault())
         val type = when {
-            lowerText.contains("abono") || lowerText.contains("recibido") || lowerText.contains("transferencia recibida") -> MovementType.INCOME
-            lowerText.contains("retiro") || lowerText.contains("compra") || lowerText.contains("pago") || lowerText.contains("transferencia enviada") -> MovementType.EXPENSE
+            lowerText.contains("abono") ||
+            lowerText.contains("recibido") ||
+            lowerText.contains("recibiste") ||
+            lowerText.contains("transferencia recibida") ||
+            lowerText.contains("recibiste una transferencia") -> MovementType.INCOME
+            lowerText.contains("retiro") ||
+            lowerText.contains("compra") ||
+            lowerText.contains("pago") ||
+            lowerText.contains("pagaste") ||
+            lowerText.contains("transferencia enviada") -> MovementType.EXPENSE
             else -> determineType(lowerText)
         }
 
         val amount = parseAmount(notificationText)
             ?: return ParseResult.Failure("No se pudo extraer monto", notificationText)
 
-        val counterparty = extractCounterparty(lowerText)
+        val counterparty = extractCounterparty(notificationText)
         val paymentMethod = determinePaymentMethod(lowerText)
         val date = parseDate(notificationText) ?: Instant.now()
 
@@ -36,19 +44,24 @@ class BancolombiaParser : BaseBankParser(
             counterpartyRaw = counterparty,
             date = date,
             rawText = notificationText,
-            confidence = 0.85
+            confidence = 0.90
         )
     }
 
     private fun extractCounterparty(text: String): String {
         val patterns = listOf(
-            Pattern.compile("a\\s+nombre\\s+de\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("\\bde\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("\\ben\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("a\\s+nombre\\s+de\\s+([^\\.,\\n]+?)(?=\\s+en|\\s+desde|\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("de\\s+([^\\.,\\n]+?)(?=\\s+en|\\s+desde|\\s+por|\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("en\\s+([^\\.,\\n]+?)(?=\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE)
         )
         for (pattern in patterns) {
             val matcher = pattern.matcher(text)
-            if (matcher.find()) return matcher.group(1).trim()
+            if (matcher.find()) {
+                val extracted = matcher.group(1).trim()
+                if (extracted.isNotBlank() && !extracted.equals("bancolombia", ignoreCase = true)) {
+                    return extracted
+                }
+            }
         }
         return "Bancolombia"
     }

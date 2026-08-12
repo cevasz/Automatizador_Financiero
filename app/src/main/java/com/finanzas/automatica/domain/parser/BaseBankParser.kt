@@ -16,12 +16,40 @@ abstract class BaseBankParser(
     override val supportedPackageNames: List<String>
 ) : BankParser {
 
+    private val smsPackages = listOf(
+        "com.google.android.apps.messaging",
+        "com.samsung.android.messaging",
+        "com.android.mms",
+        "com.android.messaging",
+        "messaging",
+        "mms",
+        "sms"
+    )
+
     override fun canParse(packageName: String, notificationText: String): Boolean {
-        return supportedPackageNames.any { packageName.contains(it, ignoreCase = true) }
+        val matchesPackage = supportedPackageNames.any { packageName.contains(it, ignoreCase = true) }
+        if (matchesPackage) return true
+
+        val lower = notificationText.lowercase(Locale.getDefault())
+        val bankKeywordMatches = when (bankEntity) {
+            BankEntity.BANCOLOMBIA -> lower.contains("bancolombia")
+            BankEntity.NEQUI -> lower.contains("nequi")
+            BankEntity.DAVIPLATA -> lower.contains("daviplata") || lower.contains("davivienda")
+            BankEntity.NU -> lower.contains("nu ") || lower.contains("nubank")
+            BankEntity.LULO -> lower.contains("lulo")
+            else -> false
+        }
+
+        val isSmsApp = smsPackages.any { packageName.contains(it, ignoreCase = true) }
+        if (isSmsApp && bankKeywordMatches) {
+            return true
+        }
+
+        return bankKeywordMatches
     }
 
     protected fun parseAmount(text: String): Long? {
-        // Busca patrones como: $ 50.000, $50.000, 50.000 COP, 50000
+        // Busca patrones como: $ 50.000, $50,000, $100.000, 50.000 COP, 50000
         val patterns = listOf(
             Pattern.compile("\\$\\s*([\\d.,]+)"),
             Pattern.compile("([\\d.,]+)\\s*COP"),
@@ -33,7 +61,7 @@ abstract class BaseBankParser(
             if (matcher.find()) {
                 val amountStr = matcher.group(1).replace(",", "").replace(".", "")
                 return try {
-                    amountStr.toLong()
+                    amountStr.toLong() * 100 // Convertir pesos COP a centavos COP
                 } catch (e: NumberFormatException) {
                     null
                 }

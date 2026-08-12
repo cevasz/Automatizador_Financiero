@@ -80,4 +80,30 @@ class MovementViewModel(
             loadPendingCount()
         }
     }
+
+    fun importStatementText(
+        text: String,
+        defaultBank: com.finanzas.automatica.domain.model.BankEntity,
+        onComplete: (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit
+    ) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val summary = com.finanzas.automatica.domain.importer.StatementImporter.parseStatementText(text, defaultBank)
+                val pipeline = com.finanzas.automatica.domain.enrichment.EnrichmentPipeline(database)
+
+                for (movement in summary.importedMovements) {
+                    pipeline.process(movement)
+                }
+
+                loadMovements()
+                loadPendingCount()
+                onComplete(summary)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }
