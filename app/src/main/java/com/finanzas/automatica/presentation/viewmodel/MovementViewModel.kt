@@ -5,10 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.MovementRepositoryImpl
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.importer.ImportSummary
+import com.finanzas.automatica.domain.importer.PdfStatementExtractor
+import com.finanzas.automatica.domain.importer.StatementImporter
+import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.Movement
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MovementViewModel(
     private val database: FinanzasDatabase
@@ -83,27 +89,55 @@ class MovementViewModel(
 
     fun importStatementText(
         text: String,
-        defaultBank: com.finanzas.automatica.domain.model.BankEntity,
-        onComplete: (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit
+        defaultBank: BankEntity,
+        onComplete: (ImportSummary) -> Unit
     ) {
         viewModelScope.launch {
-            _isLoading.value = true
+            importRaw(text, defaultBank, onComplete)
+        }
+    }
+
+    fun importStatementPdf(
+        pdfBytes: ByteArray,
+        defaultBank: BankEntity,
+        onComplete: (ImportSummary) -> Unit
+    ) {
+        viewModelScope.launch {
             try {
-                val summary = com.finanzas.automatica.domain.importer.StatementImporter.parseStatementText(text, defaultBank)
-                val pipeline = com.finanzas.automatica.domain.enrichment.EnrichmentPipeline(database)
-
-                for (movement in summary.importedMovements) {
-                    pipeline.process(movement)
+                val text = withContext(Dispatchers.Default) {
+                    PdfStatementExtractor.extractText(pdfBytes)
                 }
-
-                loadMovements()
-                loadPendingCount()
-                onComplete(summary)
+                importRaw(text, defaultBank, onComplete)
             } catch (e: Exception) {
                 e.printStackTrace()
+                onComplete(ImportSummary(0, 0, 0, 0, 0, emptyList()))
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private suspend fun importRaw(
+        text: String,
+        defaultBank: BankEntity,
+        onComplete: (ImportSummary) -> Unit
+    ) {
+        _isLoading.value = true
+        try {
+            val summary = StatementImporter.parseStatementText(text, defaultBank)
+            val pipeline = com.finanzas.automatica.domain.enrichment.EnrichmentPipeline(database)
+
+            for (movement in summary.importedMovements) {
+                pipeline.process(movement)
+            }
+
+            loadMovements()
+            loadPendingCount()
+            onComplete(summary)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            _isLoading.value = false
         }
     }
 }

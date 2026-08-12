@@ -23,6 +23,12 @@ android {
         viewBinding = true
     }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
@@ -103,6 +109,9 @@ dependencies {
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // PDF (lectura de extractos bancarios en PDF, 100% offline)
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
