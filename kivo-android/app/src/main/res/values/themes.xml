@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Tema base de la app (Compose + Material3). Solo cubre el frame nativo previo
+        al primer render de Compose (splash del sistema, rotaciones); una vez Compose
+        pinta, FinanzasAutomaticaTheme toma el control real de status/nav bar según el
+        ThemeMode/paleta elegidos por el usuario (ver Theme.kt). Este archivo (modo
+        claro) se complementa con values-night/themes.xml para que ese primer frame no
+        "flashee" claro cuando el sistema está en modo oscuro.
+    -->
+    <style name="Theme.FinanzasAutomatica" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#FEFCF5</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+</resources>

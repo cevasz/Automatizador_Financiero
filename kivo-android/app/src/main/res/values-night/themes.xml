@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Contraparte oscura de values/themes.xml — evita el flash de fondo claro
+         en el primer frame nativo cuando el sistema está en modo oscuro. -->
+    <style name="Theme.FinanzasAutomatica" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#14161C</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+</resources>
