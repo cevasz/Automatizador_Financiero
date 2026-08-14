@@ -25,9 +25,9 @@
     "semantic_hash": "0bc020d491fca99550c1ea3de0a5f862"
   },
   "kivo-android/app/build.gradle.kts": {
-    "mtime": 1786733525.4549146,
-    "ast_hash": "d5a0317585f976c8e73c330bbb50c35e",
-    "semantic_hash": "d5a0317585f976c8e73c330bbb50c35e"
+    "mtime": 1786736657.5527654,
+    "ast_hash": "34ffc69a94e3e7e43ad122f4991af378",
+    "semantic_hash": "34ffc69a94e3e7e43ad122f4991af378"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/FinanzasApplication.kt": {
     "mtime": 1786731294.4378757,
@@ -180,9 +180,9 @@
     "semantic_hash": "39da5f89d3b364d0cb9d6b2fca2b31e8"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/domain/importer/PdfStatementExtractor.kt": {
-    "mtime": 1786733182.4404464,
-    "ast_hash": "2f809923ef4e1bc41949b50caae113e3",
-    "semantic_hash": "2f809923ef4e1bc41949b50caae113e3"
+    "mtime": 1786736424.054302,
+    "ast_hash": "5267af066fc6f72836a71a0ffa3ca64c",
+    "semantic_hash": "5267af066fc6f72836a71a0ffa3ca64c"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/domain/importer/StatementImporter.kt": {
     "mtime": 1786727799.8060195,
@@ -325,9 +325,9 @@
     "semantic_hash": "5bc6a4665db98533ea920787b23775df"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SettingsScreen.kt": {
-    "mtime": 1786733531.2339668,
-    "ast_hash": "637e4a03851bc1e18a6001f85ce33779",
-    "semantic_hash": "637e4a03851bc1e18a6001f85ce33779"
+    "mtime": 1786736595.4583757,
+    "ast_hash": "676b3b877482f5fd4da8c3535efbb98f",
+    "semantic_hash": "676b3b877482f5fd4da8c3535efbb98f"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/theme/Color.kt": {
     "mtime": 1786731705.663322,
@@ -360,9 +360,9 @@
     "semantic_hash": "2a95c12e06c8bb0e905513293b56e0db"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/MovementViewModel.kt": {
-    "mtime": 1786733238.7290757,
-    "ast_hash": "e256bf020e2ed8558c0fc23deaca09e5",
-    "semantic_hash": "e256bf020e2ed8558c0fc23deaca09e5"
+    "mtime": 1786736440.700406,
+    "ast_hash": "93cfbd3b3509e57d80ccf8ba486a7189",
+    "semantic_hash": "93cfbd3b3509e57d80ccf8ba486a7189"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/NotificationCenterViewModel.kt": {
     "mtime": 1786516148.6316905,
@@ -565,9 +565,9 @@
     "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
   },
   "docs/PENDIENTES.md": {
-    "mtime": 1786733613.5456936,
-    "ast_hash": "1f59ba5579acae07fce77b14d18c7b8f",
-    "semantic_hash": "1f59ba5579acae07fce77b14d18c7b8f"
+    "mtime": 1786736690.6869738,
+    "ast_hash": "ec98db822e5bef606e2defce072cdc07",
+    "semantic_hash": "ec98db822e5bef606e2defce072cdc07"
   },
   "graphify-out/converted/SDD_App_Finanzas_94a76240.md": {
     "mtime": 1786694086.4913433,
@@ -588,5 +588,10 @@
     "mtime": 1786727842.660118,
     "ast_hash": "7abf8d6a594a7a9a18fc9e9d89f29dc9",
     "semantic_hash": "7abf8d6a594a7a9a18fc9e9d89f29dc9"
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/PostNotificationsPermissionState.kt": {
+    "mtime": 1786736496.8457575,
+    "ast_hash": "f38c0c188e4831471d900771951229e4",
+    "semantic_hash": "f38c0c188e4831471d900771951229e4"
   }
 }
