@@ -1,5 +1,8 @@
 # Guía del proyecto — Kivo
 
+> Especificación completa (visión, arquitectura, roadmap, riesgos, cumplimiento
+> normativo): `docs/SDD.md`.
+
 ## Identidad
 - Nombre: **Kivo**, tagline "Tu dinero, en orden".
 - Paleta: coral `#F56565`/`#FC8181`, pizarra `#2D3748`, crema `#FEFCF5`;

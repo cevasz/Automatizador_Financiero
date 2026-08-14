@@ -4,6 +4,17 @@
 Kivo es una app Android que lee notificaciones bancarias autorizadas (Nequi, Bancolombia,
 Daviplata, Nu, Lulo Bank) para construir un historial financiero automático, sin pedir nunca
 credenciales ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
+Especificación completa (visión de producto, arquitectura objetivo, modelo de datos,
+roadmap por fases, riesgos): `docs/SDD.md` (transcripción viva de `SDD_App_Finanzas.docx`).
+
+## Contexto regulatorio (Colombia, 2026) — condiciona el diseño, no solo el MVP
+- **Decreto 0368 de 2026**: obliga el Sistema de Finanzas Abiertas (Open Finance) para
+  entidades vigiladas por la Superfinanciera. La lectura de notificaciones es una estrategia
+  puente: el diseño debe anticipar migrar hacia APIs oficiales de Open Finance en 12-24 meses
+  (ver sección 5.2 y Fase 4 del roadmap en `docs/SDD.md`) sin rediseñar clasificación ni agenda.
+- **Ley 1581 de 2012** (habeas data): exige poder exportar/eliminar toda la información del
+  usuario en cualquier momento (ya implementado en Ajustes) y, a futuro, registro formal como
+  responsable del tratamiento + consentimiento diferenciado por fuente de captura.
 
 ## Estructura del repositorio (monorepo)
 - `kivo-android/`: app Android nativa (Kotlin + Compose). Proyecto Gradle autocontenido.
@@ -58,7 +69,18 @@ credenciales ni acceder directamente a cuentas. Guía viva del proyecto: `docs/g
 
 ## Documentos vivos
 - `docs/guia.md`: resumen operativo de arquitectura, sincronizacion y alcance.
+- `docs/SDD.md`: especificación completa del producto (visión, arquitectura, modelo de
+  datos, roadmap, riesgos, cumplimiento normativo). `SDD_App_Finanzas.docx` en la raíz es
+  la fuente original; si cambia, actualizar `docs/SDD.md` a mano para no desincronizar.
 - `graphify-out/GRAPH_REPORT.md`: mapa de dependencias generado por `graphify`.
+
+## Cómo contextualizarse en este repo (para agentes / sesiones nuevas)
+`graphify-out/` ya existe y se mantiene actualizado (`/graphify` re-extrae solo lo
+nuevo/cambiado). **Antes de leer archivos sueltos o explorar el árbol a mano, usa
+`graphify query "<pregunta>"`** (o el skill `graphify`) para ubicar el código/doc relevante
+con pocos tokens — cae directo a nodos y líneas concretas en vez de barrer directorios.
+Recurre a Explore/Read completos solo cuando graphify no encuentre nodos coincidentes o
+cuando ya sepas exactamente qué archivo necesitas editar.
 
 ## Convenciones de código
 - Kotlin idiomático, sin dependencias innecesarias.
@@ -69,9 +91,9 @@ credenciales ni acceder directamente a cuentas. Guía viva del proyecto: `docs/g
 - Compilar/testear desde `kivo-android/` (proyecto autocontenido).
 
 ## Entidades bancarias soportadas en el MVP
-Bancolombia, Nequi, Daviplata, Nu, Lulo Bank (ver sección 5 y 6.1 del SDD para el detalle
-de flujo). Agregar una entidad nueva = agregar un `BankParser` nuevo + sus fixtures,
-sin tocar el resto del sistema.
+Bancolombia, Nequi, Daviplata, Nu, Lulo Bank (ver secciones 5 y 6.1 de `docs/SDD.md` para
+el detalle de flujo). Agregar una entidad nueva = agregar un `BankParser` nuevo + sus
+fixtures, sin tocar el resto del sistema.
 
 ## Qué NO hacer
 - No usar la API de Accesibilidad para ejecutar acciones automáticas (prohibido por
