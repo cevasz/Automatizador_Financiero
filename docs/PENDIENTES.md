@@ -18,16 +18,23 @@ fuente: "[[docs/SDD]]"
 
 ## 🔴 Rápidos (bajo esfuerzo, alto impacto)
 
-- [ ] Conectar el botón "Abonar" en Metas de ahorro — [[SavingsGoalsViewModel]].addProgress() ya existe y ya está cableado en [[AppNavHost]] (`onAddProgress = savingsGoalsViewModel::addProgress`); solo falta el botón/diálogo en [[SavingsGoalsScreen]] que lo dispare. #pendiente/rapido
-- [ ] Arreglar el selector de formato de exportación — `exportDataFormat` en Ajustes puede decir "CSV" pero [[SettingsViewModel]].exportData() siempre escribe JSON sin importar la selección. #pendiente/rapido #bug
-- [ ] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`) — hoy solo compila el APK (`assembleDebug`), nunca corre los 28 tests existentes; una regresión futura no se detectaría sola. #pendiente/rapido #ci
+- [x] Conectar el botón "Abonar" en Metas de ahorro — se agregó el botón + diálogo en [[SavingsGoalsScreen]]. De paso se corrigió un bug real: `addProgress()` **reemplazaba** el ahorro en vez de sumarle (`SavingsGoalDao.updateProgress` hace un `SET`, no un incremento). #pendiente/rapido ✅ 2026-08-14
+- [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
+- [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14
 
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
-- [ ] Crear/editar presupuesto desde la UI — `onAddBudget`/`onBudgetClick` son no-ops en [[BudgetsScreen]]. #pendiente/deuda-tecnica
-- [ ] Pantalla de gestión de categorías (crear/editar/eliminar categorías propias) — hoy solo existen las categorías sembradas por `DefaultCategories`, sin UI de administración. #pendiente/deuda-tecnica
-- [ ] UI para reglas de clasificación — `ClassificationRuleEntity` existe en Room pero ninguna pantalla la expone; el usuario no puede ver ni editar sus propias reglas. #pendiente/deuda-tecnica
-- [ ] Configurar variante *release* (firma, ofuscación/R8) — hoy el proyecto solo tiene variante debug lista. #pendiente/deuda-tecnica
+- [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14
+- [ ] Pantalla de gestión de categorías (crear/editar/eliminar categorías propias) — hoy solo existen las categorías sembradas por `DefaultCategories`, sin UI de administración. **Diferido** (feature nueva, no un botón roto). #pendiente/deuda-tecnica
+- [ ] UI para reglas de clasificación — `ClassificationRuleEntity` existe en Room pero ninguna pantalla la expone; el usuario no puede ver ni editar sus propias reglas. **Diferido** (feature nueva, no un botón roto). #pendiente/deuda-tecnica
+- [ ] Configurar variante *release* (firma, ofuscación/R8) — hoy el proyecto solo tiene variante debug lista. **Diferido** (config de build, no un botón). #pendiente/deuda-tecnica
+
+### Botones que además se arreglaron en esta pasada (auditoría completa de `AppNavHost`)
+No estaban en la lista original pero aparecieron al auditar cada callback: siete botones
+en `AppNavHost` estaban literalmente cableados a `{}` (no hacían nada al tocarlos).
+- [x] Agenda: "Agregar contacto" y tocar un contacto — ya existía `AddEditAgendaEntryScreen` completo pero sin ninguna ruta de navegación (pantalla huérfana). #pendiente/rapido ✅ 2026-08-14
+- [x] Movimientos: botón "Detalle" — ahora abre un diálogo para recategorizar el movimiento (`MovementViewModel.correctMovement()` ya existía, nada lo llamaba). #pendiente/rapido ✅ 2026-08-14
+- [x] Reactividad: Agenda, Presupuestos y Metas de ahorro leían con consultas de una sola vez (mismo patrón de bug que Movimientos, corregido antes) — crear/editar desde la pantalla nueva no se veía en la lista hasta reiniciar la app. Se convirtieron a `Flow` reactivo sobre Room (se agregó `BudgetDao.getAllFlow()`, no existía). #pendiente/rapido ✅ 2026-08-14
 
 ## 🟢 Fase 1 (MVP) — entregables del propio alcance aún sin terminar
 

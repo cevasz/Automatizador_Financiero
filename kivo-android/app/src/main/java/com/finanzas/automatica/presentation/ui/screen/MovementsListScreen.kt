@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
 import com.finanzas.automatica.domain.model.MovementType
@@ -93,9 +94,10 @@ private enum class MovementFilter(val routeValue: String, val label: String) {
 fun MovementsListScreen(
     movements: List<Movement>,
     initialFilter: String = "all",
-    onMovementClick: (Movement) -> Unit = {},
+    categories: List<Category> = emptyList(),
     onConfirm: (Long) -> Unit = {},
     onReject: (Long) -> Unit = {},
+    onCorrect: (Long, Long) -> Unit = { _, _ -> },
     onImportStatement: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
     onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
     onOpenMenu: (() -> Unit)? = null,
@@ -110,6 +112,7 @@ fun MovementsListScreen(
         mutableStateOf(MovementFilter.fromRoute(initialFilter))
     }
     var showImportDialog by remember { mutableStateOf(false) }
+    var recategorizeTarget by remember { mutableStateOf<Movement?>(null) }
 
     val filteredMovements = remember(movements, selectedFilter) {
         movements
@@ -137,6 +140,18 @@ fun MovementsListScreen(
                 onImportPdf(bytes, bank) { summary ->
                     onComplete(summary)
                 }
+            }
+        )
+    }
+
+    recategorizeTarget?.let { movement ->
+        RecategorizeDialog(
+            movement = movement,
+            categories = categories.filter { it.type == movement.type },
+            onDismiss = { recategorizeTarget = null },
+            onConfirm = { categoryId ->
+                onCorrect(movement.id, categoryId)
+                recategorizeTarget = null
             }
         )
     }
@@ -227,7 +242,7 @@ fun MovementsListScreen(
                     MovementCard(
                         movement = movement,
                         currencyFormat = currencyFormat,
-                        onClick = { onMovementClick(movement) },
+                        onClick = { recategorizeTarget = movement },
                         onConfirm = { onConfirm(movement.id) },
                         onReject = { onReject(movement.id) },
                         modifier = Modifier.animateItemPlacement()
@@ -236,6 +251,68 @@ fun MovementsListScreen(
             }
         }
     }
+}
+
+/**
+ * Botón "Detalle" de un movimiento ya procesado: deja recategorizarlo (el motor de
+ * reglas puede acertar la categoría equivocada). Antes este botón no tenía ningún
+ * efecto -- MovementViewModel.correctMovement() ya existía pero nada lo llamaba.
+ */
+@Composable
+private fun RecategorizeDialog(
+    movement: Movement,
+    categories: List<Category>,
+    onDismiss: () -> Unit,
+    onConfirm: (categoryId: Long) -> Unit
+) {
+    var selectedCategoryId by remember(movement.id) { mutableStateOf(movement.categoryId) }
+
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Recategorizar movimiento", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = movement.counterpartyRaw,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (categories.isEmpty()) {
+                    Text(
+                        text = "No hay categorías de este tipo todavía.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        categories.forEach { category ->
+                            FilterChip(
+                                selected = selectedCategoryId == category.id,
+                                onClick = { selectedCategoryId = category.id },
+                                label = { Text(category.name) }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.Button(
+                onClick = { selectedCategoryId?.let(onConfirm) },
+                enabled = selectedCategoryId != null && selectedCategoryId != movement.categoryId
+            ) {
+                Text("Guardar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
 
 @Composable

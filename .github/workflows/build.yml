@@ -29,6 +29,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x kivo-android/gradlew
 
+      - name: Run unit tests
+        working-directory: kivo-android
+        run: ./gradlew test --no-daemon
+
       - name: Build Debug APK
         working-directory: kivo-android
         run: ./gradlew assembleDebug --no-daemon

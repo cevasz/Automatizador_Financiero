@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.local.entity.AppNotificationEntity
 import com.finanzas.automatica.data.repository.AppNotificationRepository
+import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.MovementRepositoryImpl
 import com.finanzas.automatica.domain.enrichment.toDomain
 import com.finanzas.automatica.domain.importer.ImportSummary
 import com.finanzas.automatica.domain.importer.PdfStatementExtractor
 import com.finanzas.automatica.domain.importer.StatementImporter
 import com.finanzas.automatica.domain.model.BankEntity
+import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +29,14 @@ class MovementViewModel(
 ) : ViewModel() {
 
     private val repository = MovementRepositoryImpl(database)
+    private val categoryRepository = CategoryRepositoryImpl(database)
     private val notifications = AppNotificationRepository(database)
+
+    // Reactivo sobre Room: se usa para el dialogo de recategorizar un movimiento
+    // (boton "Detalle" en MovementsListScreen), que antes no tenia ningun efecto.
+    val categories: StateFlow<List<Category>> = categoryRepository.getAllFlow()
+        .map { entities -> entities.map { it.toDomain() } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Reactivo sobre Room: cualquier escritura a la tabla "movements" (desde esta
     // instancia o desde cualquier otra, p. ej. Dashboard y la lista de Movimientos

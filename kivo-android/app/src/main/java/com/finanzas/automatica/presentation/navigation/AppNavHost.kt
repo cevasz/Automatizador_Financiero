@@ -66,6 +66,9 @@ import com.finanzas.automatica.presentation.ui.theme.AppThemePalette
 import com.finanzas.automatica.presentation.ui.theme.ThemeMode
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import androidx.compose.material.icons.outlined.ReceiptLong
+import com.finanzas.automatica.presentation.ui.screen.AddEditAgendaEntryScreen
+import com.finanzas.automatica.presentation.ui.screen.AddEditBudgetScreen
+import com.finanzas.automatica.presentation.ui.screen.AddEditSavingsGoalScreen
 import com.finanzas.automatica.presentation.ui.screen.AgendaScreen
 import com.finanzas.automatica.presentation.ui.screen.LoginScreen
 import com.finanzas.automatica.presentation.ui.screen.BudgetsScreen
@@ -346,14 +349,16 @@ fun AppNavHost(database: FinanzasDatabase) {
                     MovementViewModel(database)
                 }
                 val movements by movementViewModel.movements.collectAsState()
+                val movementCategories by movementViewModel.categories.collectAsState()
                 val initialFilter = backStackEntry.arguments?.getString("filter") ?: "all"
 
                 MovementsListScreen(
                     movements = movements,
                     initialFilter = initialFilter,
-                    onMovementClick = {},
+                    categories = movementCategories,
                     onConfirm = movementViewModel::confirmMovement,
                     onReject = movementViewModel::rejectMovement,
+                    onCorrect = movementViewModel::correctMovement,
                     onImportStatement = movementViewModel::importStatementText,
                     onImportPdf = movementViewModel::importStatementPdf,
                     onOpenMenu = ::openDrawer
@@ -392,9 +397,35 @@ fun AppNavHost(database: FinanzasDatabase) {
                 AgendaScreen(
                     agendaEntries = entries,
                     categories = categories,
-                    onEntryClick = {},
-                    onAddEntry = {},
+                    onEntryClick = { entry -> navigateTo(Screen.agendaEditRoute(entry.id)) },
+                    onAddEntry = { navigateTo(Screen.agendaEditRoute()) },
                     onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(
+                route = Screen.AGENDA_EDIT_PATTERN,
+                arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })
+            ) { backStackEntry ->
+                val agendaViewModel: AgendaViewModel = databaseViewModel {
+                    AgendaViewModel(database)
+                }
+                val entries by agendaViewModel.entries.collectAsState()
+                val categories by agendaViewModel.categories.collectAsState()
+                val id = backStackEntry.arguments?.getLong("id") ?: -1L
+                val entry = entries.find { it.id == id }
+
+                AddEditAgendaEntryScreen(
+                    entry = entry,
+                    categories = categories,
+                    onSave = { updated ->
+                        if (entry == null) agendaViewModel.addEntry(updated) else agendaViewModel.updateEntry(updated)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = entry?.let { existing ->
+                        { agendaViewModel.deleteEntry(existing.id); navController.popBackStack() }
+                    }
                 )
             }
 
@@ -410,9 +441,35 @@ fun AppNavHost(database: FinanzasDatabase) {
                     budgets = budgets,
                     categories = categories,
                     spentByBudgetKey = spentByBudgetKey,
-                    onBudgetClick = {},
-                    onAddBudget = {},
+                    onBudgetClick = { budget -> navigateTo(Screen.budgetEditRoute(budget.id)) },
+                    onAddBudget = { navigateTo(Screen.budgetEditRoute()) },
                     onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(
+                route = Screen.BUDGET_EDIT_PATTERN,
+                arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })
+            ) { backStackEntry ->
+                val budgetsViewModel: BudgetsViewModel = databaseViewModel {
+                    BudgetsViewModel(database)
+                }
+                val budgets by budgetsViewModel.budgets.collectAsState()
+                val categories by budgetsViewModel.categories.collectAsState()
+                val id = backStackEntry.arguments?.getLong("id") ?: -1L
+                val budget = budgets.find { it.id == id }
+
+                AddEditBudgetScreen(
+                    budget = budget,
+                    categories = categories,
+                    onSave = { updated ->
+                        if (budget == null) budgetsViewModel.addBudget(updated) else budgetsViewModel.updateBudget(updated)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = budget?.id?.let { budgetId ->
+                        { budgetsViewModel.deleteBudget(budgetId); navController.popBackStack() }
+                    }
                 )
             }
 
@@ -424,10 +481,34 @@ fun AppNavHost(database: FinanzasDatabase) {
 
                 SavingsGoalsScreen(
                     goals = goals,
-                    onGoalClick = {},
-                    onAddGoal = {},
+                    onGoalClick = { goal -> navigateTo(Screen.savingsEditRoute(goal.id)) },
+                    onAddGoal = { navigateTo(Screen.savingsEditRoute()) },
                     onAddProgress = savingsGoalsViewModel::addProgress,
                     onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(
+                route = Screen.SAVINGS_EDIT_PATTERN,
+                arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })
+            ) { backStackEntry ->
+                val savingsGoalsViewModel: SavingsGoalsViewModel = databaseViewModel {
+                    SavingsGoalsViewModel(database)
+                }
+                val goals by savingsGoalsViewModel.goals.collectAsState()
+                val id = backStackEntry.arguments?.getLong("id") ?: -1L
+                val goal = goals.find { it.id == id }
+
+                AddEditSavingsGoalScreen(
+                    goal = goal,
+                    onSave = { updated ->
+                        if (goal == null) savingsGoalsViewModel.addGoal(updated) else savingsGoalsViewModel.updateGoal(updated)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = goal?.id?.let { goalId ->
+                        { savingsGoalsViewModel.deleteGoal(goalId); navController.popBackStack() }
+                    }
                 )
             }
 
@@ -500,7 +581,7 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onConnect = sessionVm::connect,
                     onDisconnect = sessionVm::disconnect,
                     onSyncNow = {
-                        settingsViewModel.exportData()
+                        settingsViewModel.prepareSyncSnapshot()
                         sessionVm.markSynced()
                     },
                     onOpenMenu = ::openDrawer
@@ -548,5 +629,15 @@ sealed class Screen(
     companion object {
         val bottomItems: List<Screen>
             get() = listOf(Dashboard, Movements, Invoices, Agenda, Budgets)
+
+        // Rutas de crear/editar (no son destinos del menu, por eso no son objetos Screen
+        // completos): -1 significa "nuevo registro", cualquier otro valor es el id a editar.
+        const val AGENDA_EDIT_PATTERN = "agenda/edit?id={id}"
+        const val BUDGET_EDIT_PATTERN = "budgets/edit?id={id}"
+        const val SAVINGS_EDIT_PATTERN = "savings/edit?id={id}"
+
+        fun agendaEditRoute(id: Long = -1L) = "agenda/edit?id=$id"
+        fun budgetEditRoute(id: Long? = null) = "budgets/edit?id=${id ?: -1L}"
+        fun savingsEditRoute(id: Long? = null) = "savings/edit?id=${id ?: -1L}"
     }
 }

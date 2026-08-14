@@ -35,6 +35,12 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets ORDER BY year DESC, month DESC, categoryId ASC")
     suspend fun getAll(): List<BudgetEntity>
 
+    // Reactivo sobre Room: usado por BudgetsViewModel para que crear/editar/eliminar
+    // un presupuesto desde cualquier pantalla se refleje al instante en todas las
+    // demas (misma razon que MovementDao.getAllFlow(), ver esa clase).
+    @Query("SELECT * FROM budgets ORDER BY year DESC, month DESC, categoryId ASC")
+    fun getAllFlow(): Flow<List<BudgetEntity>>
+
     @Query("DELETE FROM budgets WHERE id = :id")
     suspend fun deleteById(id: Long): Int
 

@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
+import com.finanzas.automatica.data.local.entity.AppNotificationEntity
+import com.finanzas.automatica.data.repository.AppNotificationRepository
 import com.finanzas.automatica.data.repository.DefaultCategories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ class SettingsViewModel(
 
     private val appContext = context.applicationContext
     private val preferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val notifications = AppNotificationRepository(database)
 
     init {
         // Idempotente: la primera instancia lo inicializa, el resto solo lo reutiliza.
@@ -119,16 +122,66 @@ class SettingsViewModel(
         ThemePreferences.setThemePalette(palette)
     }
 
+    /**
+     * Exporta los movimientos en el formato elegido por el usuario en Ajustes.
+     * Antes esta funcion ignoraba _exportDataFormat.value y siempre escribia un JSON
+     * completo, sin importar si el selector decia CSV, Excel o PDF -- y nunca avisaba
+     * al usuario del resultado (ni exito ni error). Ahora CSV realmente exporta CSV;
+     * Excel/PDF (roadmap, ver docs/PENDIENTES.md) avisan honestamente que aun no estan
+     * disponibles en vez de entregar un archivo con el formato equivocado.
+     */
     fun exportData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                when (_exportDataFormat.value) {
+                    "CSV" -> {
+                        val exportDir = File(appContext.filesDir, "exports").apply { mkdirs() }
+                        val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+                        val file = File(exportDir, "kivo-movimientos-$timestamp.csv")
+                        file.writeText(buildMovementsCsv())
+                        Log.i(TAG, "Exportacion CSV completada: ${file.absolutePath}")
+                        notifications.notify(
+                            type = AppNotificationEntity.TYPE_SYSTEM,
+                            title = "Exportación lista",
+                            message = "Tus movimientos se guardaron en ${file.name}."
+                        )
+                    }
+                    else -> {
+                        Log.i(TAG, "Exportacion a ${_exportDataFormat.value} solicitada (aun no implementada)")
+                        notifications.notify(
+                            type = AppNotificationEntity.TYPE_SYSTEM,
+                            title = "Formato aún no disponible",
+                            message = "La exportación a ${_exportDataFormat.value} está en el roadmap. Usa CSV por ahora."
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error exportando datos", e)
+                notifications.notify(
+                    type = AppNotificationEntity.TYPE_SYSTEM,
+                    title = "Error al exportar",
+                    message = "No se pudo completar la exportación. Intenta de nuevo."
+                )
+            }
+        }
+    }
+
+    /**
+     * Genera el snapshot completo (todas las tablas) en JSON para preparar la
+     * sincronizacion con el panel web -- separado de exportData() porque son dos
+     * usos distintos que antes compartian la misma funcion: "Sincronizar" en Login
+     * no debe depender del formato de exportacion (CSV/Excel/PDF) elegido en Ajustes.
+     */
+    fun prepareSyncSnapshot() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val exportDir = File(appContext.filesDir, "exports").apply { mkdirs() }
                 val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
-                val file = File(exportDir, "finanzas-export-$timestamp.json")
+                val file = File(exportDir, "kivo-sync-$timestamp.json")
                 file.writeText(buildExportSnapshot().toString(2))
-                Log.i(TAG, "Exportacion completada: ${file.absolutePath}")
+                Log.i(TAG, "Snapshot de sincronizacion generado: ${file.absolutePath}")
             } catch (e: Exception) {
-                Log.e(TAG, "Error exportando datos", e)
+                Log.e(TAG, "Error preparando snapshot de sincronizacion", e)
             }
         }
     }
@@ -178,6 +231,36 @@ class SettingsViewModel(
             .put("exportDataFormat", _exportDataFormat.value)
             .put("themeMode", themeMode.value.name)
             .put("themePalette", themePalette.value.name)
+    }
+
+    private suspend fun buildMovementsCsv(): String {
+        val movements = database.movementDao().getAll()
+        val categoryNames = database.categoryDao().getAll().associateBy({ it.id }, { it.name })
+        val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+            .withZone(java.time.ZoneId.systemDefault())
+
+        val header = "fecha,tipo,monto_cop,medio_pago,contraparte,categoria,banco,estado"
+        val rows = movements.joinToString("\n") { movement ->
+            listOf(
+                dateFormatter.format(java.time.Instant.ofEpochMilli(movement.date)),
+                movement.type,
+                (movement.amount / 100.0).toString(),
+                movement.paymentMethod,
+                movement.counterpartyRaw.csvEscape(),
+                (movement.categoryId?.let { categoryNames[it] } ?: "Sin categoria").csvEscape(),
+                movement.bankEntity,
+                movement.confirmationState
+            ).joinToString(",")
+        }
+        return if (rows.isBlank()) header else "$header\n$rows"
+    }
+
+    private fun String.csvEscape(): String {
+        return if (contains(",") || contains("\"") || contains("\n")) {
+            "\"" + replace("\"", "\"\"") + "\""
+        } else {
+            this
+        }
     }
 
     private suspend fun buildMovementsArray(): JSONArray {

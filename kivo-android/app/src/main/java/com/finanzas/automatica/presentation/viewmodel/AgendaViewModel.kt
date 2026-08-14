@@ -11,7 +11,10 @@ import com.finanzas.automatica.domain.model.AgendaEntry
 import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.MovementType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AgendaViewModel(
@@ -20,38 +23,27 @@ class AgendaViewModel(
 
     private val agendaRepo = AgendaRepositoryImpl(database)
     private val categoryRepo = CategoryRepositoryImpl(database)
-    
-    private val _entries = MutableStateFlow<List<AgendaEntry>>(emptyList())
-    val entries: StateFlow<List<AgendaEntry>> = _entries
-    
+
+    // Reactivo sobre Room: crear/editar/eliminar un contacto desde la pantalla de
+    // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
+    // al instante en la lista tambien (misma correccion que MovementViewModel.movements).
+    val entries: StateFlow<List<AgendaEntry>> = agendaRepo.observeAll()
+        .map { entities -> entities.map { it.toDomain() } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories
-    
+
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
-    
+
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery: StateFlow<String> = _searchQuery
-    
+
     init {
-        loadEntries()
         loadCategories()
     }
-    
-    fun loadEntries() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                _entries.value = agendaRepo.findAll().map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _entries.value = emptyList()
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-    
+
     fun loadCategories() {
         viewModelScope.launch {
             try {
@@ -65,21 +57,18 @@ class AgendaViewModel(
     fun addEntry(entry: AgendaEntry) {
         viewModelScope.launch {
             agendaRepo.insert(entry.toEntity())
-            loadEntries()
         }
     }
-    
+
     fun updateEntry(entry: AgendaEntry) {
         viewModelScope.launch {
             agendaRepo.update(entry.toEntity())
-            loadEntries()
         }
     }
-    
+
     fun deleteEntry(id: Long) {
         viewModelScope.launch {
             agendaRepo.delete(id)
-            loadEntries()
         }
     }
     

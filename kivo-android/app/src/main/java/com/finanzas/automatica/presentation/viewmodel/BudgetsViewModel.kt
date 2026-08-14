@@ -37,8 +37,13 @@ class BudgetsViewModel(
     private val movementRepository = MovementRepositoryImpl(database)
     private val notifications = AppNotificationRepository(database)
 
-    private val _budgets = MutableStateFlow<List<Budget>>(emptyList())
-    val budgets: StateFlow<List<Budget>> = _budgets
+    // Reactivo sobre Room: crear/editar/eliminar un presupuesto desde la pantalla de
+    // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
+    // al instante en la lista tambien, sin refrescar nada a mano ni reiniciar la app
+    // (misma correccion que MovementViewModel.movements, ver esa clase).
+    val budgets: StateFlow<List<Budget>> = budgetDao.getAllFlow()
+        .map { entities -> entities.map { it.toDomain() } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories
@@ -50,7 +55,7 @@ class BudgetsViewModel(
     // recalcula solo al confirmar/rechazar un movimiento o cambiar la lista de
     // presupuestos, sin recargar nada manualmente. Antes BudgetsScreen mostraba
     // siempre 0 gastado porque nunca se conectó a los movimientos reales.
-    val spentByBudgetKey: StateFlow<Map<String, Long>> = _budgets
+    val spentByBudgetKey: StateFlow<Map<String, Long>> = budgets
         .flatMapLatest { list ->
             if (list.isEmpty()) {
                 flowOf(emptyMap())
@@ -67,7 +72,6 @@ class BudgetsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     init {
-        loadBudgets()
         loadExpenseCategories()
     }
 
@@ -77,21 +81,7 @@ class BudgetsViewModel(
         val end = LocalDate.of(year, month, 1).plusMonths(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1
         return start to end
     }
-    
-    fun loadBudgets() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                _budgets.value = budgetDao.getAll().map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _budgets.value = emptyList()
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-    
+
     fun loadExpenseCategories() {
         viewModelScope.launch {
             try {
@@ -106,7 +96,6 @@ class BudgetsViewModel(
         viewModelScope.launch {
             budgetDao.insert(budget.toEntity())
             warnIfAlreadyOverLimit(budget)
-            loadBudgets()
         }
     }
 
@@ -114,7 +103,6 @@ class BudgetsViewModel(
         viewModelScope.launch {
             budgetDao.update(budget.toEntity())
             warnIfAlreadyOverLimit(budget)
-            loadBudgets()
         }
     }
 
@@ -138,7 +126,6 @@ class BudgetsViewModel(
     fun deleteBudget(id: Long) {
         viewModelScope.launch {
             budgetDao.deleteById(id)
-            loadBudgets()
         }
     }
 }

@@ -2,34 +2,48 @@ package com.finanzas.automatica.presentation.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.PieChart
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.Budget
@@ -47,6 +61,7 @@ import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
@@ -246,30 +261,136 @@ fun BudgetCard(
     }
 }
 
+/**
+ * Crear/editar un presupuesto. Antes onAddBudget/onBudgetClick eran no-ops en
+ * BudgetsScreen -- este formulario es lo que faltaba para que ambos botones
+ * funcionen. El mes/año se fija al mes actual (un presupuesto siempre aplica al
+ * mes vigente, ver BudgetsViewModel.warnIfAlreadyOverLimit); solo son editables
+ * la categoría y el límite mensual.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BudgetDetailScreen(
-    budget: Budget,
-    category: Category?,
-    onEdit: () -> Unit = {},
-    onDelete: () -> Unit = {},
+fun AddEditBudgetScreen(
+    budget: Budget?,
+    categories: List<Category>,
+    onSave: (Budget) -> Unit,
+    onCancel: () -> Unit,
+    onDelete: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
+    var selectedCategoryId by rememberSaveable { mutableStateOf(budget?.categoryId) }
+    var limitInput by rememberSaveable {
+        mutableStateOf(if (budget != null) (budget.monthlyLimit / 100L).toString() else "")
     }
-    FinanceCard(modifier = modifier.padding(16.dp)) {
-        Text(
-            text = category?.name ?: "Presupuesto",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
+    val today = remember { LocalDate.now() }
+    val limitCents = limitInput.toLongOrNull()?.let { it * 100 }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        TopAppBar(
+            title = { Text(if (budget == null) "Nuevo presupuesto" else "Editar presupuesto") },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
         )
-        Text(
-            text = currencyFormat.money(budget.monthlyLimit),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Categoría",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (categories.isEmpty()) {
+                    Text(
+                        text = "Crea una categoría de gasto primero.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        categories.forEach { category ->
+                            FilterChip(
+                                selected = selectedCategoryId == category.id,
+                                onClick = { selectedCategoryId = category.id },
+                                label = { Text(category.name) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            OutlinedTextField(
+                value = limitInput,
+                onValueChange = { value -> if (value.all { it.isDigit() }) limitInput = value },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("Límite mensual (COP)") },
+                prefix = { Text("$ ") }
+            )
+
+            Text(
+                text = "Aplica a " + today.month
+                    .getDisplayName(TextStyle.FULL, Locale("es", "CO"))
+                    .replaceFirstChar { it.titlecase(Locale("es", "CO")) } + " ${today.year}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Cancelar")
+                }
+                Button(
+                    onClick = {
+                        val categoryId = selectedCategoryId ?: return@Button
+                        val limit = limitCents ?: return@Button
+                        onSave(
+                            Budget(
+                                id = budget?.id,
+                                categoryId = categoryId,
+                                monthlyLimit = limit,
+                                month = budget?.month ?: today.monthValue,
+                                year = budget?.year ?: today.year,
+                                createdAt = budget?.createdAt ?: java.time.Instant.now()
+                            )
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    enabled = selectedCategoryId != null && limitCents != null && limitCents > 0,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Guardar")
+                }
+            }
+
+            if (onDelete != null) {
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Eliminar presupuesto")
+                }
+            }
+        }
     }
 }
 
