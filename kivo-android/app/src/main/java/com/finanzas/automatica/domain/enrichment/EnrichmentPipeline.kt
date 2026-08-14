@@ -126,7 +126,7 @@ class EnrichmentPipeline(
             counterpartyId = enriched.agendaEntry?.id,
             categoryId = enriched.suggestedCategory?.id,
             date = enriched.rawMovement.date.toEpochMilli(),
-            source = MovementSource.NOTIFICATION.name,
+            source = enriched.rawMovement.source.name,
             confirmationState = if (enriched.needsConfirmation) 
                 ConfirmationState.PENDING.name 
             else 

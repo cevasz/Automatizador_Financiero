@@ -317,9 +317,8 @@ fun AppNavHost(database: FinanzasDatabase) {
                 }
             ) {
             composable(Screen.Dashboard.route) {
-                val context = LocalContext.current
                 val movementViewModel: MovementViewModel = databaseViewModel {
-                    MovementViewModel(database)
+                    MovementViewModel(database, context)
                 }
                 val movements by movementViewModel.movements.collectAsState()
                 val pendingCount by movementViewModel.pendingCount.collectAsState()
@@ -346,7 +345,7 @@ fun AppNavHost(database: FinanzasDatabase) {
                 )
             ) { backStackEntry ->
                 val movementViewModel: MovementViewModel = databaseViewModel {
-                    MovementViewModel(database)
+                    MovementViewModel(database, context)
                 }
                 val movements by movementViewModel.movements.collectAsState()
                 val movementCategories by movementViewModel.categories.collectAsState()
@@ -361,13 +360,14 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onCorrect = movementViewModel::correctMovement,
                     onImportStatement = movementViewModel::importStatementText,
                     onImportPdf = movementViewModel::importStatementPdf,
+                    onImportScreenshot = movementViewModel::importScreenshot,
                     onOpenMenu = ::openDrawer
                 )
             }
 
             composable(Screen.Invoices.route) {
                 val invoiceViewModel: InvoiceViewModel = databaseViewModel {
-                    InvoiceViewModel(database)
+                    InvoiceViewModel(database, context)
                 }
                 val invoices by invoiceViewModel.invoices.collectAsState()
                 val debtSummaries by invoiceViewModel.debtSummaries.collectAsState()
@@ -382,7 +382,9 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onSaveInvoice = invoiceViewModel::saveInvoice,
                     onMarkDebtPaid = invoiceViewModel::markDebtAsPaid,
                     onDeleteInvoice = invoiceViewModel::deleteInvoice,
-                    onSimulateScan = invoiceViewModel::createSampleParsedInvoice,
+                    onScanReceiptBitmap = invoiceViewModel::scanReceiptBitmap,
+                    onScanReceiptUri = invoiceViewModel::scanReceiptUri,
+                    onLoadSample = invoiceViewModel::createSampleParsedInvoice,
                     onOpenMenu = ::openDrawer
                 )
             }

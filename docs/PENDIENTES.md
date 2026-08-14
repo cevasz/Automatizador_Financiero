@@ -22,6 +22,10 @@ fuente: "[[docs/SDD]]"
 - [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14
 
+### Sesión 2026-08-14 (tarde): OCR real + versión de la app
+- [x] Total/deudas de Facturas no se actualizaban al agregar un producto individual — `totalInvoiceAmount`/`totalDebtAmount` en [[InvoiceScreen]] usaban `remember(draftItems)`, pero `draftItems` es la misma instancia de `SnapshotStateList` durante toda la pantalla (su referencia nunca cambia), así que el cálculo solo corría una vez. Cambiado a `derivedStateOf`, que sí rastrea los cambios internos de la lista. #pendiente/rapido #bug ✅ 2026-08-14
+- [x] Versionado: cada cambio funcional sube `versionCode`/`versionName` en `app/build.gradle.kts` (esta sesión: 1 → 2, `1.0.0` → `1.1.0`). #pendiente/rapido ✅ 2026-08-14
+
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
 - [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14
@@ -47,7 +51,7 @@ Ver [[docs/SDD]] § 6 (módulos funcionales) y § 11 (roadmap).
 ## 🔵 Fase 2 (Robustecimiento) — sin iniciar
 
 - [ ] Alertas y detección de patrones: gasto inusual, rachas de gasto, movimientos recurrentes (§6.7) — confirmado sin código: cero nodos coincidentes al consultar el grafo. #pendiente/fase2
-- [ ] Escaneo de comprobantes por OCR con ML Kit (§6.8) — `MovementSource.OCR` existe en el enum, sin pipeline detrás. #pendiente/fase2
+- [x] Escaneo de comprobantes por OCR con ML Kit (§6.8) — implementado con `ImageTextRecognizer` (ML Kit Text Recognition, 100% local) + `ReceiptOcrParser` (regex, sin LLM). Facturas: botones reales "Tomar foto"/"Galería" en [[InvoiceScreen]] (antes solo insertaban una plantilla fija de 3 productos falsos vía "Simular Escaneo"). Movimientos: nueva opción "Escanear Captura de Pantalla" en el diálogo de importar extracto — reusa `ParserRegistry` (los mismos `BankParser` de las notificaciones) sobre el texto OCR, con `StatementImporter` como respaldo; `MovementSource.OCR` ya se guarda de verdad (antes `EnrichmentPipeline` fijaba `NOTIFICATION` siempre, sin importar el origen real). #pendiente/fase2 ✅ 2026-08-14
 - [ ] Exportación a Excel y PDF (§6.9) — hoy solo hay export a JSON local. #pendiente/fase2
 - [ ] Aprendizaje comunitario opt-in de la agenda financiera (§6.2, refuerzo) — requiere backend. #pendiente/fase2
 - [ ] Panel web completo — requiere backend. #pendiente/fase2

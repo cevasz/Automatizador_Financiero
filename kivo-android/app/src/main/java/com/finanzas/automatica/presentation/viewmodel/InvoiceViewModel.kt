@@ -1,5 +1,8 @@
 package com.finanzas.automatica.presentation.viewmodel
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
@@ -7,19 +10,24 @@ import com.finanzas.automatica.data.repository.AgendaRepositoryImpl
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.InvoiceRepository
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.importer.ImageTextRecognizer
+import com.finanzas.automatica.domain.importer.ReceiptOcrParser
 import com.finanzas.automatica.domain.model.AgendaEntry
 import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.DebtStatus
 import com.finanzas.automatica.domain.model.DebtSummary
 import com.finanzas.automatica.domain.model.Invoice
 import com.finanzas.automatica.domain.model.InvoiceItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class InvoiceViewModel(
-    private val database: FinanzasDatabase
+    private val database: FinanzasDatabase,
+    private val appContext: Context
 ) : ViewModel() {
 
     private val invoiceRepo = InvoiceRepository(database)
@@ -107,7 +115,29 @@ class InvoiceViewModel(
     }
 
     /**
-     * Genera una plantilla de productos simulados al subir o escanear una factura.
+     * OCR real (ML Kit, 100% local) sobre una foto tomada con la camara del sistema.
+     * Devuelve el comercio detectado + los productos que se pudieron reconocer para que
+     * el usuario los revise/edite antes de guardar -- el reconocimiento de un recibo
+     * fotografiado nunca es perfecto, por eso el borrador siempre queda editable.
+     */
+    suspend fun scanReceiptBitmap(bitmap: Bitmap): Pair<String, List<InvoiceItem>> {
+        return withContext(Dispatchers.Default) {
+            val text = ImageTextRecognizer.recognize(bitmap)
+            ReceiptOcrParser.parse(text)
+        }
+    }
+
+    /** Igual que [scanReceiptBitmap] pero para una imagen elegida de la galeria. */
+    suspend fun scanReceiptUri(uri: Uri): Pair<String, List<InvoiceItem>> {
+        val text = ImageTextRecognizer.recognize(appContext, uri)
+        return withContext(Dispatchers.Default) {
+            ReceiptOcrParser.parse(text)
+        }
+    }
+
+    /**
+     * Plantilla de ejemplo para probar el flujo sin tener una factura a la mano (queda
+     * como accion secundaria en el estado vacio, ya no es el boton principal de "escanear").
      */
     fun createSampleParsedInvoice(): Pair<String, List<InvoiceItem>> {
         val sampleItems = listOf(

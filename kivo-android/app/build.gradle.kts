@@ -12,8 +12,10 @@ android {
         applicationId = "com.finanzas.automatica"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
+        // fixes, minor para features nuevas como el OCR de facturas/movimientos).
+        versionCode = 2
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -114,6 +116,10 @@ dependencies {
 
     // PDF (lectura de extractos bancarios en PDF, 100% offline)
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
+
+    // OCR (escaneo de facturas y capturas de pantalla de movimientos, 100% en el
+    // dispositivo -- no es un LLM ni un servicio externo, ver CLAUDE.md)
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

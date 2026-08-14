@@ -100,6 +100,7 @@ fun MovementsListScreen(
     onCorrect: (Long, Long) -> Unit = { _, _ -> },
     onImportStatement: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
     onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
+    onImportScreenshot: (android.net.Uri, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _ -> },
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -138,6 +139,11 @@ fun MovementsListScreen(
             },
             onImportPdf = { bytes, bank, onComplete ->
                 onImportPdf(bytes, bank) { summary ->
+                    onComplete(summary)
+                }
+            },
+            onImportScreenshot = { uri, onComplete ->
+                onImportScreenshot(uri) { summary ->
                     onComplete(summary)
                 }
             }
@@ -229,7 +235,7 @@ fun MovementsListScreen(
                         icon = if (movements.isEmpty()) Icons.Outlined.ReceiptLong else Icons.Outlined.Tune,
                         title = if (movements.isEmpty()) "Sin movimientos" else "Sin resultados",
                         message = if (movements.isEmpty()) {
-                            "Presiona 'Importar Extracto' para cargar movimientos en CSV/Texto/PDF o espera notificaciones."
+                            "Presiona 'Importar Extracto' para cargar movimientos en CSV/Texto/PDF/captura de pantalla o espera notificaciones."
                         } else {
                             "Cambia el filtro para revisar otros movimientos."
                         },
@@ -320,13 +326,16 @@ private fun ImportStatementDialog(
     currencyFormat: NumberFormat,
     onDismiss: () -> Unit,
     onImport: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit,
-    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit
+    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit,
+    onImportScreenshot: (android.net.Uri, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _ -> }
 ) {
     var selectedBank by remember { mutableStateOf(com.finanzas.automatica.domain.model.BankEntity.BANCOLOMBIA) }
     var inputText by remember { mutableStateOf("") }
     var summaryResult by remember { mutableStateOf<com.finanzas.automatica.domain.importer.ImportSummary?>(null) }
     var isImported by remember { mutableStateOf(false) }
     var isPdfLoading by remember { mutableStateOf(false) }
+    var isScreenshotLoading by remember { mutableStateOf(false) }
+    var screenshotFeedback by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -351,6 +360,23 @@ private fun ImportStatementDialog(
             }
         }
     }
+    val screenshotLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null && !isImported) {
+            isScreenshotLoading = true
+            screenshotFeedback = null
+            onImportScreenshot(uri) { summary ->
+                isScreenshotLoading = false
+                if (summary.totalCount > 0) {
+                    summaryResult = summary
+                    isImported = true
+                } else {
+                    screenshotFeedback = "No pudimos reconocer un movimiento en esa captura. Prueba con otra imagen o pega el texto manualmente."
+                }
+            }
+        }
+    }
 
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
@@ -360,7 +386,7 @@ private fun ImportStatementDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    "Pega las lineas de tu extracto bancario (CSV o texto plano de los ultimos 2 meses) o sube el extracto en PDF:",
+                    "Pega las lineas de tu extracto bancario (CSV o texto plano de los ultimos 2 meses), sube el extracto en PDF, o escanea una captura de pantalla (OCR local, util para movimientos que no llegaron como notificacion):",
                     style = MaterialTheme.typography.bodySmall
                 )
 
@@ -406,6 +432,33 @@ private fun ImportStatementDialog(
                     }
                     Spacer(Modifier.width(6.dp))
                     Text(if (isPdfLoading) "Extrayendo texto del PDF..." else "Subir Extracto en PDF")
+                }
+
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { screenshotLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isImported && !isScreenshotLoading
+                ) {
+                    if (isScreenshotLoading) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.ReceiptLong,
+                            contentDescription = null
+                        )
+                    }
+                    Spacer(Modifier.width(6.dp))
+                    Text(if (isScreenshotLoading) "Leyendo la captura..." else "Escanear Captura de Pantalla")
+                }
+                screenshotFeedback?.let { feedback ->
+                    Text(
+                        text = feedback,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = WarningAmber
+                    )
                 }
 
                 TextButton(onClick = {

@@ -1,5 +1,9 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,8 +26,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ReceiptLong
@@ -32,6 +39,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -48,10 +56,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +83,7 @@ import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -92,7 +103,9 @@ fun InvoiceScreen(
     onSaveInvoice: (merchantName: String, totalAmount: Long, items: List<InvoiceItem>) -> Unit,
     onMarkDebtPaid: (Long) -> Unit,
     onDeleteInvoice: (Long) -> Unit,
-    onSimulateScan: () -> Pair<String, List<InvoiceItem>>,
+    onScanReceiptBitmap: suspend (Bitmap) -> Pair<String, List<InvoiceItem>> = { "" to emptyList() },
+    onScanReceiptUri: suspend (Uri) -> Pair<String, List<InvoiceItem>> = { "" to emptyList() },
+    onLoadSample: () -> Pair<String, List<InvoiceItem>>,
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -107,13 +120,48 @@ fun InvoiceScreen(
     var merchantName by remember { mutableStateOf("") }
     val draftItems = remember { mutableStateListOf<InvoiceItem>() }
     var showSuccessMessage by remember { mutableStateOf(false) }
+    var isScanning by remember { mutableStateOf(false) }
+    var scanFeedback by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val totalInvoiceAmount = remember(draftItems) {
-        draftItems.sumOf { it.totalPrice }
+    fun applyScanResult(result: Pair<String, List<InvoiceItem>>) {
+        isScanning = false
+        val (name, items) = result
+        if (items.isEmpty()) {
+            scanFeedback = "No pudimos reconocer productos en esa imagen. Puedes agregarlos manualmente."
+            return
+        }
+        scanFeedback = null
+        if (name.isNotBlank()) merchantName = name
+        draftItems.clear()
+        draftItems.addAll(items)
     }
-    val totalDebtAmount = remember(draftItems) {
-        draftItems.filter { it.isDebt }.sumOf { it.totalPrice }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            isScanning = true
+            coroutineScope.launch { applyScanResult(onScanReceiptBitmap(bitmap)) }
+        }
     }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            isScanning = true
+            coroutineScope.launch { applyScanResult(onScanReceiptUri(uri)) }
+        }
+    }
+
+    // derivedStateOf (no remember(draftItems)): draftItems es la MISMA instancia de
+    // SnapshotStateList durante toda la pantalla (mutableStateListOf una sola vez), asi
+    // que su referencia nunca cambia. remember(draftItems) solo recalculaba la primera
+    // vez -- agregar/editar un producto no volvia a sumar el total ("el dashboard de
+    // abajo no se actualiza en tiempo real"). derivedStateOf sí rastrea las lecturas
+    // internas (add/removeAt/set) del snapshot y se recalcula con cada una.
+    val totalInvoiceAmount by remember { derivedStateOf { draftItems.sumOf { it.totalPrice } } }
+    val totalDebtAmount by remember { derivedStateOf { draftItems.filter { it.isDebt }.sumOf { it.totalPrice } } }
     val totalPersonalAmount = totalInvoiceAmount - totalDebtAmount
 
     Column(
@@ -178,44 +226,73 @@ fun InvoiceScreen(
                     item {
                         FinanceCard(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    IconBadge(
-                                        icon = Icons.Outlined.Scanner,
-                                        contentDescription = "OCR Factura",
-                                        tint = MaterialTheme.colorScheme.primary
+                                IconBadge(
+                                    icon = Icons.Outlined.Scanner,
+                                    contentDescription = "OCR Factura",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column {
+                                    Text(
+                                        text = "Escaneo de Factura",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold
                                     )
-                                    Column {
-                                        Text(
-                                            text = "Escaneo / Carga de Factura",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                        Text(
-                                            text = "Sube tu recibo o simula la lectura automática",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
+                                    Text(
+                                        text = "Lectura automática con OCR local (sin conexión)",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Spacer(Modifier.height(4.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { cameraLauncher.launch(null) },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = !isScanning
+                                ) {
+                                    Icon(Icons.Outlined.CameraAlt, contentDescription = null)
+                                    Spacer(Modifier.width(6.dp))
+                                    Text("Tomar foto")
                                 }
                                 OutlinedButton(
-                                    onClick = {
-                                        val sample = onSimulateScan()
-                                        merchantName = sample.first
-                                        draftItems.clear()
-                                        draftItems.addAll(sample.second)
-                                    }
+                                    onClick = { galleryLauncher.launch("image/*") },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = !isScanning
                                 ) {
-                                    Icon(Icons.Outlined.Scanner, contentDescription = null)
+                                    Icon(Icons.Outlined.Image, contentDescription = null)
                                     Spacer(Modifier.width(6.dp))
-                                    Text("Simular Escaneo")
+                                    Text("Galería")
                                 }
+                            }
+
+                            if (isScanning) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                    Text(
+                                        text = "Leyendo la factura...",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            scanFeedback?.let { feedback ->
+                                Text(
+                                    text = feedback,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = WarningAmber
+                                )
                             }
                         }
                     }
@@ -268,14 +345,9 @@ fun InvoiceScreen(
                             EmptyState(
                                 icon = Icons.Outlined.ShoppingBag,
                                 title = "Sin productos agregados",
-                                message = "Presiona 'Simular Escaneo' o 'Agregar Producto' para desglosar la factura.",
-                                actionLabel = "Cargar Ejemplo",
-                                onAction = {
-                                    val sample = onSimulateScan()
-                                    merchantName = sample.first
-                                    draftItems.clear()
-                                    draftItems.addAll(sample.second)
-                                }
+                                message = "Toma una foto, elige una imagen de la galería o agrega productos manualmente.",
+                                actionLabel = "Cargar ejemplo de prueba",
+                                onAction = { applyScanResult(onLoadSample()) }
                             )
                         }
                     } else {

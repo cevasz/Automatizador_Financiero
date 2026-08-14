@@ -1,6 +1,7 @@
 package com.finanzas.automatica.domain.importer
 
 import com.finanzas.automatica.domain.model.BankEntity
+import com.finanzas.automatica.domain.model.MovementSource
 import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.PaymentMethod
 import com.finanzas.automatica.domain.model.RawMovement
@@ -35,7 +36,8 @@ object StatementImporter {
      */
     fun parseStatementText(
         text: String,
-        defaultBank: BankEntity = BankEntity.BANCOLOMBIA
+        defaultBank: BankEntity = BankEntity.BANCOLOMBIA,
+        source: MovementSource = MovementSource.NOTIFICATION
     ): ImportSummary {
         val lines = text.lines()
         val movements = mutableListOf<RawMovement>()
@@ -44,7 +46,7 @@ object StatementImporter {
             val trimmed = line.trim()
             if (trimmed.isBlank() || trimmed.startsWith("#") || trimmed.startsWith("//")) continue
 
-            val movement = parseLine(trimmed, defaultBank)
+            val movement = parseLine(trimmed, defaultBank, source)
             if (movement != null) {
                 movements.add(movement)
             }
@@ -63,7 +65,7 @@ object StatementImporter {
         )
     }
 
-    private fun parseLine(line: String, defaultBank: BankEntity): RawMovement? {
+    private fun parseLine(line: String, defaultBank: BankEntity, source: MovementSource): RawMovement? {
         val tokens = if (line.contains(";")) line.split(";") else line.split(",")
 
         // Si es CSV estructurado de 3+ columnas (Fecha, Descripción, Monto)
@@ -86,7 +88,8 @@ object StatementImporter {
                 date = date,
                 bankEntity = defaultBank,
                 rawText = line,
-                confidence = 0.95
+                confidence = 0.95,
+                source = source
             )
         }
 
@@ -126,7 +129,8 @@ object StatementImporter {
                 date = date,
                 bankEntity = defaultBank,
                 rawText = line,
-                confidence = 0.90
+                confidence = 0.90,
+                source = source
             )
         }
 

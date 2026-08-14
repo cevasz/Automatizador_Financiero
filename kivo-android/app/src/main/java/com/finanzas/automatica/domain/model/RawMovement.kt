@@ -11,7 +11,12 @@ data class RawMovement(
     val date: Instant,
     val bankEntity: BankEntity,
     val rawText: String,
-    val confidence: Double = 1.0 // 0.0 - 1.0
+    val confidence: Double = 1.0, // 0.0 - 1.0
+    // Default NOTIFICATION porque los parsers de notificacion (BankParser) y el motor
+    // heredado de importacion de extractos (StatementImporter) siempre representaron ese
+    // origen antes de que este campo existiera -- EnrichmentPipeline usaba un valor fijo.
+    // Los flujos nuevos (captura de pantalla por OCR) pasan MovementSource.OCR explicito.
+    val source: MovementSource = MovementSource.NOTIFICATION
 )
 
 // Resultado del parseo
