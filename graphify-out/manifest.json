@@ -25,9 +25,9 @@
     "semantic_hash": "0bc020d491fca99550c1ea3de0a5f862"
   },
   "kivo-android/app/build.gradle.kts": {
-    "mtime": 1786727850.5861363,
-    "ast_hash": "0f390bd25a4b7b599e74c9b3b54be293",
-    "semantic_hash": "0f390bd25a4b7b599e74c9b3b54be293"
+    "mtime": 1786729711.406415,
+    "ast_hash": "4f7bc636b8048dc15ddb683c2caaa941",
+    "semantic_hash": "4f7bc636b8048dc15ddb683c2caaa941"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/FinanzasApplication.kt": {
     "mtime": 1786487218.660347,
@@ -265,14 +265,14 @@
     "semantic_hash": "c5260cdd18f4c555ed5cf5a9a1c5b54f"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/BiometricLockGate.kt": {
-    "mtime": 1786516411.2559578,
-    "ast_hash": "581a381d7a75854cb1975f9a58671050",
-    "semantic_hash": "581a381d7a75854cb1975f9a58671050"
+    "mtime": 1786729399.926772,
+    "ast_hash": "cbd6d761642ed59e6220d660f2652331",
+    "semantic_hash": "cbd6d761642ed59e6220d660f2652331"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt": {
-    "mtime": 1786676075.9455576,
-    "ast_hash": "c42ba5f2ba61449dbfa7fdcbef39e6e2",
-    "semantic_hash": "c42ba5f2ba61449dbfa7fdcbef39e6e2"
+    "mtime": 1786729245.1269646,
+    "ast_hash": "d33926e52fa929b4cdb32074dd13d6b2",
+    "semantic_hash": "d33926e52fa929b4cdb32074dd13d6b2"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/Motion.kt": {
     "mtime": 1786676057.1054997,
@@ -300,19 +300,19 @@
     "semantic_hash": "634c6975f66a61b884c728bb2ef31fce"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/InvoiceScreen.kt": {
-    "mtime": 1786728143.3778076,
-    "ast_hash": "343e6f0c99bf7430ea3e6d236992a08d",
-    "semantic_hash": "343e6f0c99bf7430ea3e6d236992a08d"
+    "mtime": 1786729376.8346832,
+    "ast_hash": "771ffd86fb89f2468bc6636733cf131d",
+    "semantic_hash": "771ffd86fb89f2468bc6636733cf131d"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/LoginScreen.kt": {
-    "mtime": 1786676109.5127077,
-    "ast_hash": "a92abe1f033f59d6c704ee2dca947598",
-    "semantic_hash": "a92abe1f033f59d6c704ee2dca947598"
+    "mtime": 1786729429.1408792,
+    "ast_hash": "bfdb8ebac42d57cd8783b10605e8d77c",
+    "semantic_hash": "bfdb8ebac42d57cd8783b10605e8d77c"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/MovementsListScreen.kt": {
-    "mtime": 1786728038.723568,
-    "ast_hash": "de27b5bc8c19a6144939b8b68124ee6c",
-    "semantic_hash": "de27b5bc8c19a6144939b8b68124ee6c"
+    "mtime": 1786729619.1439722,
+    "ast_hash": "f6e3b5083c40a6c11bd6a1d5f2c7515a",
+    "semantic_hash": "f6e3b5083c40a6c11bd6a1d5f2c7515a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/NotificationCenterScreen.kt": {
     "mtime": 1786676300.4195406,
@@ -320,9 +320,9 @@
     "semantic_hash": "254dcc28ada001c78b38dce69078fd75"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt": {
-    "mtime": 1786693694.6994772,
-    "ast_hash": "872fa5478adf041fdf82b118049a749a",
-    "semantic_hash": "872fa5478adf041fdf82b118049a749a"
+    "mtime": 1786729482.0811148,
+    "ast_hash": "5bc6a4665db98533ea920787b23775df",
+    "semantic_hash": "5bc6a4665db98533ea920787b23775df"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SettingsScreen.kt": {
     "mtime": 1786676328.7019324,
@@ -510,9 +510,9 @@
     "semantic_hash": "cc854ad33375eeb849bd399bce093e5b"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SplashScreen.kt": {
-    "mtime": 1786532409.2769797,
-    "ast_hash": "f28f6b8ba1c5fdc1863fb10f7e8e5e46",
-    "semantic_hash": "f28f6b8ba1c5fdc1863fb10f7e8e5e46"
+    "mtime": 1786729451.707959,
+    "ast_hash": "5a54fbb0744631e3036ace42f84188b0",
+    "semantic_hash": "5a54fbb0744631e3036ace42f84188b0"
   },
   "kivo-android/app/src/main/res/drawable-nodpi/biometric_lock_illustration.jpg": {
     "mtime": 1786532464.993176,
@@ -570,9 +570,9 @@
     "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
   },
   "docs/PENDIENTES.md": {
-    "mtime": 1786728330.370235,
-    "ast_hash": "46aa7d1b8a5f7b0c2f43bc25f9d59713",
-    "semantic_hash": "46aa7d1b8a5f7b0c2f43bc25f9d59713"
+    "mtime": 1786729735.06152,
+    "ast_hash": "0f0227570569e463117d36abb485a575",
+    "semantic_hash": "0f0227570569e463117d36abb485a575"
   },
   "graphify-out/converted/SDD_App_Finanzas_94a76240.md": {
     "mtime": 1786694086.4913433,
