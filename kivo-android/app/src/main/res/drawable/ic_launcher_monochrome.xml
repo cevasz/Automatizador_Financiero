@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!--
+        Capa monocroma para íconos temáticos (Android 13+ "themed icons"): el
+        sistema tiñe esta silueta con un solo color, así que solo el monograma K
+        (sin la moneda teal, que perdería sentido teñida de un solo color).
+    -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M35,32 L48,32 L48,48 Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M35,56 Q35,48 42,48 L48,48 L48,76 Q42,76 35,68 Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M52,32 L75,32 Q72,40 64,48 L52,48 Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M52,56 L64,56 Q72,64 75,76 L52,76 Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M48,48 L56,48 L64,56 L56,56 L48,64 L48,56 Z" />
+
+</vector>
