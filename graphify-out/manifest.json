@@ -1,8 +1,8 @@
 {
   ".github/workflows/build.yml": {
-    "mtime": 1786516035.8344455,
-    "ast_hash": "bf81f28f105a79f2ad5669d2ffdc30bb",
-    "semantic_hash": "bf81f28f105a79f2ad5669d2ffdc30bb"
+    "mtime": 1786693654.059288,
+    "ast_hash": "aa3dfeff6d6d0ce8bac625cc98f822fa",
+    "semantic_hash": "aa3dfeff6d6d0ce8bac625cc98f822fa"
   },
   "CLAUDE.md": {
     "mtime": 1786691344.7321558,
@@ -55,9 +55,9 @@
     "semantic_hash": "2475d3d9bf2789aa2e4eb35aac804fe4"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/BudgetDao.kt": {
-    "mtime": 1786486944.2036467,
-    "ast_hash": "70695043ac46c8a27a23429d22d12db4",
-    "semantic_hash": "70695043ac46c8a27a23429d22d12db4"
+    "mtime": 1786693512.4346278,
+    "ast_hash": "ce99369c0fe1b202a2dfbbf3712ef29a",
+    "semantic_hash": "ce99369c0fe1b202a2dfbbf3712ef29a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/CategoryDao.kt": {
     "mtime": 1786486944.0146463,
@@ -255,9 +255,9 @@
     "semantic_hash": "3a863837f7d48e624838bb51d3690d4a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt": {
-    "mtime": 1786678028.3698032,
-    "ast_hash": "29f9587e4d6be84115c8a9fa7db8a8d3",
-    "semantic_hash": "29f9587e4d6be84115c8a9fa7db8a8d3"
+    "mtime": 1786693645.9232502,
+    "ast_hash": "038ad95c2fbf201f86cc4279b54ab229",
+    "semantic_hash": "038ad95c2fbf201f86cc4279b54ab229"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/MainActivity.kt": {
     "mtime": 1786532458.8651543,
@@ -290,9 +290,9 @@
     "semantic_hash": "8f3812eefd524ac38dc81b74078199c6"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/BudgetsScreen.kt": {
-    "mtime": 1786678042.4953775,
-    "ast_hash": "748f4be1a5b7b4055550861de0c2703a",
-    "semantic_hash": "748f4be1a5b7b4055550861de0c2703a"
+    "mtime": 1786693382.2790194,
+    "ast_hash": "a4c139826a6d558a1f598d7a7b788d15",
+    "semantic_hash": "a4c139826a6d558a1f598d7a7b788d15"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/DashboardScreen.kt": {
     "mtime": 1786676125.4747994,
@@ -310,9 +310,9 @@
     "semantic_hash": "a92abe1f033f59d6c704ee2dca947598"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/MovementsListScreen.kt": {
-    "mtime": 1786676161.6810527,
-    "ast_hash": "dcf2cf840f543fbd825313f66695aa71",
-    "semantic_hash": "dcf2cf840f543fbd825313f66695aa71"
+    "mtime": 1786693345.3468463,
+    "ast_hash": "45b33419804d946e53eb6957b3b611ff",
+    "semantic_hash": "45b33419804d946e53eb6957b3b611ff"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/NotificationCenterScreen.kt": {
     "mtime": 1786676300.4195406,
@@ -320,9 +320,9 @@
     "semantic_hash": "254dcc28ada001c78b38dce69078fd75"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt": {
-    "mtime": 1786514476.9457784,
-    "ast_hash": "dfc3e8b6aaee8faf87bb4359353a32c4",
-    "semantic_hash": "dfc3e8b6aaee8faf87bb4359353a32c4"
+    "mtime": 1786693694.6994772,
+    "ast_hash": "872fa5478adf041fdf82b118049a749a",
+    "semantic_hash": "872fa5478adf041fdf82b118049a749a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SettingsScreen.kt": {
     "mtime": 1786676328.7019324,
@@ -345,14 +345,14 @@
     "semantic_hash": "e48eabb1ed490f4e300ae9d41a7f3be1"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/AgendaViewModel.kt": {
-    "mtime": 1786489455.7229896,
-    "ast_hash": "9e86d4b6b9c64524423f7548297332fc",
-    "semantic_hash": "9e86d4b6b9c64524423f7548297332fc"
+    "mtime": 1786693568.0268872,
+    "ast_hash": "5c51e7bf6f0a5b2dd6e43395387aeee4",
+    "semantic_hash": "5c51e7bf6f0a5b2dd6e43395387aeee4"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/BudgetsViewModel.kt": {
-    "mtime": 1786678022.6759803,
-    "ast_hash": "bcc66692323659776805617969556c08",
-    "semantic_hash": "bcc66692323659776805617969556c08"
+    "mtime": 1786693545.1957808,
+    "ast_hash": "a5b883ea2e162d2e0814750b8d583e59",
+    "semantic_hash": "a5b883ea2e162d2e0814750b8d583e59"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/InvoiceViewModel.kt": {
     "mtime": 1786491290.5211778,
@@ -360,9 +360,9 @@
     "semantic_hash": "6c39972cd59e27429ae42dad1a2acfa3"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/MovementViewModel.kt": {
-    "mtime": 1786677956.6362698,
-    "ast_hash": "4907a212f2a6933ce49b42688c6d0c3b",
-    "semantic_hash": "4907a212f2a6933ce49b42688c6d0c3b"
+    "mtime": 1786693274.6495144,
+    "ast_hash": "37f3427466a0099580926a280a46e73d",
+    "semantic_hash": "37f3427466a0099580926a280a46e73d"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/NotificationCenterViewModel.kt": {
     "mtime": 1786516148.6316905,
@@ -370,9 +370,9 @@
     "semantic_hash": "0272d59482b6b79ea8db21498245902e"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SavingsGoalsViewModel.kt": {
-    "mtime": 1786516265.251727,
-    "ast_hash": "6eca18a958d464a5b4d69b50d4a8fffe",
-    "semantic_hash": "6eca18a958d464a5b4d69b50d4a8fffe"
+    "mtime": 1786693592.0679994,
+    "ast_hash": "4ba8a79f2427f5c04ac7e64ebce9daac",
+    "semantic_hash": "4ba8a79f2427f5c04ac7e64ebce9daac"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SessionViewModel.kt": {
     "mtime": 1786488428.0853112,
@@ -380,9 +380,9 @@
     "semantic_hash": "8e25704dc6b413d6db4845f14403fbed"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SettingsViewModel.kt": {
-    "mtime": 1786677602.594687,
-    "ast_hash": "e676e2e472577dc527918a35d75ac14e",
-    "semantic_hash": "e676e2e472577dc527918a35d75ac14e"
+    "mtime": 1786693259.7304442,
+    "ast_hash": "4e094ab0081ff0988edea6d72176aa14",
+    "semantic_hash": "4e094ab0081ff0988edea6d72176aa14"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/service/BiometricAccess.kt": {
     "mtime": 1786516403.1408417,
@@ -568,5 +568,15 @@
     "mtime": 1786531816.8526964,
     "ast_hash": "1ba312f6c41f56347c12740722a34ee4",
     "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
+  },
+  "docs/PENDIENTES.md": {
+    "mtime": 1786693925.3725483,
+    "ast_hash": "6836ae0eb334bc0e04a0c57e437ffce9",
+    "semantic_hash": "6836ae0eb334bc0e04a0c57e437ffce9"
+  },
+  "graphify-out/converted/SDD_App_Finanzas_94a76240.md": {
+    "mtime": 1786694086.4913433,
+    "ast_hash": "7953dcf69e37e5809d101c9143abbdfe",
+    "semantic_hash": "7953dcf69e37e5809d101c9143abbdfe"
   }
 }
