@@ -40,4 +40,8 @@ interface ClassificationRuleDao {
 
     @Query("UPDATE classification_rules SET isActive = :active WHERE id = :id")
     suspend fun setActive(id: Long, active: Boolean): Int
+
+    // Usado por DefaultCategories.dedupe() al fusionar categorias duplicadas.
+    @Query("UPDATE classification_rules SET categoryId = :newCategoryId WHERE categoryId = :oldCategoryId")
+    suspend fun reassignCategory(oldCategoryId: Long, newCategoryId: Long): Int
 }

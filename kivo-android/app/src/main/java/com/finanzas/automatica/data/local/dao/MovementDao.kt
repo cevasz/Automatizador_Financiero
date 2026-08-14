@@ -122,6 +122,12 @@ interface MovementDao {
 
     @Query("UPDATE movements SET categoryId = :categoryId, updatedAt = :updatedAt WHERE id = :id")
     suspend fun updateCategory(id: Long, categoryId: Long, updatedAt: Long): Int
+
+    // Usado por DefaultCategories.dedupe() al fusionar categorias duplicadas: reapunta
+    // todos los movimientos ya clasificados con la categoria duplicada hacia la
+    // categoria "canonica" antes de borrar la duplicada, para no perder clasificaciones.
+    @Query("UPDATE movements SET categoryId = :newCategoryId WHERE categoryId = :oldCategoryId")
+    suspend fun reassignCategory(oldCategoryId: Long, newCategoryId: Long): Int
 }
 
 data class CategoryTotal(

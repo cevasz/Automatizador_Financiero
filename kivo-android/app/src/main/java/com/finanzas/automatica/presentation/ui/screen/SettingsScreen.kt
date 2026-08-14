@@ -251,7 +251,7 @@ fun SettingsScreen(
                             val isSelected = themePalette == palette
                             val colors = palettePreviewColors(palette)
                             val paletteName = when (palette) {
-                                AppThemePalette.KIVO_CORAL -> "Kivo Coral"
+                                AppThemePalette.KIVO_CORAL -> "Kivo Barro"
                                 AppThemePalette.OCEAN_TEAL -> "Oceano Teal"
                                 AppThemePalette.FOREST_GREEN -> "Bosque Verde"
                                 AppThemePalette.MIDNIGHT_BLUE -> "Medianoche"
@@ -508,7 +508,7 @@ private fun SettingRow(
 
 private fun palettePreviewColors(palette: AppThemePalette): Triple<Color, Color, Color> {
     return when (palette) {
-        AppThemePalette.KIVO_CORAL -> Triple(Color(0xFFF56565), Color(0xFF2C7A7B), Color(0xFFD69E2E))
+        AppThemePalette.KIVO_CORAL -> Triple(Color(0xFF9C4A3C), Color(0xFF6B7D4F), Color(0xFFC68A3D))
         AppThemePalette.OCEAN_TEAL -> Triple(Color(0xFF0891B2), Color(0xFF164E63), Color(0xFF22D3EE))
         AppThemePalette.FOREST_GREEN -> Triple(Color(0xFF059669), Color(0xFF064E3B), Color(0xFF10B981))
         AppThemePalette.MIDNIGHT_BLUE -> Triple(Color(0xFF3B82F6), Color(0xFF1E3A5F), Color(0xFF93C5FD))

@@ -62,10 +62,63 @@ object DefaultCategories {
         CategoryEntity(0, "Otros ingresos", "INCOME", "add_circle", false, null, 990),
     )
 
+    /**
+     * Siembra las categorias por defecto -- pero solo si la tabla esta vacia.
+     *
+     * Bug corregido: esto se llamaba en CADA arranque de la app (FinanzasApplication.
+     * onCreate) sin verificar si ya existian. `insert(onConflict = IGNORE)` no evitaba
+     * nada porque el id es autogenerado (nunca hay choque de clave primaria) y no hay
+     * indice unico en (name, type) -- cada reinicio insertaba las 33 categorias de nuevo,
+     * duplicandolas en cualquier selector de categoria. Ver docs/PENDIENTES.md.
+     */
     suspend fun seed(database: FinanzasDatabase): List<Long> {
         val repo = CategoryRepositoryImpl(database)
+        if (database.categoryDao().count() > 0) return emptyList()
         val allCategories = expenseCategories + incomeCategories
         return repo.insertAll(allCategories)
+    }
+
+    /**
+     * Corrige categorias que ya quedaron duplicadas en el dispositivo por el bug de
+     * arriba (versiones anteriores de la app sembraban en cada arranque). Idempotente:
+     * si no hay duplicados no hace nada, seguro de llamar en cada arranque.
+     *
+     * Para cada grupo de categorias con el mismo (nombre, tipo), conserva la de menor id
+     * (la mas antigua) como "canonica" y reapunta a ella los movimientos/reglas/
+     * presupuestos que apuntaban a las copias antes de borrarlas -- para no perder
+     * clasificaciones ni presupuestos ya hechos por el usuario.
+     */
+    suspend fun dedupe(database: FinanzasDatabase) {
+        val categoryDao = database.categoryDao()
+        val movementDao = database.movementDao()
+        val ruleDao = database.classificationRuleDao()
+        val budgetDao = database.budgetDao()
+
+        val groups = categoryDao.getAll().groupBy { it.name to it.type }
+        for (rows in groups.values) {
+            if (rows.size <= 1) continue
+            val sorted = rows.sortedBy { it.id }
+            val canonicalId = sorted.first().id
+
+            for (duplicate in sorted.drop(1)) {
+                movementDao.reassignCategory(duplicate.id, canonicalId)
+                ruleDao.reassignCategory(duplicate.id, canonicalId)
+
+                // Los presupuestos tienen un indice unico (categoryId, month, year): si
+                // la categoria canonica ya tiene un presupuesto para ese mes/año, no se
+                // puede reapuntar sin violar el indice -- en ese caso se descarta el
+                // presupuesto duplicado (ya hay uno equivalente en la canonica).
+                for (budget in budgetDao.getByCategory(duplicate.id)) {
+                    try {
+                        budgetDao.reassignSingle(budget.id, canonicalId)
+                    } catch (e: Exception) {
+                        budgetDao.deleteById(budget.id)
+                    }
+                }
+
+                categoryDao.deleteById(duplicate.id)
+            }
+        }
     }
 
     fun getAll(): List<CategoryEntity> {

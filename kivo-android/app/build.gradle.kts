@@ -14,8 +14,8 @@ android {
         targetSdk = 34
         // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
         // fixes, minor para features nuevas).
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

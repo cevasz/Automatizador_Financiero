@@ -190,19 +190,15 @@ fun AppNavHost(database: FinanzasDatabase) {
                         }
                     }
 
-                    NavigationDrawerItem(
-                        label = { Text("Inicio") },
-                        selected = currentRoute.startsWith(Screen.Dashboard.selectedPrefix),
-                        onClick = { navigateTo(Screen.Dashboard.route) },
-                        icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
-                        colors = NavigationDrawerItemDefaults.colors()
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Movimientos") },
-                        selected = currentRoute.startsWith(Screen.Movements.selectedPrefix),
-                        onClick = { navigateTo(Screen.Movements.route) },
-                        icon = { Icon(Icons.Outlined.FormatListBulleted, contentDescription = null) },
-                        colors = NavigationDrawerItemDefaults.colors()
+                    // Inicio/Movimientos/Presupuestos/Metas viven en la barra inferior
+                    // (Screen.bottomItems) -- ya no se repiten aca. El menu lateral ahora
+                    // solo tiene lo que no cabe en la barra, agrupado por que tan seguido
+                    // se usa: "Gestion" (ocasional) y "Cuenta" (configuracion).
+                    Text(
+                        text = "Gestión",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
                     )
                     NavigationDrawerItem(
                         label = { Text("Facturas y Deudas") },
@@ -216,20 +212,6 @@ fun AppNavHost(database: FinanzasDatabase) {
                         selected = currentRoute.startsWith(Screen.Agenda.selectedPrefix),
                         onClick = { navigateTo(Screen.Agenda.route) },
                         icon = { Icon(Icons.Outlined.Contacts, contentDescription = null) },
-                        colors = NavigationDrawerItemDefaults.colors()
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Planes") },
-                        selected = currentRoute.startsWith(Screen.Budgets.selectedPrefix),
-                        onClick = { navigateTo(Screen.Budgets.route) },
-                        icon = { Icon(Icons.Outlined.AccountBalance, contentDescription = null) },
-                        colors = NavigationDrawerItemDefaults.colors()
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Metas") },
-                        selected = currentRoute.startsWith(Screen.Savings.selectedPrefix),
-                        onClick = { navigateTo(Screen.Savings.route) },
-                        icon = { Icon(Icons.Outlined.Savings, contentDescription = null) },
                         colors = NavigationDrawerItemDefaults.colors()
                     )
                     NavigationDrawerItem(
@@ -251,6 +233,12 @@ fun AppNavHost(database: FinanzasDatabase) {
 
                     Divider()
 
+                    Text(
+                        text = "Cuenta",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp)
+                    )
                     NavigationDrawerItem(
                         label = { Text("Cuenta y sincronizacion") },
                         selected = currentRoute.startsWith(Screen.Login.selectedPrefix),
@@ -629,8 +617,12 @@ sealed class Screen(
     object Settings : Screen("settings", "settings", "Ajustes", Icons.Outlined.Settings)
 
     companion object {
+        // Redistribucion de navegacion: Presupuestos y Metas se revisan seguido (se
+        // planea con ellas) y antes vivian escondidas en el menu lateral, mientras que
+        // Facturas y Agenda -- uso mas ocasional -- ocupaban la zona del pulgar en la
+        // barra inferior. Se intercambiaron.
         val bottomItems: List<Screen>
-            get() = listOf(Dashboard, Movements, Invoices, Agenda, Budgets)
+            get() = listOf(Dashboard, Movements, Budgets, Savings)
 
         // Rutas de crear/editar (no son destinos del menu, por eso no son objetos Screen
         // completos): -1 significa "nuevo registro", cualquier otro valor es el id a editar.

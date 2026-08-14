@@ -45,6 +45,44 @@ adaptados aquí a Compose ya que el skill original apunta a React/Tailwind). Cam
   entrada) en vez de solo la notificación silenciosa que ya existía. #pendiente/fase1 ✅ 2026-08-14
 - [x] Confirmación con gesto swipe en Movimientos (ver ítem de Fase 1 arriba). ✅ 2026-08-14
 
+### Sesión 2026-08-14 (madrugada): paleta "Barro & Ocre", fondo del splash y navegación
+El usuario no le gustó el resultado de la sesión anterior: "se ve muy AI" — pidió tonos
+tierra en vez de coral/teal, un fondo de splash que no fuera una ilustración generada, y
+reorganizar la navegación. Se presentaron 3 direcciones de paleta + 3 conceptos de fondo
+en un artifact interactivo; el usuario eligió **Barro & Ocre** y **curvas topográficas**.
+- [x] Paleta completa reemplazada en `Color.kt`/`Theme.kt` (tema "Kivo Coral" → "Kivo
+  Barro"): primario ladrillo apagado `#9C4A3C` (antes coral `#F56565`), secundario oliva
+  `#6B7D4F` (antes teal), terciario ocre `#C68A3D` (antes ámbar — casi sin cambio), fondo
+  piedra cálida `#DED1B8` (antes crema casi blanco `#FEFCF5`). `IncomeGreen`/`ExpenseRose`/
+  `WarningAmber` se remapearon a oliva/barro/ocre para que los movimientos no choquen con
+  la paleta nueva. El nombre guardado en `SharedPreferences` (enum `KIVO_CORAL`) no cambió
+  para no perder la preferencia de quien ya tenga la app instalada — solo el
+  `displayName` visible. #pendiente/rapido ✅ 2026-08-14
+- [x] Fondo del splash: la ilustración `splash_background.jpg` (ola abstracta, generada)
+  se reemplazó por un patrón de curvas topográficas dibujado a mano en `Canvas` (dos
+  focos de anillos concéntricos, deriva de 90s casi imperceptible) — el asset JPG se
+  eliminó del proyecto por quedar sin uso. #pendiente/rapido ✅ 2026-08-14
+- [x] **Categorías duplicadas** (bug real, no de diseño): `DefaultCategories.seed()` se
+  ejecutaba en cada arranque de la app (`FinanzasApplication.onCreate`) sin revisar si ya
+  existían — el id autogenerado nunca choca, así que `OnConflictStrategy.IGNORE` no
+  evitaba nada. Cada reinicio insertaba las 33 categorías de nuevo. Arreglado:
+  `seed()` ahora no hace nada si la tabla ya tiene datos, y una función nueva
+  `dedupe()` corre una vez al iniciar para fusionar duplicados ya existentes en el
+  dispositivo — reasigna movimientos/reglas/presupuestos a la categoría más antigua de
+  cada grupo antes de borrar las copias, para no perder clasificaciones. #pendiente/rapido #bug ✅ 2026-08-14
+- [x] Navegación redistribuida: Presupuestos y Metas (se revisan seguido) subieron de la
+  barra inferior; Facturas y Agenda (uso más ocasional) bajaron al menú lateral, agrupadas
+  bajo "Gestión" junto con Notificaciones; Cuenta/Ajustes quedaron bajo "Cuenta". El menú
+  ya no repite Inicio/Movimientos/Presupuestos/Metas (redundantes con la barra inferior).
+  #pendiente/fase1 ✅ 2026-08-14
+
+**Diferido, no resuelto en esta pasada:** las otras 4 ilustraciones conectadas en la
+sesión anterior (`empty_state_wallet`, `savings_goal_illustration`,
+`biometric_lock_illustration`, `onboarding_security`) no se tocaron — el usuario aclaró
+que "el fondo" se refería específicamente al splash. Si esas ilustraciones también se
+sienten "muy IA" en la práctica, valdría la pena reemplazarlas por algo más sobrio
+(iconografía lineal propia, o nada) — no se hizo por no asumir de más. #pendiente/deuda-tecnica
+
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
 - [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14
@@ -83,7 +121,7 @@ guarda `isContributor`/`contributionAmount` como flags locales, sin infraestruct
 - [ ] Huella financiera generativa (arte único a partir de los patrones de gasto). #pendiente/sostenibilidad
 - [ ] Número de fundador. #pendiente/sostenibilidad
 - [ ] Voto de roadmap (encuesta mensual dentro de la app). #pendiente/sostenibilidad
-- [ ] Temas exclusivos — tema "fundador" terracota-ocre real (los alias `Terracotta*`/`Ocre*` en `Color.kt` hoy solo apuntan a los valores coral/crema base; habría que definir una paleta terracota-ocre distinta). #pendiente/sostenibilidad
+- [ ] Temas exclusivos — tema "fundador" diferenciado. **Cambió el contexto**: desde la sesión del 2026-08-14 (madrugada) la paleta *base* de Kivo ya es terracota-ocre (`Kivo Barro`, ver arriba), así que los alias `Terracotta*`/`Ocre*` en `Color.kt` ahora sí describen tonos reales — pero un tema "fundador" ya no puede ser "terracota-ocre" a secas porque eso dejó de ser exclusivo. Habría que definir algo que se diferencie del tema base (p.ej. un acento metálico/dorado, o una variante más oscura y saturada). #pendiente/sostenibilidad
 - [ ] Resumen del año enriquecido (versión animada/exportable para aportantes). #pendiente/sostenibilidad
 
 ## ⚫ Legal / cumplimiento (no-código)

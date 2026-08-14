@@ -2,7 +2,6 @@ package com.finanzas.automatica.presentation.ui.screen
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -18,12 +17,10 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.finanzas.automatica.R
 import com.finanzas.automatica.presentation.ui.theme.FinancePrimary
 import com.finanzas.automatica.presentation.ui.theme.FinanceSecondary
 import kotlinx.coroutines.delay
@@ -67,14 +64,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        // Fondo decorativo (antes sin usar en ningun composable, ver res/drawable-nodpi).
-        // Alpha bajo para que quede como textura de marca, sin competir con el logo/texto.
-        Image(
-            painter = painterResource(R.drawable.splash_background),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize().alpha(0.5f),
-            contentScale = ContentScale.Crop
-        )
+        TopographicBackground(modifier = Modifier.fillMaxSize())
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -100,11 +90,71 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
     }
 }
 
+/**
+ * Fondo del splash: curvas de contorno como un mapa topografico, dibujadas a mano con
+ * Canvas (no una ilustracion generada) -- deriva muy lenta e imperceptible. Reemplaza el
+ * fondo anterior (una ilustracion tipo stock-AI, ver docs/PENDIENTES.md) por un patron
+ * geometrico sobrio propio, coherente con la paleta Barro & Ocre. Dos focos de anillos
+ * concentricos en esquinas opuestas, igual que el concepto elegido en la vista previa.
+ */
+@Composable
+private fun TopographicBackground(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "topoDrift")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 90_000, easing = LinearEasing)
+        ),
+        label = "topoRotation"
+    )
+    val ringColorA = FinanceSecondary
+    val ringColorB = FinancePrimary
+
+    Canvas(modifier = modifier) {
+        rotate(degrees = rotation, pivot = Offset(size.width * 0.5f, size.height * 0.5f)) {
+            drawContourCluster(
+                center = Offset(size.width * 0.22f, size.height * 0.18f),
+                baseRadius = size.minDimension * 0.10f,
+                ringGap = size.minDimension * 0.075f,
+                ringCount = 4,
+                color = ringColorA
+            )
+            drawContourCluster(
+                center = Offset(size.width * 0.82f, size.height * 0.86f),
+                baseRadius = size.minDimension * 0.08f,
+                ringGap = size.minDimension * 0.065f,
+                ringCount = 5,
+                color = ringColorB
+            )
+        }
+    }
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawContourCluster(
+    center: Offset,
+    baseRadius: Float,
+    ringGap: Float,
+    ringCount: Int,
+    color: Color
+) {
+    for (i in 0 until ringCount) {
+        val alpha = 0.16f - (i * 0.024f)
+        if (alpha <= 0f) continue
+        drawCircle(
+            color = color.copy(alpha = alpha),
+            radius = baseRadius + (ringGap * i),
+            center = center,
+            style = Stroke(width = 1.6.dp.toPx())
+        )
+    }
+}
+
 @Composable
 fun KivoLogo(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         val strokeWidth = size.width * 0.15f
-        
+
         // Draw the vertical line of 'K'
         drawLine(
             color = FinanceSecondary,

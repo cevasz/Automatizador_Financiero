@@ -26,6 +26,18 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE categoryId = :categoryId AND month = :month AND year = :year")
     suspend fun getByCategoryAndPeriod(categoryId: Long, month: Int, year: Int): BudgetEntity?
 
+    @Query("SELECT * FROM budgets WHERE categoryId = :categoryId")
+    suspend fun getByCategory(categoryId: Long): List<BudgetEntity>
+
+    // Usado por DefaultCategories.dedupe() para reapuntar un presupuesto individual a la
+    // categoria "canonica" al fusionar categorias duplicadas. Se actualiza de a un
+    // presupuesto por vez (no en bloque) porque el indice unico (categoryId, month, year)
+    // puede rechazar la actualizacion si la categoria canonica ya tiene un presupuesto
+    // para ese mismo mes/año -- el llamador debe capturar esa excepcion y decidir
+    // (ver DefaultCategories.dedupe).
+    @Query("UPDATE budgets SET categoryId = :newCategoryId WHERE id = :budgetId")
+    suspend fun reassignSingle(budgetId: Long, newCategoryId: Long): Int
+
     @Query("SELECT * FROM budgets WHERE month = :month AND year = :year ORDER BY categoryId ASC")
     suspend fun getByPeriod(month: Int, year: Int): List<BudgetEntity>
 

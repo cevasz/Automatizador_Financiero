@@ -26,6 +26,9 @@ class FinanzasApplication : Application() {
 
         CoroutineScope(Dispatchers.IO).launch {
             DefaultCategories.seed(database!!)
+            // Limpia categorias duplicadas dejadas por versiones anteriores (seed() se
+            // ejecutaba en cada arranque sin verificar si ya existian). Idempotente.
+            DefaultCategories.dedupe(database!!)
         }
 
         ClassificationRepositoryProvider.categoryLookupRepository =

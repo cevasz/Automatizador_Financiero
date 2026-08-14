@@ -2,37 +2,47 @@ package com.finanzas.automatica.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Kivo Theme - Coral vibrante sobre crema cálido, con acentos teal y ámbar
-val FinancePrimary = Color(0xFFF56565) // Coral Kivo
-val FinancePrimaryDark = Color(0xFF7A2E2E)
+// Kivo Theme "Barro & Ocre" -- rediseño sobrio en tonos tierra (ladrillo apagado, ocre,
+// oliva) sobre piedra cálida, reemplaza la paleta coral/teal original (más saturada y
+// "genérica de fintech"). Ver artifact de direcciones visuales presentado al usuario;
+// esta es la dirección elegida ("Barro & ocre"). El fondo ya no es un crema casi blanco
+// (FEFCF5) sino una piedra cálida más presente (DED1B8) -- se siente más "puesto ahí a
+// propósito" que "brillante por defecto".
+val FinancePrimary = Color(0xFF9C4A3C) // Barro (ladrillo apagado)
+val FinancePrimaryDark = Color(0xFF6B3128)
 val FinanceOnPrimary = Color(0xFFFFFFFF)
-val FinancePrimaryContainer = Color(0xFFFC8181) // Coral claro
-val FinanceOnPrimaryContainer = Color(0xFF5C1A1A)
+val FinancePrimaryContainer = Color(0xFFC17862) // Barro claro
+val FinanceOnPrimaryContainer = Color(0xFF3D1A12)
 
-val FinanceSecondary = Color(0xFF2C7A7B) // Teal complementario
-val FinanceSecondaryContainer = Color(0xFFD8ECEA)
-val FinanceTertiary = Color(0xFFD69E2E) // Ámbar cálido
-val FinanceTertiaryContainer = Color(0xFFF8EBCB)
+val FinanceSecondary = Color(0xFF6B7D4F) // Oliva complementario
+val FinanceSecondaryContainer = Color(0xFFD3DAB9)
+val FinanceTertiary = Color(0xFFC68A3D) // Ocre cálido
+val FinanceTertiaryContainer = Color(0xFFEFDDBB)
 
-val FinanceBackground = Color(0xFFFEFCF5) // Crema cálido
-val FinanceSurface = Color(0xFFFFFFFF)
-val FinanceSurfaceVariant = Color(0xFFF3EFE6)
-val FinanceOnSurface = Color(0xFF2D3748) // Pizarra profunda
-val FinanceOnSurfaceVariant = Color(0xFF5A626E)
-val FinanceOutline = Color(0xFFD8D4CA)
-val FinanceOutlineSoft = Color(0xFFE8E4DA)
+val FinanceBackground = Color(0xFFDED1B8) // Piedra cálida
+val FinanceSurface = Color(0xFFEDE4D0) // Un tono más clara que el fondo, para tarjetas
+val FinanceSurfaceVariant = Color(0xFFD2C4A8)
+val FinanceOnSurface = Color(0xFF241A12) // Marrón casi negro
+val FinanceOnSurfaceVariant = Color(0xFF6B5842)
+val FinanceOutline = Color(0xFFB8A98A)
+val FinanceOutlineSoft = Color(0xFFC9BC9F)
 
-val FinanceDarkBackground = Color(0xFF14161C)
-val FinanceDarkSurface = Color(0xFF1C1F27)
-val FinanceDarkSurfaceVariant = Color(0xFF2A2E38)
-val FinanceDarkOnSurface = Color(0xFFE8EBF2)
-val FinanceDarkOnSurfaceVariant = Color(0xFFA8AEB8)
+val FinanceDarkBackground = Color(0xFF1B140E) // Umbra oscura cálida
+val FinanceDarkSurface = Color(0xFF241B13)
+val FinanceDarkSurfaceVariant = Color(0xFF33281C)
+val FinanceDarkOnSurface = Color(0xFFEDE4D0)
+val FinanceDarkOnSurfaceVariant = Color(0xFFC2B393)
 
-val IncomeGreen = Color(0xFF2C7A7B) // Teal de ingresos
-val ExpenseRose = Color(0xFFF56565) // Coral de gastos
-val WarningAmber = Color(0xFFD69E2E) // Ámbar Kivo
-val InfoBlue = Color(0xFF3182CE)
+val IncomeGreen = Color(0xFF6B7D4F) // Oliva de ingresos
+val ExpenseRose = Color(0xFF9C4A3C) // Barro de gastos
+val WarningAmber = Color(0xFFC68A3D) // Ocre Kivo
+val InfoBlue = Color(0xFF5E7A8C) // Azul piedra apagado (único acento frío, solo semántico)
 
+// Estos alias apuntaban antes literalmente a los valores coral/crema base (ver
+// docs/PENDIENTES.md, quedaba pendiente definir una paleta terracota-ocre real para un
+// futuro tema "fundador"). Con este rediseño la paleta base YA es terracota-ocre, así
+// que estos alias ahora sí describen lo que dicen -- un tema "fundador" futuro debería
+// diferenciarse con algo más (p.ej. un acento metálico), no solo con estos tonos.
 val TerracottaPrimary = FinancePrimary
 val TerracottaOnPrimary = FinanceOnPrimary
 val TerracottaSecondary = FinanceSecondary
@@ -41,7 +51,7 @@ val OcreSurface = FinanceBackground
 val OcreOnSurface = FinanceOnSurface
 
 val Ocre = WarningAmber
-val OcreLight = Color(0xFFF8EBCB)
+val OcreLight = Color(0xFFEFDDBB)
 val TerracottaDark = FinancePrimaryDark
 val SurfaceLight = FinanceSurface
 val SurfaceDark = FinanceDarkSurface

@@ -17,14 +17,18 @@ enum class ThemeMode {
 }
 
 enum class AppThemePalette(val displayName: String) {
-    KIVO_CORAL("Kivo Coral"),
+    // El nombre del enum (KIVO_CORAL) se mantiene sin cambios -- es la clave que ya
+    // está guardada en SharedPreferences en dispositivos existentes (ThemePreferences),
+    // renombrarlo perdería la preferencia guardada de quien ya tenga la app instalada.
+    // Solo cambia el displayName visible, que ahora sí describe la paleta real.
+    KIVO_CORAL("Kivo Barro"),
     OCEAN_TEAL("Oceano Teal"),
     FOREST_GREEN("Bosque Verde"),
     MIDNIGHT_BLUE("Medianoche"),
     SUNSET_AMBER("Atardecer")
 }
 
-// 1. Kivo Coral
+// 1. Kivo Barro (tonos tierra: ladrillo apagado + ocre + oliva)
 private val CoralLightColorScheme = lightColorScheme(
     primary = FinancePrimary,
     onPrimary = FinanceOnPrimary,
@@ -48,23 +52,23 @@ private val CoralLightColorScheme = lightColorScheme(
 )
 
 private val CoralDarkColorScheme = darkColorScheme(
-    primary = Color(0xFFFC8181),
-    onPrimary = Color(0xFF4A1212),
+    primary = Color(0xFFD08468),
+    onPrimary = Color(0xFF3D1A12),
     primaryContainer = FinancePrimaryDark,
-    onPrimaryContainer = Color(0xFFFFDAD6),
-    secondary = Color(0xFF6FC9C6),
-    onSecondary = Color(0xFF0F3A3A),
-    secondaryContainer = Color(0xFF1E4A48),
-    tertiary = Color(0xFFF0C464),
-    tertiaryContainer = Color(0xFF4A3406),
+    onPrimaryContainer = Color(0xFFF5DDD3),
+    secondary = Color(0xFFA3B37F),
+    onSecondary = Color(0xFF23301A),
+    secondaryContainer = Color(0xFF3A4A2C),
+    tertiary = Color(0xFFE0B366),
+    tertiaryContainer = Color(0xFF4A3510),
     background = FinanceDarkBackground,
     onBackground = FinanceDarkOnSurface,
     surface = FinanceDarkSurface,
     onSurface = FinanceDarkOnSurface,
     surfaceVariant = FinanceDarkSurfaceVariant,
     onSurfaceVariant = FinanceDarkOnSurfaceVariant,
-    outline = Color(0xFF7E8A82),
-    outlineVariant = Color(0xFF3D4842),
+    outline = Color(0xFF8A7A5C),
+    outlineVariant = Color(0xFF453824),
     error = Color(0xFFE7A0A0),
     errorContainer = Color(0xFF5B2F34)
 )

@@ -46,4 +46,7 @@ interface CategoryDao {
 
     @Query("SELECT COUNT(*) FROM categories WHERE isCustom = 1")
     suspend fun countCustom(): Int
+
+    @Query("SELECT COUNT(*) FROM categories")
+    suspend fun count(): Int
 }
