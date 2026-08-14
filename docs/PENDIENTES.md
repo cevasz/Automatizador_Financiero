@@ -1,0 +1,73 @@
+---
+tags: [kivo, pendientes]
+proyecto: Kivo
+actualizado: 2026-08-14
+fuente: "[[docs/SDD]]"
+---
+
+# Pendientes — Kivo
+
+> Lista viva de trabajo pendiente, derivada de comparar `docs/SDD.md` (la
+> especificación) contra el código real (`kivo-android/`), verificado con
+> `graphify query`. Reglas/convenciones: [[CLAUDE]]. Arquitectura y alcance:
+> [[docs/guia]].
+>
+> Este archivo está escrito en Markdown compatible con Obsidian (frontmatter,
+> `[[wikilinks]]`, `#tags`, checkboxes) — se puede copiar o enlazar
+> directamente dentro de una vault sin modificar nada.
+
+## 🔴 Rápidos (bajo esfuerzo, alto impacto)
+
+- [ ] Conectar el botón "Abonar" en Metas de ahorro — [[SavingsGoalsViewModel]].addProgress() ya existe y ya está cableado en [[AppNavHost]] (`onAddProgress = savingsGoalsViewModel::addProgress`); solo falta el botón/diálogo en [[SavingsGoalsScreen]] que lo dispare. #pendiente/rapido
+- [ ] Arreglar el selector de formato de exportación — `exportDataFormat` en Ajustes puede decir "CSV" pero [[SettingsViewModel]].exportData() siempre escribe JSON sin importar la selección. #pendiente/rapido #bug
+- [ ] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`) — hoy solo compila el APK (`assembleDebug`), nunca corre los 28 tests existentes; una regresión futura no se detectaría sola. #pendiente/rapido #ci
+
+## 🟡 Deuda técnica / funcionalidad incompleta
+
+- [ ] Crear/editar presupuesto desde la UI — `onAddBudget`/`onBudgetClick` son no-ops en [[BudgetsScreen]]. #pendiente/deuda-tecnica
+- [ ] Pantalla de gestión de categorías (crear/editar/eliminar categorías propias) — hoy solo existen las categorías sembradas por `DefaultCategories`, sin UI de administración. #pendiente/deuda-tecnica
+- [ ] UI para reglas de clasificación — `ClassificationRuleEntity` existe en Room pero ninguna pantalla la expone; el usuario no puede ver ni editar sus propias reglas. #pendiente/deuda-tecnica
+- [ ] Configurar variante *release* (firma, ofuscación/R8) — hoy el proyecto solo tiene variante debug lista. #pendiente/deuda-tecnica
+
+## 🟢 Fase 1 (MVP) — entregables del propio alcance aún sin terminar
+
+Ver [[docs/SDD]] § 6 (módulos funcionales) y § 11 (roadmap).
+
+- [ ] Confirmación ligera con gesto swipe (§6.10) — hoy son botones "Confirmar"/"Rechazar" en [[MovementsListScreen]], no el patrón swipe que especifica el SDD. #pendiente/fase1
+- [ ] Cifrado en reposo de la base de datos (§8.1) — [[FinanzasDatabase]] (Room) no usa SQLCipher ni cifrado a nivel de archivo. Es el hueco de seguridad más señalado por el propio documento. #pendiente/fase1 #seguridad
+- [ ] Sugerencia proactiva de agenda cuando un número desconocido se repite en la misma categoría (§6.2) — la parte 100% local (sin comunidad) es viable ya; el enum `AgendaSource.COMMUNITY_SUGGESTED`/`AUTO_DETECTED` existe en el modelo pero nada lo asigna todavía. #pendiente/fase1
+
+## 🔵 Fase 2 (Robustecimiento) — sin iniciar
+
+- [ ] Alertas y detección de patrones: gasto inusual, rachas de gasto, movimientos recurrentes (§6.7) — confirmado sin código: cero nodos coincidentes al consultar el grafo. #pendiente/fase2
+- [ ] Escaneo de comprobantes por OCR con ML Kit (§6.8) — `MovementSource.OCR` existe en el enum, sin pipeline detrás. #pendiente/fase2
+- [ ] Exportación a Excel y PDF (§6.9) — hoy solo hay export a JSON local. #pendiente/fase2
+- [ ] Aprendizaje comunitario opt-in de la agenda financiera (§6.2, refuerzo) — requiere backend. #pendiente/fase2
+- [ ] Panel web completo — requiere backend. #pendiente/fase2
+
+## 🟣 Sostenibilidad (cola de Fase 1 / Fase 2)
+
+Ver [[docs/SDD]] § 9.1 — ninguna recompensa está implementada; `SettingsViewModel` solo
+guarda `isContributor`/`contributionAmount` como flags locales, sin infraestructura real.
+
+- [ ] Huella financiera generativa (arte único a partir de los patrones de gasto). #pendiente/sostenibilidad
+- [ ] Número de fundador. #pendiente/sostenibilidad
+- [ ] Voto de roadmap (encuesta mensual dentro de la app). #pendiente/sostenibilidad
+- [ ] Temas exclusivos — tema "fundador" terracota-ocre real (los alias `Terracotta*`/`Ocre*` en `Color.kt` hoy solo apuntan a los valores coral/crema base; habría que definir una paleta terracota-ocre distinta). #pendiente/sostenibilidad
+- [ ] Resumen del año enriquecido (versión animada/exportable para aportantes). #pendiente/sostenibilidad
+
+## ⚫ Legal / cumplimiento (no-código)
+
+- [ ] Registro formal como responsable del tratamiento de datos personales (Ley 1581 de 2012). #pendiente/legal
+- [ ] Política de tratamiento de datos + flujo de consentimiento diferenciado por fuente de captura. #pendiente/legal
+- [ ] Declaración de funciones financieras en Google Play Console (justificación del permiso de notificaciones). #pendiente/legal
+
+## ⏳ Fase 3-4 (futuro explícito — no iniciar sin discutirlo, per [[CLAUDE]])
+
+- [ ] Backend + panel web — bloqueado explícitamente hasta validar el MVP local en un dispositivo real.
+- [ ] iOS vía Share Extension.
+- [ ] Integración oficial con el Sistema de Finanzas Abiertas (Open Finance) — depende del cronograma de la Superintendencia Financiera (Decreto 0368 de 2026).
+
+## 📊 Métricas (sin instrumentar)
+
+- [ ] Instrumentar las métricas de éxito del MVP del §13 del SDD (% de movimientos clasificados correctamente sin intervención, retención a 30/90 días, tasa de corrección en confirmación ligera) — hoy no hay ninguna telemetría/analítica en el proyecto. Diseñar con cuidado dado el enfoque de privacidad del producto (opt-in, anonimizado, nunca obligatorio). #pendiente/metricas
