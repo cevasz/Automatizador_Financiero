@@ -14,8 +14,8 @@ android {
         targetSdk = 34
         // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
         // fixes, minor para features nuevas).
-        versionCode = 4
-        versionName = "1.3.0"
+        versionCode = 5
+        versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -23,6 +23,10 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        // Genera BuildConfig.VERSION_NAME/VERSION_CODE a partir de versionName/versionCode
+        // de arriba, para mostrar la version real en Ajustes (Acerca de) sin duplicarla a
+        // mano -- antes esa fila decia "1.0.0" fijo, sin importar la version real.
+        buildConfig = true
     }
 
     testOptions {

@@ -24,6 +24,7 @@ import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.RawMovement
 import com.finanzas.automatica.domain.parser.ParserRegistry
+import com.tom_roush.pdfbox.pdmodel.encryption.InvalidPasswordException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -94,17 +95,29 @@ class MovementViewModel(
         }
     }
 
+    /**
+     * Los extractos bancarios colombianos casi siempre vienen protegidos con
+     * contraseña. Si [password] es nula/incorrecta y el PDF la requiere,
+     * [onPasswordError] se dispara para que la UI pida la contraseña (o reintente) en
+     * vez de reportarse como una falla generica de importacion.
+     */
     fun importStatementPdf(
         pdfBytes: ByteArray,
         defaultBank: BankEntity,
-        onComplete: (ImportSummary) -> Unit
+        password: String? = null,
+        onComplete: (ImportSummary) -> Unit,
+        onPasswordError: () -> Unit = {}
     ) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val text = withContext(Dispatchers.Default) {
-                    PdfStatementExtractor.extractText(pdfBytes)
+                    PdfStatementExtractor.extractText(pdfBytes, password)
                 }
                 importRaw(text, defaultBank, onComplete)
+            } catch (e: InvalidPasswordException) {
+                _isLoading.value = false
+                onPasswordError()
             } catch (e: Exception) {
                 e.printStackTrace()
                 onComplete(ImportSummary(0, 0, 0, 0, 0, emptyList()))

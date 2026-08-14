@@ -377,7 +377,10 @@ fun SettingsScreen(
                     icon = Icons.Outlined.Info,
                     iconTint = MaterialTheme.colorScheme.primary,
                     title = "Version",
-                    subtitle = "1.0.0",
+                    // Leida de BuildConfig (generado desde versionName/versionCode en
+                    // build.gradle.kts) en vez de un string fijo -- antes decia "1.0.0"
+                    // sin importar la version real instalada.
+                    subtitle = "${com.finanzas.automatica.BuildConfig.VERSION_NAME} (${com.finanzas.automatica.BuildConfig.VERSION_CODE})",
                     trailing = { }
                 )
             }

@@ -3,6 +3,7 @@ package com.finanzas.automatica.presentation.ui.components
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,10 +42,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Full-screen lock: while it blocks, the rest of the app is not composed.
- * Relocks itself when the app goes to background. Uses BiometricPrompt with
- * fallback to the device credential (PIN/PATTERN). If no credential exists on
- * the device, the app stays usable instead of locking the user out.
+ * Full-screen lock: mientras esta bloqueado, el candado se dibuja ENCIMA de [content]
+ * como overlay opaco -- [content] sigue compuesto debajo, nunca se desmonta.
+ *
+ * Antes [content] (que incluye AppNavHost y su NavController) se sacaba de la
+ * composicion por completo al bloquear (`if (locked) lock else content()`), así que se
+ * perdía toda la pila de navegación. Cualquier acción que dispara un Activity externo
+ * (selector de archivos para importar un extracto, cámara/galería para escanear una
+ * factura o un movimiento) manda la app a segundo plano -- eso dispara ON_STOP, que
+ * bloquea la app -- y al volver, con biometría activada, la pantalla se reconstruía
+ * desde cero en el Inicio en vez de volver a donde el usuario estaba. Con el overlay,
+ * el NavController sobrevive y el usuario vuelve exactamente a la pantalla/diálogo
+ * donde se quedó. Se relockea solo cuando la app va a segundo plano. Usa BiometricPrompt
+ * con fallback a la credencial del dispositivo (PIN/patrón); si no hay ninguna
+ * credencial configurada, la app queda usable en vez de dejar al usuario bloqueado.
  */
 @Composable
 fun BiometricLockGate(content: @Composable () -> Unit) {
@@ -69,10 +80,11 @@ fun BiometricLockGate(content: @Composable () -> Unit) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    if (available && locked) {
-        BiometricLockPrompt(onSuccess = { locked = false })
-    } else {
+    Box(modifier = Modifier.fillMaxSize()) {
         content()
+        if (available && locked) {
+            BiometricLockPrompt(onSuccess = { locked = false })
+        }
     }
 }
 

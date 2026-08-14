@@ -83,12 +83,42 @@ que "el fondo" se refería específicamente al splash. Si esas ilustraciones tam
 sienten "muy IA" en la práctica, valdría la pena reemplazarlas por algo más sobrio
 (iconografía lineal propia, o nada) — no se hizo por no asumir de más. #pendiente/deuda-tecnica
 
+### Sesión 2026-08-15: PDF con contraseña + bug de biometría que reseteaba la navegación
+- [x] **Extractos PDF protegidos con contraseña** — los extractos bancarios colombianos
+  casi siempre vienen cifrados (a veces con la cédula del titular como clave).
+  `PdfStatementExtractor` no tenía forma de pasar contraseña; ahora `requiresPassword()`
+  detecta si el PDF la necesita y `extractText(bytes, password)` la usa para descifrar.
+  En [[MovementsListScreen]], si el PDF elegido requiere contraseña se abre un diálogo
+  (`PdfPasswordDialog`, con ancho acotado para verse bien en tablet) antes de intentar
+  importar; si la contraseña es incorrecta, se pide de nuevo con un mensaje claro en vez
+  de reportar "0 movimientos importados" sin explicación. Con tests que cifran el fixture
+  real en memoria con pdfbox (no se inventa un formato de banco). #pendiente/rapido #bug ✅ 2026-08-15
+- [x] **Bug real, causa raíz encontrada**: al bloquearse por biometría, `BiometricLockGate`
+  sacaba `AppNavHost` (y su `NavController`) completamente de la composición
+  (`if (locked) lock else content()`) en vez de solo ocultarlo. Cualquier acción que abre
+  un Activity externo (selector de archivos para importar extracto, cámara/galería para
+  escanear factura o captura de pantalla) manda la app a segundo plano → dispara
+  `ON_STOP` → bloquea la app → al volver, con biometría activada, `AppNavHost` se volvía
+  a construir desde cero en el Inicio en vez de continuar donde el usuario estaba.
+  Arreglado: el candado ahora se dibuja como overlay opaco ENCIMA del contenido (`Box`),
+  que sigue compuesto debajo sin interrupción — el `NavController` sobrevive y el usuario
+  vuelve exactamente a la pantalla/diálogo donde se quedó. Arregla el flujo de PDF, y de
+  paso el de cámara/galería de Facturas y el de captura de pantalla de Movimientos (todos
+  comparten el mismo `BiometricLockGate`). #pendiente/rapido #bug ✅ 2026-08-15
+- [x] **Versión mostrada en la app** — Ajustes → "Acerca de" ya tenía una fila de
+  versión, pero decía **"1.0.0" fijo en el código**, sin relación con la versión real
+  (que ya iba en 1.4.0). Se activó `buildConfig = true` en `build.gradle.kts` para que
+  `BuildConfig.VERSION_NAME`/`VERSION_CODE` (generados automáticamente desde
+  `versionName`/`versionCode`) alimenten esa fila — de aquí en adelante se actualiza sola
+  en cada build, sin volver a quedar desfasada. #pendiente/rapido #bug ✅ 2026-08-15
+
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
 - [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14
 - [ ] Pantalla de gestión de categorías (crear/editar/eliminar categorías propias) — hoy solo existen las categorías sembradas por `DefaultCategories`, sin UI de administración. **Diferido** (feature nueva, no un botón roto). #pendiente/deuda-tecnica
 - [ ] UI para reglas de clasificación — `ClassificationRuleEntity` existe en Room pero ninguna pantalla la expone; el usuario no puede ver ni editar sus propias reglas. **Diferido** (feature nueva, no un botón roto). #pendiente/deuda-tecnica
 - [ ] Configurar variante *release* (firma, ofuscación/R8) — hoy el proyecto solo tiene variante debug lista. **Diferido** (config de build, no un botón). #pendiente/deuda-tecnica
+- [ ] Layout adaptativo para tablet (nav rail permanente / dos paneles) — la dependencia `androidx.compose.material3:material3-window-size-class` está en `build.gradle.kts` pero **nunca se usa** en ningún composable (confirmado con grep). El 2026-08-15 el `PdfPasswordDialog` nuevo se acotó a `widthIn(max = 420.dp)` para que no se estire feo en pantallas grandes, pero eso es un parche puntual, no una estrategia de layout para tablet. **Diferido** (feature de layout grande, no cabía en el pedido puntual de esa sesión). #pendiente/deuda-tecnica
 
 ### Botones que además se arreglaron en esta pasada (auditoría completa de `AppNavHost`)
 No estaban en la lista original pero aparecieron al auditar cada callback: siete botones

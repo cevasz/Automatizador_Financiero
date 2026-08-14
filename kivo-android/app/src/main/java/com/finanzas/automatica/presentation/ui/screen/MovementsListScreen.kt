@@ -22,19 +22,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.TrendingDown
 import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -52,6 +57,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +67,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.R
@@ -108,7 +115,7 @@ fun MovementsListScreen(
     onReject: (Long) -> Unit = {},
     onCorrect: (Long, Long) -> Unit = { _, _ -> },
     onImportStatement: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
-    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
+    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, String?, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit, () -> Unit) -> Unit = { _, _, _, _, _ -> },
     onImportScreenshot: (android.net.Uri, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _ -> },
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -146,10 +153,8 @@ fun MovementsListScreen(
                     onComplete(summary)
                 }
             },
-            onImportPdf = { bytes, bank, onComplete ->
-                onImportPdf(bytes, bank) { summary ->
-                    onComplete(summary)
-                }
+            onImportPdf = { bytes, bank, password, onComplete, onPasswordError ->
+                onImportPdf(bytes, bank, password, { summary -> onComplete(summary) }, onPasswordError)
             },
             onImportScreenshot = { uri, onComplete ->
                 onImportScreenshot(uri) { summary ->
@@ -336,7 +341,7 @@ private fun ImportStatementDialog(
     currencyFormat: NumberFormat,
     onDismiss: () -> Unit,
     onImport: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit,
-    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit,
+    onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, String?, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit, () -> Unit) -> Unit,
     onImportScreenshot: (android.net.Uri, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _ -> }
 ) {
     var selectedBank by remember { mutableStateOf(com.finanzas.automatica.domain.model.BankEntity.BANCOLOMBIA) }
@@ -347,8 +352,38 @@ private fun ImportStatementDialog(
     var isScreenshotLoading by remember { mutableStateOf(false) }
     var screenshotFeedback by remember { mutableStateOf<String?>(null) }
 
+    // Extracto en PDF protegido con contraseña -- muy comun en bancos colombianos
+    // (Bancolombia, Nequi, etc. suelen usar la cedula del titular). Se pide la
+    // contraseña en un dialogo aparte en vez de fallar en silencio.
+    var pendingPdfBytes by remember { mutableStateOf<ByteArray?>(null) }
+    var showPdfPasswordDialog by remember { mutableStateOf(false) }
+    var pdfPasswordError by remember { mutableStateOf<String?>(null) }
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    fun runPdfImport(bytes: ByteArray, password: String?) {
+        isPdfLoading = true
+        onImportPdf(
+            bytes, selectedBank, password,
+            { summary ->
+                summaryResult = summary
+                isImported = true
+                isPdfLoading = false
+                showPdfPasswordDialog = false
+                pendingPdfBytes = null
+            },
+            {
+                // Contraseña ausente/incorrecta: vuelve a pedirla en vez de reportar
+                // una importacion fallida generica.
+                isPdfLoading = false
+                pendingPdfBytes = bytes
+                pdfPasswordError = "Contraseña incorrecta. Intenta de nuevo."
+                showPdfPasswordDialog = true
+            }
+        )
+    }
+
     val pdfLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -359,10 +394,16 @@ private fun ImportStatementDialog(
                     context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 }
                 if (bytes != null && bytes.isNotEmpty()) {
-                    onImportPdf(bytes, selectedBank) { summary ->
-                        summaryResult = summary
-                        isImported = true
+                    val needsPassword = withContext(Dispatchers.Default) {
+                        com.finanzas.automatica.domain.importer.PdfStatementExtractor.requiresPassword(bytes)
+                    }
+                    if (needsPassword) {
                         isPdfLoading = false
+                        pendingPdfBytes = bytes
+                        pdfPasswordError = null
+                        showPdfPasswordDialog = true
+                    } else {
+                        runPdfImport(bytes, null)
                     }
                 } else {
                     isPdfLoading = false
@@ -518,6 +559,98 @@ private fun ImportStatementDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+
+    if (showPdfPasswordDialog) {
+        PdfPasswordDialog(
+            errorMessage = pdfPasswordError,
+            isLoading = isPdfLoading,
+            onDismiss = {
+                showPdfPasswordDialog = false
+                pendingPdfBytes = null
+                pdfPasswordError = null
+            },
+            onSubmit = { password ->
+                pdfPasswordError = null
+                pendingPdfBytes?.let { runPdfImport(it, password) }
+            }
+        )
+    }
+}
+
+/**
+ * Extracto en PDF protegido con contraseña -- se centra en una `Card` de ancho acotado
+ * (`widthIn(max = 420.dp)`) en vez de estirarse de borde a borde, para que se vea bien
+ * tanto en celular como en tablet.
+ */
+@Composable
+private fun PdfPasswordDialog(
+    errorMessage: String?,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onSubmit: (String) -> Unit
+) {
+    var password by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.widthIn(max = 420.dp),
+        icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+        title = { Text("El PDF está protegido", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    "Los extractos bancarios en Colombia suelen venir con contraseña " +
+                        "(a veces es tu número de cédula). Escríbela para poder leerlo.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                androidx.compose.material3.OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Contraseña del PDF") },
+                    singleLine = true,
+                    enabled = !isLoading,
+                    isError = errorMessage != null,
+                    supportingText = errorMessage?.let { { Text(it, color = ExpenseRose) } },
+                    visualTransformation = if (showPassword) {
+                        androidx.compose.ui.text.input.VisualTransformation.None
+                    } else {
+                        androidx.compose.ui.text.input.PasswordVisualTransformation()
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { showPassword = !showPassword }) {
+                            Icon(
+                                imageVector = if (showPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                contentDescription = if (showPassword) "Ocultar contraseña" else "Mostrar contraseña"
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.Button(
+                onClick = { onSubmit(password) },
+                enabled = password.isNotBlank() && !isLoading
+            ) {
+                if (isLoading) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Desbloquear")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = !isLoading) {
                 Text("Cancelar")
             }
         }
