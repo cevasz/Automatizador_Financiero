@@ -26,6 +26,25 @@ fuente: "[[docs/SDD]]"
 - [x] Total/deudas de Facturas no se actualizaban al agregar un producto individual — `totalInvoiceAmount`/`totalDebtAmount` en [[InvoiceScreen]] usaban `remember(draftItems)`, pero `draftItems` es la misma instancia de `SnapshotStateList` durante toda la pantalla (su referencia nunca cambia), así que el cálculo solo corría una vez. Cambiado a `derivedStateOf`, que sí rastrea los cambios internos de la lista. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Versionado: cada cambio funcional sube `versionCode`/`versionName` en `app/build.gradle.kts` (esta sesión: 1 → 2, `1.0.0` → `1.1.0`). #pendiente/rapido ✅ 2026-08-14
 
+### Sesión 2026-08-14 (noche): rediseño visual + animaciones (skill `mobile-app-ui-design`)
+Se instaló el skill [mobile-app-ui-design](https://github.com/ceorkm/mobile-app-ui-design)
+en `~/.claude/skills/` (principios de diseño mobile de apps como Airbnb/Duolingo/Revolut,
+adaptados aquí a Compose ya que el skill original apunta a React/Tailwind). Cambios:
+- [x] `FinanceCard`: esquinas 8dp → 20dp y sombra suave tintada con el color de marca (antes
+  `elevation = 0.dp` + solo borde de 1px, se veía plano). `IconBadge`: 40dp → 44dp (zona de
+  toque mínima recomendada). #pendiente/rapido ✅ 2026-08-14
+- [x] 5 ilustraciones de marca en `res/drawable-nodpi/*.jpg` que ya existían en el proyecto
+  pero **ningún composable las usaba** (confirmado con grep, cero referencias) — conectadas:
+  `empty_state_wallet` en Movimientos/Facturas vacías, `savings_goal_illustration` en Metas
+  vacías y en la celebración de meta lograda, `biometric_lock_illustration` en
+  [[BiometricLockGate]], `onboarding_security` como hero en [[LoginScreen]],
+  `splash_background` de fondo en [[SplashScreen]]. `EmptyState` ganó un parámetro
+  `illustrationRes` opcional (compatible hacia atrás). #pendiente/deuda-tecnica ✅ 2026-08-14
+- [x] Momento "pico" (peak-end rule) en Metas de ahorro: al abonar y completar una meta
+  aparece una celebración a pantalla completa (ilustración + destellos animados + rebote de
+  entrada) en vez de solo la notificación silenciosa que ya existía. #pendiente/fase1 ✅ 2026-08-14
+- [x] Confirmación con gesto swipe en Movimientos (ver ítem de Fase 1 arriba). ✅ 2026-08-14
+
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
 - [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14
@@ -44,7 +63,7 @@ en `AppNavHost` estaban literalmente cableados a `{}` (no hacían nada al tocarl
 
 Ver [[docs/SDD]] § 6 (módulos funcionales) y § 11 (roadmap).
 
-- [ ] Confirmación ligera con gesto swipe (§6.10) — hoy son botones "Confirmar"/"Rechazar" en [[MovementsListScreen]], no el patrón swipe que especifica el SDD. #pendiente/fase1
+- [x] Confirmación ligera con gesto swipe (§6.10) — deslizar a la derecha confirma, a la izquierda rechaza, en [[MovementsListScreen]] (solo movimientos PENDING). Los botones "Confirmar"/"Rechazar" se mantienen debajo como vía explícita (accesibilidad/descubribilidad); el swipe es un atajo adicional, no un reemplazo. #pendiente/fase1 ✅ 2026-08-14
 - [ ] Cifrado en reposo de la base de datos (§8.1) — [[FinanzasDatabase]] (Room) no usa SQLCipher ni cifrado a nivel de archivo. Es el hueco de seguridad más señalado por el propio documento. #pendiente/fase1 #seguridad
 - [ ] Sugerencia proactiva de agenda cuando un número desconocido se repite en la misma categoría (§6.2) — la parte 100% local (sin comunidad) es viable ya; el enum `AgendaSource.COMMUNITY_SUGGESTED`/`AUTO_DETECTED` existe en el modelo pero nada lo asigna todavía. #pendiente/fase1
 

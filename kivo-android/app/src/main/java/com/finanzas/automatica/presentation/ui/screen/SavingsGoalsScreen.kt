@@ -1,11 +1,23 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,11 +29,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +48,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +56,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.finanzas.automatica.R
 import com.finanzas.automatica.domain.model.SavingsGoal
 import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
@@ -81,6 +104,12 @@ fun SavingsGoalsScreen(
     }
     val totalTarget = goals.sumOf { it.targetAmount }
     val totalSaved = goals.sumOf { it.currentAmount }
+
+    // Momento "pico" (peak-end rule): cuando un abono hace que una meta cruce el 100%,
+    // se muestra una celebracion en pantalla completa en vez de solo el aviso silencioso
+    // que ya existia (notificacion del sistema en SavingsGoalsViewModel). El usuario
+    // recuerda sobre todo el pico y el cierre de una experiencia -- este es el pico.
+    var celebratingGoal by remember { mutableStateOf<SavingsGoal?>(null) }
 
     Column(
         modifier = modifier
@@ -137,7 +166,8 @@ fun SavingsGoalsScreen(
                         title = "Sin metas de ahorro",
                         message = "Crea metas para separar objetivos concretos y medir el avance mes a mes.",
                         actionLabel = "Crear meta",
-                        onAction = onAddGoal
+                        onAction = onAddGoal,
+                        illustrationRes = R.drawable.savings_goal_illustration
                     )
                 }
             } else {
@@ -146,9 +176,122 @@ fun SavingsGoalsScreen(
                         goal = goal,
                         currencyFormat = currencyFormat,
                         onClick = { onGoalClick(goal) },
-                        onAddProgress = onAddProgress,
+                        onAddProgress = { id, amount ->
+                            val wasIncomplete = goal.currentAmount < goal.targetAmount
+                            val willComplete = goal.currentAmount + amount >= goal.targetAmount
+                            onAddProgress(id, amount)
+                            if (wasIncomplete && willComplete) {
+                                celebratingGoal = goal.copy(currentAmount = goal.currentAmount + amount)
+                            }
+                        },
                         modifier = Modifier.animateItemPlacement()
                     )
+                }
+            }
+        }
+    }
+
+    celebratingGoal?.let { goal ->
+        GoalCelebrationOverlay(goal = goal, currencyFormat = currencyFormat, onDismiss = { celebratingGoal = null })
+    }
+}
+
+/**
+ * Celebracion de "meta lograda": el momento pico de esta pantalla (peak-end rule del
+ * skill de diseño). Reutiliza la ilustracion savings_goal_illustration.jpg (antes sin
+ * usar en ningun composable) + un par de destellos animados y un rebote de entrada.
+ */
+@Composable
+private fun GoalCelebrationOverlay(
+    goal: SavingsGoal,
+    currencyFormat: NumberFormat,
+    onDismiss: () -> Unit
+) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.6f,
+        animationSpec = spring(dampingRatio = 0.55f, stiffness = Spring.StiffnessLow),
+        label = "celebrationScale"
+    )
+    val infiniteTransition = rememberInfiniteTransition(label = "sparkle")
+    val sparkleRotation by infiniteTransition.animateFloat(
+        initialValue = -12f,
+        targetValue = 12f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "sparkleRotation"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.45f)),
+        contentAlignment = Alignment.Center
+    ) {
+        FinanceCard(
+            modifier = Modifier
+                .padding(32.dp)
+                .scale(scale),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(R.drawable.savings_goal_illustration),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(180.dp)
+                            .clip(RoundedCornerShape(24.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.AutoAwesome,
+                        contentDescription = null,
+                        tint = WarningAmber,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(Alignment.TopEnd)
+                            .rotate(sparkleRotation)
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.AutoAwesome,
+                        contentDescription = null,
+                        tint = IncomeGreen,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.BottomStart)
+                            .rotate(-sparkleRotation)
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "¡Meta lograda! 🎉",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Completaste \"${goal.name}\" con ${currencyFormat.money(goal.currentAmount)}. Tu constancia rindió frutos.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = IncomeGreen)
+                ) {
+                    Text("Genial")
                 }
             }
         }

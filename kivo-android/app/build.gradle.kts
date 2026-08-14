@@ -13,9 +13,9 @@ android {
         minSdk = 26
         targetSdk = 34
         // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
-        // fixes, minor para features nuevas como el OCR de facturas/movimientos).
-        versionCode = 2
-        versionName = "1.1.0"
+        // fixes, minor para features nuevas).
+        versionCode = 3
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

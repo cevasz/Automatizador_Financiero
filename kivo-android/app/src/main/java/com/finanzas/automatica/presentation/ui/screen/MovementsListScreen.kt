@@ -11,6 +11,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -38,10 +40,13 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +55,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.finanzas.automatica.R
 import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
@@ -240,12 +249,13 @@ fun MovementsListScreen(
                             "Cambia el filtro para revisar otros movimientos."
                         },
                         actionLabel = if (movements.isEmpty()) "Importar Extracto" else null,
-                        onAction = if (movements.isEmpty()) { { showImportDialog = true } } else null
+                        onAction = if (movements.isEmpty()) { { showImportDialog = true } } else null,
+                        illustrationRes = if (movements.isEmpty()) R.drawable.empty_state_wallet else null
                     )
                 }
             } else {
                 items(filteredMovements, key = { it.id }) { movement ->
-                    MovementCard(
+                    SwipeableMovementCard(
                         movement = movement,
                         currencyFormat = currencyFormat,
                         onClick = { recategorizeTarget = movement },
@@ -513,6 +523,109 @@ private fun ImportStatementDialog(
         }
     )
 }
+
+/**
+ * Confirmacion ligera con gesto swipe (§6.10 del SDD, quedaba pendiente en
+ * docs/PENDIENTES.md): deslizar a la derecha confirma, deslizar a la izquierda rechaza.
+ * Los botones "Confirmar"/"Rechazar" siguen ahi debajo -- el swipe es un atajo mas rapido
+ * para quien ya conoce el patron, no reemplaza la accion explicita (accesibilidad).
+ * Solo aplica a movimientos PENDING; los demas se muestran sin gesto (nada que confirmar).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableMovementCard(
+    movement: Movement,
+    currencyFormat: NumberFormat,
+    onClick: () -> Unit,
+    onConfirm: () -> Unit,
+    onReject: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (movement.confirmationState != ConfirmationState.PENDING) {
+        MovementCard(
+            movement = movement,
+            currencyFormat = currencyFormat,
+            onClick = onClick,
+            onConfirm = onConfirm,
+            onReject = onReject,
+            modifier = modifier
+        )
+        return
+    }
+
+    val haptics = LocalHapticFeedback.current
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            when (value) {
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onConfirm()
+                    true
+                }
+                SwipeToDismissBoxValue.EndToStart -> {
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onReject()
+                    true
+                }
+                SwipeToDismissBoxValue.Settled -> false
+            }
+        },
+        // Umbral mas alto que el default (50%->35% de la tarjeta): un gesto de
+        // confirmacion financiera debe sentirse intencional, no un roce accidental.
+        positionalThreshold = { totalDistance -> totalDistance * 0.35f }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        modifier = modifier,
+        backgroundContent = { SwipeActionBackground(dismissState.dismissDirection) }
+    ) {
+        MovementCard(
+            movement = movement,
+            currencyFormat = currencyFormat,
+            onClick = onClick,
+            onConfirm = onConfirm,
+            onReject = onReject
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeActionBackground(direction: SwipeToDismissBoxValue) {
+    val (color, icon, alignment, label) = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> SwipeBackgroundSpec(IncomeGreen, Icons.Outlined.CheckCircle, Alignment.CenterStart, "Confirmar")
+        SwipeToDismissBoxValue.EndToStart -> SwipeBackgroundSpec(ExpenseRose, Icons.Outlined.Close, Alignment.CenterEnd, "Rechazar")
+        SwipeToDismissBoxValue.Settled -> SwipeBackgroundSpec(Color.Transparent, null, Alignment.Center, "")
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(20.dp))
+            .background(color.copy(alpha = 0.16f))
+            .padding(horizontal = 24.dp),
+        contentAlignment = alignment
+    ) {
+        if (icon != null) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (alignment == Alignment.CenterStart) {
+                    Icon(icon, contentDescription = null, tint = color)
+                    Text(label, color = color, fontWeight = FontWeight.SemiBold)
+                } else {
+                    Text(label, color = color, fontWeight = FontWeight.SemiBold)
+                    Icon(icon, contentDescription = null, tint = color)
+                }
+            }
+        }
+    }
+}
+
+private data class SwipeBackgroundSpec(
+    val color: Color,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    val alignment: Alignment,
+    val label: String
+)
 
 @Composable
 private fun MovementCard(

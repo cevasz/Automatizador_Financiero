@@ -507,7 +507,8 @@ fun InvoiceScreen(
                                 title = "No hay facturas guardadas",
                                 message = "Sube o registra tu primera factura para llevar el desglose de consumos y deudas.",
                                 actionLabel = "Subir Factura",
-                                onAction = { currentTab = InvoiceTab.UPLOAD }
+                                onAction = { currentTab = InvoiceTab.UPLOAD },
+                                illustrationRes = com.finanzas.automatica.R.drawable.empty_state_wallet
                             )
                         }
                     } else {
