@@ -3,10 +3,10 @@
 Ecosistema móvil + backend + panel web para Colombia
 Versión 1.0 — Julio de 2026
 
-> Transcripción viva de `SDD_App_Finanzas.docx` (fuente original, en la raíz del
-> repositorio). Este archivo es el que se mantiene actualizado, se referencia
-> desde el código/documentación y se indexa con `graphify`. Si el `.docx`
-> cambia, actualizar este archivo a mano para que quede sincronizado.
+> Transcripción viva de `docs/SDD_App_Finanzas.docx` (fuente original). Este
+> archivo es el que se mantiene actualizado, se referencia desde el
+> código/documentación y se indexa con `graphify`. Si el `.docx` cambia,
+> actualizar este archivo a mano para que quede sincronizado.
 
 ## 1. Resumen ejecutivo
 

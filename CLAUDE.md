@@ -3,24 +3,19 @@
 ## Qué es
 Kivo es una app Android que lee notificaciones bancarias autorizadas (Nequi, Bancolombia,
 Daviplata, Nu, Lulo Bank) para construir un historial financiero automático, sin pedir nunca
-credenciales ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
-Especificación completa (visión de producto, arquitectura objetivo, modelo de datos,
-roadmap por fases, riesgos): `docs/SDD.md` (transcripción viva de `SDD_App_Finanzas.docx`).
+credenciales ni acceder directamente a cuentas.
 
-## Contexto regulatorio (Colombia, 2026) — condiciona el diseño, no solo el MVP
-- **Decreto 0368 de 2026**: obliga el Sistema de Finanzas Abiertas (Open Finance) para
-  entidades vigiladas por la Superfinanciera. La lectura de notificaciones es una estrategia
-  puente: el diseño debe anticipar migrar hacia APIs oficiales de Open Finance en 12-24 meses
-  (ver sección 5.2 y Fase 4 del roadmap en `docs/SDD.md`) sin rediseñar clasificación ni agenda.
-- **Ley 1581 de 2012** (habeas data): exige poder exportar/eliminar toda la información del
-  usuario en cualquier momento (ya implementado en Ajustes) y, a futuro, registro formal como
-  responsable del tratamiento + consentimiento diferenciado por fuente de captura.
+Este archivo son las **reglas y convenciones** del proyecto. Para identidad de marca,
+arquitectura interna detallada, permisos y sincronización, ver `docs/guia.md` (resumen
+operativo). Para visión de producto, contexto regulatorio completo, modelo de datos y
+roadmap por fases, ver `docs/SDD.md`. Para la lista de trabajo pendiente, ver
+`docs/PENDIENTES.md`.
 
 ## Estructura del repositorio (monorepo)
 - `kivo-android/`: app Android nativa (Kotlin + Compose). Proyecto Gradle autocontenido.
 - `web/`: panel web, **pendiente de desarrollo** (solo README).
 - `backend/`: API de sincronización, **pendiente de desarrollo** (solo README).
-- `docs/`: documentación viva del proyecto.
+- `docs/`: documentación viva del proyecto (guía, SDD, pendientes, fuente de marca).
 - `graphify-out/`: mapa de dependencias generado por `graphify`.
 
 ## Decisiones de alcance ya tomadas (no reabrir sin discutirlo explícitamente)
@@ -35,47 +30,15 @@ roadmap por fases, riesgos): `docs/SDD.md` (transcripción viva de `SDD_App_Fina
 - Nunca solicitar usuario/clave bancario ni scraping de credenciales. Solo notificaciones
   autorizadas explícitamente por el usuario, permiso por permiso.
 
-## Identidad de marca
-- Nombre: **Kivo**. Tagline: "Tu dinero, en orden".
-- Paleta: coral `#F56565` y `#FC8181`, pizarra `#2D3748`, crema `#FEFCF5`.
-  Complementarios: teal `#2C7A7B` (ingresos), ámbar `#D69E2E` (avisos), azul `#3182CE`
-  (información). Ver `app/src/main/java/.../theme/Color.kt` (ruta dentro de `kivo-android/`).
-- Ícono adaptativo vectorial (monograma K + moneda teal sobre fondo coral), sin PNG.
-
-## Arquitectura interna (dentro de la app Android)
-1. `NotificationListenerService` captura el texto crudo de la notificación.
-2. Capa de parseo: una implementación de `BankParser` por entidad bancaria, cada una
-   con sus propias reglas regex. Nunca mezclar reglas de distintos bancos en una sola función.
-3. Salida estandarizada: objeto `RawMovement` (tipo, valor, medio, contraparte, fecha, entidad).
-4. Enriquecimiento: cruce de `contraparte` contra la tabla `Agenda` (número/cuenta → comercio).
-5. Clasificación: reglas de categoría por comercio conocido, palabra clave, o histórico.
-6. Persistencia local en Room.
-7. Centro de notificaciones in-app (tabla `app_notifications`): avisos de movimientos
-   capturados, importaciones, presupuestos ajustados y metas logradas.
-8. Bloqueo biométrico opcional (`BiometricLockGate` + `BiometricAccess`): pantalla de
-   desbloqueo al abrir la app cuando la opción está activa. Sin permisos adicionales;
-   usa `BiometricPrompt` con respaldo a PIN/patrón del dispositivo.
-
-## Sincronizacion con la web
-- El inicio de sesion no es bancario: sirve para vincular la app Android con la cuenta
-  del panel web y preparar la sincronizacion de datos propios del usuario.
-- El backend y la web ya aparecen en el SDD como parte de la arquitectura objetivo,
-  incluyendo una sesion en la nube activa para sincronizar movimientos, agenda y
-  configuraciones.
-- Si la sesion web no existe, la app sigue funcionando localmente sin bloquear el uso
-  principal.
-- No guardar ni pedir credenciales de bancos. Solo correo, URL del backend y token de
-  acceso de la cuenta web.
-
-## Documentos vivos
-- `docs/guia.md`: resumen operativo de arquitectura, sincronizacion y alcance.
-- `docs/SDD.md`: especificación completa del producto (visión, arquitectura, modelo de
-  datos, roadmap, riesgos, cumplimiento normativo). `SDD_App_Finanzas.docx` en la raíz es
-  la fuente original; si cambia, actualizar `docs/SDD.md` a mano para no desincronizar.
-- `graphify-out/GRAPH_REPORT.md`: mapa de dependencias generado por `graphify`.
+## Contexto regulatorio (Colombia, 2026) — condiciona el diseño, no solo el MVP
+El Decreto 0368 de 2026 (Finanzas Abiertas) y la Ley 1581 de 2012 (habeas data) condicionan
+la arquitectura a mediano plazo — detalle completo en `docs/guia.md` § Contexto regulatorio
+y `docs/SDD.md` § 2.2/8.2. En corto: la lectura de notificaciones es una estrategia puente
+hacia Open Finance (12-24 meses), no rediseñar clasificación/agenda al migrar; y el usuario
+debe poder exportar/eliminar su información en cualquier momento (ya implementado).
 
 ## Cómo contextualizarse en este repo (para agentes / sesiones nuevas)
-`graphify-out/` ya existe y se mantiene actualizado (`/graphify` re-extrae solo lo
+`graphify-out/` ya existe y se mantiene actualizado (`/graphify --update` re-extrae solo lo
 nuevo/cambiado). **Antes de leer archivos sueltos o explorar el árbol a mano, usa
 `graphify query "<pregunta>"`** (o el skill `graphify`) para ubicar el código/doc relevante
 con pocos tokens — cae directo a nodos y líneas concretas en vez de barrer directorios.
@@ -86,14 +49,11 @@ cuando ya sepas exactamente qué archivo necesitas editar.
 - Kotlin idiomático, sin dependencias innecesarias.
 - Cada `BankParser` debe tener tests unitarios con ejemplos de texto REAL (ver
   `kivo-android/app/src/test/resources/fixtures/`) — nunca inventar el formato de una notificación.
+- Agregar una entidad bancaria nueva = un `BankParser` nuevo + sus fixtures, sin tocar el
+  resto del sistema. Nunca mezclar reglas de distintos bancos en una sola función.
 - Módulos desacoplados: el motor de parseo/clasificación no debe saber nada de UI.
 - Commits pequeños, un cambio funcional por commit, mensajes descriptivos en español.
 - Compilar/testear desde `kivo-android/` (proyecto autocontenido).
-
-## Entidades bancarias soportadas en el MVP
-Bancolombia, Nequi, Daviplata, Nu, Lulo Bank (ver secciones 5 y 6.1 de `docs/SDD.md` para
-el detalle de flujo). Agregar una entidad nueva = agregar un `BankParser` nuevo + sus
-fixtures, sin tocar el resto del sistema.
 
 ## Qué NO hacer
 - No usar la API de Accesibilidad para ejecutar acciones automáticas (prohibido por
