@@ -42,6 +42,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -130,6 +132,9 @@ fun SettingsScreen(
                     enabled = notificationAccessEnabled,
                     onEnable = onEnableNotificationAccess
                 )
+            }
+            item {
+                PostNotificationsPermissionRow()
             }
             item {
                 SettingRow(
@@ -443,6 +448,85 @@ private fun NotificationAccessRow(
                 } else {
                     Button(onClick = onEnable) {
                         Text("Habilitar")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Permiso "Enviar notificaciones" (POST_NOTIFICATIONS, Android 13+). Se declaraba en el
+ * manifiesto pero nunca se pedia en tiempo de ejecucion -- en Android 13+ eso lo deja
+ * denegado por defecto, así que ninguna notificacion local (meta lograda, resumen de
+ * importacion) se mostraba, en silencio. El usuario decide con el boton "Permitir": no
+ * se asume el permiso, se pide explicitamente y el sistema es quien muestra el dialogo
+ * real de Android donde el usuario puede aceptar o rechazar.
+ */
+@androidx.compose.runtime.Composable
+private fun PostNotificationsPermissionRow() {
+    val granted = com.finanzas.automatica.presentation.ui.components.rememberPostNotificationsGranted()
+    var deniedOnce by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val needsRuntimePermission = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+
+    val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { wasGranted ->
+        if (!wasGranted) deniedOnce = true
+    }
+
+    if (!needsRuntimePermission) return
+
+    FinanceCard(
+        containerColor = if (!granted) WarningAmber.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconBadge(
+                    icon = Icons.Outlined.Notifications,
+                    contentDescription = "Notificaciones locales",
+                    tint = if (granted) IncomeGreen else WarningAmber
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    Text(
+                        text = "Avisos de la app",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = when {
+                            granted -> "Activo: Kivo puede avisarte de metas logradas y resumenes de importacion."
+                            deniedOnce -> "Rechazado. Puedes activarlo despues desde los ajustes de Android si cambias de opinion."
+                            else -> "Para avisarte de metas logradas y resumenes de importacion. Tu decides si lo permites."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            Row(modifier = Modifier.padding(start = 12.dp)) {
+                if (granted) {
+                    FinanceTag(
+                        text = "Activo",
+                        color = IncomeGreen,
+                        containerColor = IncomeGreen.copy(alpha = 0.12f)
+                    )
+                } else {
+                    Button(onClick = { permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS) }) {
+                        Text("Permitir")
                     }
                 }
             }

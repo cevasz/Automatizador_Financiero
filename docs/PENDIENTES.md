@@ -112,6 +112,30 @@ sienten "muy IA" en la práctica, valdría la pena reemplazarlas por algo más s
   `versionName`/`versionCode`) alimenten esa fila — de aquí en adelante se actualiza sola
   en cada build, sin volver a quedar desfasada. #pendiente/rapido #bug ✅ 2026-08-15
 
+### Sesión 2026-08-15 (continuación): crash de PDF con contraseña + permiso de notificaciones
+- [x] **Crash real al ingresar la contraseña correcta del PDF** — `PdfStatementExtractor`
+  usa BouncyCastle (vía pdfbox-android) para descifrar; un extracto real con un
+  algoritmo/estructura que la librería no maneja del todo bien puede lanzar un `Error`
+  (no una `Exception`), que antes escapaba del `catch (e: Exception)` en
+  `MovementViewModel.importStatementPdf` y tumbaba **todo el proceso** de la app (se veía
+  como "se cierra y se reinicia"). Se amplió el catch a `Throwable` ahí y en
+  `requiresPassword()`, para que nada de lo que pase leyendo un PDF de un usuario pueda
+  crashear la app — como mucho, se reporta como importación fallida. #pendiente/rapido #bug ✅ 2026-08-15
+- [x] **Permiso de notificaciones locales (POST_NOTIFICATIONS) nunca se pedía** — estaba
+  declarado en el manifiesto pero ningún código lo solicitaba en tiempo de ejecución; en
+  Android 13+ eso lo deja denegado por defecto **en silencio**, así que ninguna
+  notificación local (meta lograda, resumen de importación) se mostraba nunca, sin que la
+  app ni siquiera lo hubiera pedido. Se agregó `PostNotificationsPermissionRow` en
+  Ajustes: el usuario ve el estado real y decide con un botón "Permitir" (dispara el
+  diálogo real de Android, donde puede aceptar o rechazar) — no se asume el permiso.
+  #pendiente/rapido #bug ✅ 2026-08-15
+- **Revisado y confirmado correcto, sin cambios**: cámara (usa intents implícitos al
+  selector del sistema, nunca declara `CAMERA` como permiso propio — el consentimiento lo
+  maneja la app de cámara del sistema) y biometría (`USE_BIOMETRIC` es un permiso
+  "normal" sin diálogo propio; el consentimiento real ocurre en el `BiometricPrompt` del
+  sistema cada vez que se invoca, y el usuario ya opta explícitamente al activar el
+  switch en Ajustes).
+
 ## 🟡 Deuda técnica / funcionalidad incompleta
 
 - [x] Crear/editar presupuesto desde la UI — `AddEditBudgetScreen` nuevo, reemplaza el `BudgetDetailScreen` que existía pero no tenía ni botones de editar/eliminar. #pendiente/deuda-tecnica ✅ 2026-08-14

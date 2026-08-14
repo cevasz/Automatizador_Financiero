@@ -100,6 +100,13 @@ class MovementViewModel(
      * contraseña. Si [password] es nula/incorrecta y el PDF la requiere,
      * [onPasswordError] se dispara para que la UI pida la contraseña (o reintente) en
      * vez de reportarse como una falla generica de importacion.
+     *
+     * Atrapa `Throwable`, no solo `Exception`: el descifrado real (no solo detectar que
+     * hace falta contraseña) pasa por BouncyCastle via pdfbox-android, y un extracto
+     * real con un algoritmo/version de cifrado que la libreria no maneja del todo bien
+     * puede lanzar un `Error` (no una `Exception`) -- eso antes escapaba de este bloque
+     * y tumbaba toda la app (bug reportado: "al ingresar la contraseña se cierra la app
+     * y se reinicia"). Nada de lo que pase aca debe crashear el proceso.
      */
     fun importStatementPdf(
         pdfBytes: ByteArray,
@@ -118,8 +125,8 @@ class MovementViewModel(
             } catch (e: InvalidPasswordException) {
                 _isLoading.value = false
                 onPasswordError()
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } catch (t: Throwable) {
+                t.printStackTrace()
                 onComplete(ImportSummary(0, 0, 0, 0, 0, emptyList()))
             } finally {
                 _isLoading.value = false

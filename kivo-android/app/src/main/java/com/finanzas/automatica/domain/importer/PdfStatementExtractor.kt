@@ -15,13 +15,24 @@ import com.tom_roush.pdfbox.text.PDFTextStripper
  */
 object PdfStatementExtractor {
 
-    /** true si el PDF necesita contraseña para abrirse (no se puede leer sin ella). */
+    /**
+     * true si el PDF necesita contraseña para abrirse (no se puede leer sin ella).
+     *
+     * Atrapa `Throwable`, no solo `Exception`: pdfbox-android delega el descifrado a
+     * BouncyCastle, y un PDF real (protegido con algoritmos que la libreria no soporta
+     * del todo bien, o simplemente corrupto) puede lanzar errores que no son
+     * `InvalidPasswordException` ni siquiera `Exception` (p.ej. `Error` de una clase de
+     * criptografia faltante). Esta funcion solo detecta si HAY que pedir contraseña --
+     * cualquier otra falla se reporta de forma segura mas adelante, en [extractText].
+     */
     fun requiresPassword(pdfBytes: ByteArray): Boolean {
         return try {
             PDDocument.load(pdfBytes).use { }
             false
         } catch (e: InvalidPasswordException) {
             true
+        } catch (e: Throwable) {
+            false
         }
     }
 
