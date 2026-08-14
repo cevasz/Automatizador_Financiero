@@ -5,14 +5,14 @@
     "semantic_hash": "bf81f28f105a79f2ad5669d2ffdc30bb"
   },
   "CLAUDE.md": {
-    "mtime": 1786690276.1932619,
-    "ast_hash": "aa49a4089fb77494fd0dba4043df7d10",
-    "semantic_hash": "aa49a4089fb77494fd0dba4043df7d10"
+    "mtime": 1786691344.7321558,
+    "ast_hash": "e8da73cf010e127f18983543f8bdf7f5",
+    "semantic_hash": "e8da73cf010e127f18983543f8bdf7f5"
   },
   "docs/guia.md": {
-    "mtime": 1786690280.1492805,
-    "ast_hash": "c6dfe46f121c6cbc34ef79844c147e8d",
-    "semantic_hash": "c6dfe46f121c6cbc34ef79844c147e8d"
+    "mtime": 1786691367.7292593,
+    "ast_hash": "9a91b75a081149c0ef1b280028cf6067",
+    "semantic_hash": "9a91b75a081149c0ef1b280028cf6067"
   },
   ".agents/rules/graphify.md": {
     "mtime": 1786491119.811442,
@@ -514,11 +514,6 @@
     "ast_hash": "f28f6b8ba1c5fdc1863fb10f7e8e5e46",
     "semantic_hash": "f28f6b8ba1c5fdc1863fb10f7e8e5e46"
   },
-  "Icono/flat-vector-abstract-geometric-brand-symbol-for-ki.png": {
-    "mtime": 1786531816.8526964,
-    "ast_hash": "1ba312f6c41f56347c12740722a34ee4",
-    "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
-  },
   "kivo-android/app/src/main/res/drawable-nodpi/biometric_lock_illustration.jpg": {
     "mtime": 1786532464.993176,
     "ast_hash": "3a97aa2a80a2f081f3932aa27d099bb4",
@@ -565,8 +560,13 @@
     "semantic_hash": "e0f1f44f4b6d6233bd60f9ffef43943d"
   },
   "docs/SDD.md": {
-    "mtime": 1786690248.3061297,
-    "ast_hash": "ac8a8fa8232ad5349a41e1580df8fff3",
-    "semantic_hash": "ac8a8fa8232ad5349a41e1580df8fff3"
+    "mtime": 1786691391.7123673,
+    "ast_hash": "3307f6bad776613b0ced7926de35a826",
+    "semantic_hash": "3307f6bad776613b0ced7926de35a826"
+  },
+  "docs/brand/kivo-icon-reference.png": {
+    "mtime": 1786531816.8526964,
+    "ast_hash": "1ba312f6c41f56347c12740722a34ee4",
+    "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
   }
 }
