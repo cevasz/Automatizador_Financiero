@@ -1,9 +1,16 @@
-# Contexto del proyecto — App de Contabilidad Financiera Automática (Colombia)
+# Contexto del proyecto — Kivo, Contabilidad Financiera Automática (Colombia)
 
 ## Qué es
-App Android que lee notificaciones bancarias autorizadas (Nequi, Bancolombia, Daviplata, Nu,
-Lulo Bank) para construir un historial financiero automático, sin pedir nunca credenciales
-ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
+Kivo es una app Android que lee notificaciones bancarias autorizadas (Nequi, Bancolombia,
+Daviplata, Nu, Lulo Bank) para construir un historial financiero automático, sin pedir nunca
+credenciales ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
+
+## Estructura del repositorio (monorepo)
+- `kivo-android/`: app Android nativa (Kotlin + Compose). Proyecto Gradle autocontenido.
+- `web/`: panel web, **pendiente de desarrollo** (solo README).
+- `backend/`: API de sincronización, **pendiente de desarrollo** (solo README).
+- `docs/`: documentación viva del proyecto.
+- `graphify-out/`: mapa de dependencias generado por `graphify`.
 
 ## Decisiones de alcance ya tomadas (no reabrir sin discutirlo explícitamente)
 - Plataforma: Android nativo (Kotlin) primero. iOS queda para una fase posterior vía
@@ -17,6 +24,13 @@ ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
 - Nunca solicitar usuario/clave bancario ni scraping de credenciales. Solo notificaciones
   autorizadas explícitamente por el usuario, permiso por permiso.
 
+## Identidad de marca
+- Nombre: **Kivo**. Tagline: "Tu dinero, en orden".
+- Paleta: coral `#F56565` y `#FC8181`, pizarra `#2D3748`, crema `#FEFCF5`.
+  Complementarios: teal `#2C7A7B` (ingresos), ámbar `#D69E2E` (avisos), azul `#3182CE`
+  (información). Ver `app/src/main/java/.../theme/Color.kt` (ruta dentro de `kivo-android/`).
+- Ícono adaptativo vectorial (monograma K + moneda teal sobre fondo coral), sin PNG.
+
 ## Arquitectura interna (dentro de la app Android)
 1. `NotificationListenerService` captura el texto crudo de la notificación.
 2. Capa de parseo: una implementación de `BankParser` por entidad bancaria, cada una
@@ -25,6 +39,11 @@ ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
 4. Enriquecimiento: cruce de `contraparte` contra la tabla `Agenda` (número/cuenta → comercio).
 5. Clasificación: reglas de categoría por comercio conocido, palabra clave, o histórico.
 6. Persistencia local en Room.
+7. Centro de notificaciones in-app (tabla `app_notifications`): avisos de movimientos
+   capturados, importaciones, presupuestos ajustados y metas logradas.
+8. Bloqueo biométrico opcional (`BiometricLockGate` + `BiometricAccess`): pantalla de
+   desbloqueo al abrir la app cuando la opción está activa. Sin permisos adicionales;
+   usa `BiometricPrompt` con respaldo a PIN/patrón del dispositivo.
 
 ## Sincronizacion con la web
 - El inicio de sesion no es bancario: sirve para vincular la app Android con la cuenta
@@ -44,9 +63,10 @@ ni acceder directamente a cuentas. Guía viva del proyecto: `docs/guia.md`.
 ## Convenciones de código
 - Kotlin idiomático, sin dependencias innecesarias.
 - Cada `BankParser` debe tener tests unitarios con ejemplos de texto REAL (ver
-  `app/src/test/resources/fixtures/`) — nunca inventar el formato de una notificación.
+  `kivo-android/app/src/test/resources/fixtures/`) — nunca inventar el formato de una notificación.
 - Módulos desacoplados: el motor de parseo/clasificación no debe saber nada de UI.
 - Commits pequeños, un cambio funcional por commit, mensajes descriptivos en español.
+- Compilar/testear desde `kivo-android/` (proyecto autocontenido).
 
 ## Entidades bancarias soportadas en el MVP
 Bancolombia, Nequi, Daviplata, Nu, Lulo Bank (ver sección 5 y 6.1 del SDD para el detalle

@@ -33,10 +33,12 @@ cmdline-tools-extract/
 downloads/
 
 # ===========================
-# Build outputs
+# Build outputs (monorepo: app en kivo-android/)
 # ===========================
-app/build/
-build/
+kivo-android/app/build/
+kivo-android/build/
+kivo-android/.gradle/
+kivo-android/local.properties
 
 # ===========================
 # IDE
