@@ -1,265 +1,292 @@
-# Graph Report - .  (2026-08-12)
+# Graph Report - .  (2026-08-13)
 
 ## Corpus Check
-- 11 files · ~35,631 words
+- 110 files · ~123,389 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 869 nodes · 1500 edges · 62 communities (39 shown, 23 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.8)
-- Token cost: 0 input · 0 output
+- 960 nodes · 1747 edges · 56 communities (47 shown, 9 thin omitted)
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 151 edges (avg confidence: 0.81)
+- Token cost: 0 input · 15,000 output
 
 ## Community Hubs (Navigation)
-- CategoryEntity
-- MovementEntity
-- .buildRawMovement()
-- AgendaEntryEntity
-- InvoiceViewModel
-- SettingsViewModel
-- FinanzasDatabase
-- SavingsGoalsViewModel
-- DashboardScreen()
-- AppNavHost.kt
-- MovementsListScreen()
-- ClassificationRuleEntity
-- MovementViewModel
-- BudgetDao
-- InvoiceDao
-- SavingsGoalDao
-- IconBadge()
-- AgendaViewModel
-- NotificationCaptureService
-- Guía del proyecto (resumen operativo)
-- Converters
-- .parseLine()
-- BudgetCard()
-- MovementProcessorService
-- Category
-- BudgetsViewModel
-- SessionViewModel
-- PaymentMethod
-- ParserRegistry
-- Contexto del proyecto — App de Contab...
-- SettingRow()
-- BankParserTest
-- BankEntity
-- AgendaOrigin
-- ConfirmationState
-- Movement.kt
-- BankParser
-- BootReceiver
-- .extractText()
-- .fromInstant()
-- gradlew
-- toDomain()
-- StatementImporterTest
-- SimpleTest
-- graphify.md
-- graphify.md
-- build.gradle.kts
-- Context
-- ImageVector
-- Color.kt
-- Type.kt
-- Notification
-- build.gradle.kts
-- com
-- Color de tema
-- Paquete com
-- Iconos ImageVector
+- Movement Data Access (DAO)
+- Bank Parsers & Raw Movement Model
+- Classification Rule DAO
+- Agenda & Category UI
+- Invoice/Debt Data Access
+- Category Data Access
+- Room Type Converters
+- Project Docs & Architecture
+- Model Mappers & UI Motion
+- Brand Theme & Color Palette
+- Bank Statement Importer
+- Budget Data Access
+- Agenda Data Access
+- Movement Enrichment Pipeline
+- Dashboard Screen UI
+- Movements List Screen
+- Biometric Lock Gate
+- Savings Goal Data Access
+- Notification Processor Service
+- Invoice/Debt Screen UI
+- App Navigation Routes
+- In-App Notification DAO
+- Settings Screen UI
+- Web Session ViewModel
+- Shared Finance UI Components
+- In-App Notification Repository
+- Navigation & Login Screens
+- Bank Parser Tests
+- Notification Center Screen
+- Notification Center ViewModel
+- Notification Access Permission
+- In-App Notification Entity
+- Onboarding Security Illustration
+- Boot Receiver
+- Notification Access Tests
+- PDF Statement Extractor
+- Notification Center Composable
+- Biometric Availability Check
+- Dashboard Period Enum
+- Invoice Tab Enum
+- Gradle Wrapper Script
+- Kivo Brand Icon Asset
+- Empty State Wallet Illustration
+- PDF Extractor Tests
+- Statement Importer Tests
+- Simple Smoke Test
+- PDFBox Vendored Glyph Resources
+- In-App Notifications Table
+- Biometric Lock Illustration
+- Savings Goal Illustration
+- Splash Background Illustration
 
 ## God Nodes (most connected - your core abstractions)
 1. `MovementEntity` - 37 edges
-2. `MovementDao` - 30 edges
-3. `CategoryEntity` - 26 edges
-4. `MovementRepositoryImpl` - 26 edges
-5. `SettingsViewModel` - 25 edges
-6. `AgendaEntryEntity` - 23 edges
-7. `MovementViewModel` - 16 edges
-8. `Converters` - 15 edges
-9. `AgendaViewModel` - 15 edges
-10. `InvoiceViewModel` - 15 edges
+2. `MovementDao` - 31 edges
+3. `SettingsViewModel` - 31 edges
+4. `CategoryEntity` - 26 edges
+5. `MovementRepositoryImpl` - 26 edges
+6. `AppNavHost()` - 25 edges
+7. `AgendaEntryEntity` - 23 edges
+8. `FinanceCard()` - 22 edges
+9. `IconBadge()` - 21 edges
+10. `DashboardScreen()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Extracto Bancolombia (fixture PDF de prueba)` --conceptually_related_to--> `pdfbox-android (extracción de texto de PDF)`  [INFERRED]
-  app/src/test/resources/fixtures/extracto_bancolombia.pdf → docs/guia.md
-- `Extracto Bancolombia (fixture PDF de prueba)` --shares_data_with--> `RawMovement (salida normalizada)`  [INFERRED]
-  app/src/test/resources/fixtures/extracto_bancolombia.pdf → docs/guia.md
-- `toDomain()` --references--> `Movement`  [EXTRACTED]
-  app/src/main/java/com/finanzas/automatica/domain/enrichment/ModelMappers.kt → app/src/main/java/com/finanzas/automatica/domain/model/Movement.kt
-- `SavingsGoalCard()` --calls--> `FinanceCard()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
-- `SavingsGoalCard()` --calls--> `FinanceTag()`  [INFERRED]
-  app/src/main/java/com/finanzas/automatica/presentation/ui/screen/SavingsGoalsScreen.kt → app/src/main/java/com/finanzas/automatica/presentation/ui/components/FinanceUi.kt
+- `Importación de extractos bancarios (CSV/texto/PDF)` --references--> `Bancolombia Statement PDF Fixture`  [INFERRED]
+  docs/guia.md → kivo-android/app/src/test/resources/fixtures/extracto_bancolombia.pdf
+- `Bancolombia Notification Fixtures` --semantically_similar_to--> `Bancolombia Statement PDF Fixture`  [INFERRED] [semantically similar]
+  kivo-android/app/src/test/resources/fixtures/bancolombia_notifications.txt → kivo-android/app/src/test/resources/fixtures/extracto_bancolombia.pdf
+- `BankParser unit test convention (real-text fixtures required)` --references--> `Daviplata Notification Fixtures`  [INFERRED]
+  CLAUDE.md → kivo-android/app/src/test/resources/fixtures/daviplata_notifications.txt
+- `BankParser unit test convention (real-text fixtures required)` --references--> `Lulo Bank Notification Fixtures`  [INFERRED]
+  CLAUDE.md → kivo-android/app/src/test/resources/fixtures/lulo_notifications.txt
+- `BankParser unit test convention (real-text fixtures required)` --references--> `Nequi Notification Fixtures`  [INFERRED]
+  CLAUDE.md → kivo-android/app/src/test/resources/fixtures/nequi_notifications.txt
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Pipeline de captura por notificaciones (NotificationListenerService + BankParser + RawMovement + Room)** — docs_guia_notificationlistenerservice, docs_guia_bankparser, docs_guia_rawmovement, docs_guia_persistencia_en_room [EXTRACTED 1.00]
-- **Flujo del permiso de notificaciones (acceso manual + NotificationAccess.isEnabled + pantalla de ajustes)** — docs_guia_acceso_a_notificaciones_manual, docs_guia_notificationaccess_isenabled, docs_guia_pantalla_de_ajustes_de_notificaciones [EXTRACTED 1.00]
+- **MVP Supported Bank Entities** — claude_bancolombia, claude_nequi, claude_daviplata, claude_nu, claude_lulo_bank [EXTRACTED 1.00]
+- **BankParser Real-Text Test Fixtures** — claude_bankparser_test_convention, kivo_android_app_src_test_resources_fixtures_bancolombia_notifications_fixture, kivo_android_app_src_test_resources_fixtures_daviplata_notifications_fixture, kivo_android_app_src_test_resources_fixtures_lulo_notifications_fixture, kivo_android_app_src_test_resources_fixtures_nequi_notifications_fixture, kivo_android_app_src_test_resources_fixtures_nu_notifications_fixture [INFERRED 0.85]
+- **Kivo Monorepo Structure** — claude_kivo_android_module, claude_web_module, claude_backend_module, claude_docs_module, claude_graphify_out_module [EXTRACTED 1.00]
 
-## Communities (62 total, 23 thin omitted)
+## Communities (56 total, 9 thin omitted)
 
-### Community 0 - "CategoryEntity"
-Cohesion: 0.05
-Nodes (53): toDomain(), toEntity(), AgendaEntry, Category, Budget, EmptyState(), FinanceCard(), FinanceTag() (+45 more)
-
-### Community 1 - "MovementEntity"
+### Community 0 - "Movement Data Access (DAO)"
 Cohesion: 0.08
 Nodes (15): CategoryTotal, Flow, Int, List, Long, String, MonthlyTotal, MovementDao (+7 more)
 
-### Community 2 - ".buildRawMovement()"
+### Community 1 - "Bank Parsers & Raw Movement Model"
+Cohesion: 0.05
+Nodes (40): AgendaSource, AUTO_LEARNED, COMMUNITY_SUGGESTED, MANUAL, ClassificationRule, Failure, ParseResult, Success (+32 more)
+
+### Community 2 - "Classification Rule DAO"
 Cohesion: 0.06
-Nodes (37): AgendaSource, AUTO_LEARNED, COMMUNITY_SUGGESTED, MANUAL, ClassificationRule, Failure, ParseResult, Success (+29 more)
+Nodes (31): ClassificationRuleDao, Boolean, Flow, Int, List, Long, String, ClassificationRuleEntity (+23 more)
 
-### Community 3 - "AgendaEntryEntity"
+### Community 3 - "Agenda & Category UI"
 Cohesion: 0.07
-Nodes (18): AgendaDao, Flow, Int, List, Long, String, AgendaEntryEntity, AgendaRepositoryImpl (+10 more)
+Nodes (35): AgendaEntry, Category, Budget, AddEditAgendaEntryScreen(), AgendaEntryCard(), AgendaScreen(), cleanEnum(), List (+27 more)
 
-### Community 4 - "InvoiceViewModel"
+### Community 4 - "Invoice/Debt Data Access"
+Cohesion: 0.06
+Nodes (25): InvoiceDao, InvoiceWithItemsRelation, Flow, List, Long, String, InvoiceEntity, InvoiceItemEntity (+17 more)
+
+### Community 5 - "Category Data Access"
+Cohesion: 0.08
+Nodes (16): CategoryDao, Flow, Int, List, Long, String, CategoryEntity, DefaultCategories (+8 more)
+
+### Community 6 - "Room Type Converters"
+Cohesion: 0.06
+Nodes (31): Converters, Instant, Long, String, AgendaOrigin, AUTO_DETECTED, COMMUNITY_SUGGESTED, MANUAL (+23 more)
+
+### Community 7 - "Project Docs & Architecture"
+Cohesion: 0.06
+Nodes (44): Build Debug APK Workflow (GitHub Actions), Graphify Integration Rule, Graphify Workflow, Kivo Backend (pendiente de desarrollo), Agenda (table), backend (sync API module), Bancolombia (bank entity), BankParser (+36 more)
+
+### Community 8 - "Model Mappers & UI Motion"
 Cohesion: 0.07
-Nodes (34): InvoiceRepository, Boolean, Flow, List, Long, String, DebtStatus, PAID (+26 more)
+Nodes (33): Dp, Float, FontWeight, toDomain(), toEntity(), SavingsGoal, AnimatedAmountText(), appearFromBelow() (+25 more)
 
-### Community 5 - "SettingsViewModel"
-Cohesion: 0.08
-Nodes (23): CategoryDao, Flow, Int, List, Long, String, CategoryEntity, ClassificationEngine (+15 more)
+### Community 9 - "Brand Theme & Color Palette"
+Cohesion: 0.10
+Nodes (19): JSONArray, JSONObject, AppThemePalette, FOREST_GREEN, KIVO_CORAL, MIDNIGHT_BLUE, OCEAN_TEAL, SUNSET_AMBER (+11 more)
 
-### Community 6 - "FinanzasDatabase"
-Cohesion: 0.09
-Nodes (21): ClassificationRuleDao, Boolean, Flow, Int, List, Long, String, ClassificationRuleEntity (+13 more)
+### Community 10 - "Bank Statement Importer"
+Cohesion: 0.10
+Nodes (21): ImportSummary, Instant, Long, String, StatementImporter, BankEntity, BANCOLOMBIA, DAVIPLATA (+13 more)
 
-### Community 7 - "SavingsGoalsViewModel"
-Cohesion: 0.08
-Nodes (29): Agenda, AppNavHost(), Budgets, Dashboard, databaseViewModel(), Invoices, Login, Movements (+21 more)
+### Community 11 - "Budget Data Access"
+Cohesion: 0.10
+Nodes (12): Application, BudgetDao, Flow, Int, List, Long, BudgetEntity, FinanzasDatabase (+4 more)
 
-### Community 8 - "DashboardScreen()"
-Cohesion: 0.18
-Nodes (8): Boolean, Int, String, ViewModel, SettingsViewModel, JSONArray, JSONObject, kotlinx
-
-### Community 9 - "AppNavHost.kt"
-Cohesion: 0.08
-Nodes (15): AgendaDao, FinanzasDatabase, getInstance(), DefaultCategories, List, Long, FinanzasApplication, Application (+7 more)
-
-### Community 10 - "MovementsListScreen()"
-Cohesion: 0.13
-Nodes (17): SavingsGoal, List, Long, Modifier, NumberFormat, String, Unit, money() (+9 more)
-
-### Community 11 - "ClassificationRuleEntity"
-Cohesion: 0.16
-Nodes (23): cleanEnum(), DashboardPeriod, Day, Month, Week, DashboardScreen(), Boolean, Color (+15 more)
-
-### Community 12 - "MovementViewModel"
-Cohesion: 0.18
-Nodes (20): cleanEnum(), fromRoute(), ImportStatementDialog(), List, Long, Modifier, Movement, NumberFormat (+12 more)
-
-### Community 13 - "BudgetDao"
+### Community 12 - "Agenda Data Access"
 Cohesion: 0.11
-Nodes (21): Formato CSV del extracto (fecha, descripción, monto), Extracto Bancolombia (fixture PDF de prueba), Permiso de acceso a notificaciones habilitado manualmente, Agenda (cruce de comercios/cuentas), Android nativo en Kotlin, BankParser (uno por banco), BootReceiver con NotificationListenerService.requestRebind, Captura de movimientos por notificaciones (+13 more)
+Nodes (12): AgendaDao, Flow, Int, List, Long, String, AgendaEntryEntity, AgendaRepository (+4 more)
 
-### Community 14 - "InvoiceDao"
+### Community 13 - "Movement Enrichment Pipeline"
+Cohesion: 0.13
+Nodes (11): EnrichmentPipeline, Boolean, Double, toDomain(), EnrichedMovement, RawMovement, Notification, String (+3 more)
+
+### Community 14 - "Dashboard Screen UI"
+Cohesion: 0.22
+Nodes (19): Movement, cleanEnum(), DashboardScreen(), Boolean, Color, ImageVector, Int, List (+11 more)
+
+### Community 15 - "Movements List Screen"
 Cohesion: 0.18
-Nodes (11): Boolean, Int, List, Long, Movement, String, MovementViewModel, BankEntity (+3 more)
+Nodes (19): cleanEnum(), fromRoute(), ImportStatementDialog(), List, Long, Modifier, NumberFormat, String (+11 more)
 
-### Community 15 - "SavingsGoalDao"
-Cohesion: 0.23
-Nodes (6): BudgetDao, Flow, Int, List, Long, BudgetEntity
+### Community 16 - "Biometric Lock Gate"
+Cohesion: 0.13
+Nodes (14): Bundle, Class, BiometricLockGate(), BiometricLockPrompt(), FragmentActivity, showPrompt(), BiometricSettingsViewModelFactory, androidx (+6 more)
 
-### Community 16 - "IconBadge()"
-Cohesion: 0.16
-Nodes (8): InvoiceDao, InvoiceWithItemsRelation, Flow, List, Long, String, InvoiceEntity, InvoiceItemEntity
-
-### Community 17 - "AgendaViewModel"
+### Community 17 - "Savings Goal Data Access"
 Cohesion: 0.22
 Nodes (6): Flow, Int, List, Long, SavingsGoalDao, SavingsGoalEntity
 
-### Community 18 - "NotificationCaptureService"
-Cohesion: 0.17
-Nodes (8): BootReceiver, Context, Boolean, Context, String, NotificationAccess, BroadcastReceiver, Intent
-
-### Community 19 - "Guía del proyecto (resumen operativo)"
-Cohesion: 0.25
-Nodes (8): ImportSummary, BankEntity, Instant, Long, PaymentMethod, String, StatementImporter, RawMovement
-
-### Community 20 - "Converters"
-Cohesion: 0.20
-Nodes (6): String, NotificationCaptureService, EnrichmentPipeline, Notification, NotificationListenerService, StatusBarNotification
-
-### Community 21 - ".parseLine()"
+### Community 18 - "Notification Processor Service"
 Cohesion: 0.22
-Nodes (7): Converters, String, MovementSource, MANUAL, NOTIFICATION, OCR, OPEN_FINANCE
+Nodes (6): IBinder, Int, Intent, Notification, MovementProcessorService, Service
 
-### Community 22 - "BudgetCard()"
-Cohesion: 0.22
-Nodes (6): Int, Intent, Notification, MovementProcessorService, IBinder, Service
+### Community 19 - "Invoice/Debt Screen UI"
+Cohesion: 0.31
+Nodes (11): DebtSummary, Invoice, FinanceCard(), DebtSummaryCard(), InvoiceItemEditorCard(), InvoiceScreen(), List, Modifier (+3 more)
 
-### Community 23 - "MovementProcessorService"
+### Community 20 - "App Navigation Routes"
+Cohesion: 0.27
+Nodes (12): Agenda, Budgets, Dashboard, databaseViewModel(), Invoices, Login, Movements, Notifications (+4 more)
+
+### Community 21 - "In-App Notification DAO"
+Cohesion: 0.23
+Nodes (4): AppNotificationDao, Flow, Int, List
+
+### Community 22 - "Settings Screen UI"
+Cohesion: 0.29
+Nodes (11): Boolean, Color, ImageVector, Modifier, String, Triple, Unit, NotificationAccessRow() (+3 more)
+
+### Community 23 - "Web Session ViewModel"
 Cohesion: 0.29
 Nodes (5): StateFlow, String, ViewModel, SessionState, SessionViewModel
 
-### Community 24 - "Category"
+### Community 24 - "Shared Finance UI Components"
+Cohesion: 0.36
+Nodes (10): Composable, EmptyState(), FinanceTag(), IconBadge(), Color, ImageVector, Modifier, String (+2 more)
+
+### Community 25 - "In-App Notification Repository"
+Cohesion: 0.22
+Nodes (5): AppNotificationRepository, Flow, Int, List, Long
+
+### Community 26 - "Navigation & Login Screens"
 Cohesion: 0.20
-Nodes (10): PaymentMethod, BANCOLOMBIA, CASH, DAVIPLATA, LULO, NEQUI, NU, OTHER (+2 more)
+Nodes (8): AppNavHost(), Boolean, rememberNotificationAccessEnabled(), Boolean, Modifier, String, Unit, LoginScreen()
 
-### Community 25 - "BudgetsViewModel"
-Cohesion: 0.27
-Nodes (6): createDefault(), Boolean, List, ParseResult, String, ParserRegistry
+### Community 28 - "Notification Center Screen"
+Cohesion: 0.31
+Nodes (8): androidx, ImageVector, Long, String, Triple, NotificationItem(), notificationVisuals(), relativeTime()
 
-### Community 27 - "PaymentMethod"
-Cohesion: 0.20
-Nodes (9): Arquitectura interna (dentro de la app Android), Contexto del proyecto — App de Contabilidad Financiera Automática (Colombia), Convenciones de código, Decisiones de alcance ya tomadas (no reabrir sin discutirlo explícitamente), Documentos vivos, Entidades bancarias soportadas en el MVP, Qué es, Qué NO hacer (+1 more)
+### Community 29 - "Notification Center ViewModel"
+Cohesion: 0.22
+Nodes (6): Int, List, Long, StateFlow, ViewModel, NotificationCenterViewModel
 
-### Community 28 - "ParserRegistry"
-Cohesion: 0.25
-Nodes (7): BankEntity, BANCOLOMBIA, DAVIPLATA, LULO, NEQUI, NU, UNKNOWN
+### Community 30 - "Notification Access Permission"
+Cohesion: 0.33
+Nodes (4): Boolean, Context, String, NotificationAccess
 
-### Community 29 - "Contexto del proyecto — App de Contab..."
+### Community 31 - "In-App Notification Entity"
 Cohesion: 0.29
-Nodes (4): AgendaOrigin, AUTO_DETECTED, COMMUNITY_SUGGESTED, MANUAL
+Nodes (3): Long, AppNotificationEntity, String
 
-### Community 30 - "SettingRow()"
-Cohesion: 0.29
-Nodes (5): ConfirmationState, AUTO_CONFIRMED, CONFIRMED, PENDING, REJECTED
-
-### Community 31 - "BankParserTest"
-Cohesion: 0.29
-Nodes (4): Movement, MovementType, EXPENSE, INCOME
-
-### Community 32 - "BankEntity"
+### Community 32 - "Onboarding Security Illustration"
 Cohesion: 0.38
-Nodes (4): BankParser, Boolean, List, String
+Nodes (7): Dollar Coin Icons, Onboarding Security Illustration, Onboarding Security/Privacy Screen Purpose, Rising Bar Chart with Trend Arrow, Security Shield with Padlock, Smartphone Finance Dashboard Mockup, Teal/Coral/Cream Color Palette
 
-### Community 34 - "ConfirmationState"
+### Community 33 - "Boot Receiver"
+Cohesion: 0.33
+Nodes (4): BroadcastReceiver, BootReceiver, Context, Intent
+
+### Community 35 - "PDF Statement Extractor"
 Cohesion: 0.40
 Nodes (3): ByteArray, String, PdfStatementExtractor
 
-### Community 36 - "BankParser"
+### Community 36 - "Notification Center Composable"
+Cohesion: 0.40
+Nodes (5): Int, List, Modifier, Unit, NotificationCenterScreen()
+
+### Community 37 - "Biometric Availability Check"
+Cohesion: 0.40
+Nodes (3): BiometricAccess, Boolean, Context
+
+### Community 38 - "Dashboard Period Enum"
+Cohesion: 0.50
+Nodes (4): DashboardPeriod, Day, Month, Week
+
+### Community 39 - "Invoice Tab Enum"
+Cohesion: 0.50
+Nodes (4): InvoiceTab, DEBTS, INVOICES, UPLOAD
+
+### Community 40 - "Gradle Wrapper Script"
 Cohesion: 0.83
 Nodes (3): gradlew script, die(), warn()
 
+### Community 41 - "Kivo Brand Icon Asset"
+Cohesion: 1.00
+Nodes (3): Coral and Pizarra Color Palette, Kivo Brand Icon (K Monogram), Kivo Brand Identity
+
+### Community 42 - "Empty State Wallet Illustration"
+Cohesion: 0.67
+Nodes (3): Empty State UX Pattern, Empty State Wallet Illustration, Kivo Brand Color Palette
+
+### Community 46 - "PDFBox Vendored Glyph Resources"
+Cohesion: 1.00
+Nodes (3): PDFBox Additional Glyph List, PDFBox ZapfDingbats Glyph List, PDFBox Bidi Mirroring Table
+
 ## Ambiguous Edges - Review These
-- `Sesión web del panel (correo, URL del backend, token de acceso)` → `Regla de limpieza (solo documentación viva y artefactos útiles)`  [AMBIGUOUS]
-  docs/guia.md · relation: conceptually_related_to
+- `Onboarding Security Illustration` → `Smartphone Finance Dashboard Mockup`  [AMBIGUOUS]
+  kivo-android/app/src/main/res/drawable-nodpi/onboarding_security.jpg · relation: no_login_or_credential_fields_shown
 
 ## Knowledge Gaps
-- **67 isolated node(s):** `AGENDA`, `RULES`, `KEYWORDS`, `HISTORY`, `UNKNOWN` (+62 more)
+- **75 isolated node(s):** `AGENDA`, `RULES`, `KEYWORDS`, `HISTORY`, `UNKNOWN` (+70 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **What is the exact relationship between `Sesión web del panel (correo, URL del backend, token de acceso)` and `Regla de limpieza (solo documentación viva y artefactos útiles)`?**
-  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `MovementEntity` connect `MovementEntity` to `CategoryEntity`, `SettingsViewModel`, `FinanzasDatabase`?**
-  _High betweenness centrality (0.134) - this node is a cross-community bridge._
-- **Why does `FinanzasDatabase` connect `AppNavHost.kt` to `IconBadge()`?**
-  _High betweenness centrality (0.120) - this node is a cross-community bridge._
-- **Why does `toEntity()` connect `CategoryEntity` to `MovementEntity`, `AgendaEntryEntity`, `AgendaViewModel`, `SavingsGoalDao`?**
-  _High betweenness centrality (0.112) - this node is a cross-community bridge._
+- **What is the exact relationship between `Onboarding Security Illustration` and `Smartphone Finance Dashboard Mockup`?**
+  _Edge tagged AMBIGUOUS (relation: no_login_or_credential_fields_shown) - confidence is low._
+- **Why does `AppNavHost()` connect `Navigation & Login Screens` to `Agenda & Category UI`, `Notification Center Composable`, `Invoice/Debt Data Access`, `Model Mappers & UI Motion`, `Brand Theme & Color Palette`, `Bank Statement Importer`, `Budget Data Access`, `Dashboard Screen UI`, `Movements List Screen`, `Biometric Lock Gate`, `Invoice/Debt Screen UI`, `App Navigation Routes`, `Settings Screen UI`, `Web Session ViewModel`, `Shared Finance UI Components`, `Notification Center ViewModel`?**
+  _High betweenness centrality (0.354) - this node is a cross-community bridge._
+- **Why does `FinanzasDatabase` connect `Budget Data Access` to `Category Data Access`, `Navigation & Login Screens`, `Invoice/Debt Data Access`, `In-App Notification DAO`?**
+  _High betweenness centrality (0.236) - this node is a cross-community bridge._
+- **Why does `MovementEntity` connect `Movement Data Access (DAO)` to `Model Mappers & UI Motion`, `Classification Rule DAO`, `Movement Enrichment Pipeline`?**
+  _High betweenness centrality (0.105) - this node is a cross-community bridge._
+- **Are the 2 inferred relationships involving `SettingsViewModel` (e.g. with `AppNavHost()` and `.create()`) actually correct?**
+  _`SettingsViewModel` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `AGENDA`, `RULES`, `KEYWORDS` to the rest of the system?**
-  _67 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `CategoryEntity` be split into smaller, more focused modules?**
-  _Cohesion score 0.05060882800608828 - nodes in this community are weakly interconnected._
-- **Should `MovementEntity` be split into smaller, more focused modules?**
+  _75 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Movement Data Access (DAO)` be split into smaller, more focused modules?**
   _Cohesion score 0.07565392354124749 - nodes in this community are weakly interconnected._
