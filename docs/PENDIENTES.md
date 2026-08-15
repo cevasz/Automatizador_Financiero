@@ -47,6 +47,24 @@ con búsquedas reales, no adivinado:
   permiso "Acceso a notificaciones" de Kivo en Ajustes del sistema (Ajustes → Apps →
   Acceso especial → Acceso a notificaciones).
 
+### Sesión 2026-08-15 (continuación): permisos solicitados gradualmente
+- [x] **POST_NOTIFICATIONS ahora se pide en el momento en que hace falta**, no solo
+  disponible escondido en Ajustes. `AutoRequestPostNotificationsWhenRelevant()` (nueva,
+  en `PostNotificationsPermissionState.kt`) se dispara desde el Dashboard justo cuando
+  `notificationAccessEnabled` pasa a verdadero — el momento en que la captura de
+  notificaciones bancarias queda activa y en cualquier momento va a llegar una
+  notificación local de Kivo ("movimientos capturados", meta lograda). Se pide **como
+  máximo una vez en la vida de la instalación** (se guarda en `SharedPreferences`,
+  `finanzas_settings`/`asked_post_notifications`) — se acepte o se rechace, no se vuelve
+  a insistir sola; el usuario siempre puede activarlo después a mano desde Ajustes (la
+  fila que ya existía). Revisión del resto de permisos, confirmados ya graduales por
+  construcción: cámara/galería (se piden en el instante exacto en que se toca "Tomar
+  foto"/"Escanear", nunca antes), acceso a notificaciones bancarias (botón "Habilitar" en
+  Dashboard, solo cuando el usuario llega ahí), biometría (`BiometricPrompt` del sistema
+  pide consentimiento en el momento de cada desbloqueo, después de que el usuario activó
+  el switch en Ajustes). #pendiente/rapido ✅ 2026-08-15
+- versionCode 7 -> 8, versionName 1.5.1 -> 1.6.0.
+
 - [x] Conectar el botón "Abonar" en Metas de ahorro — se agregó el botón + diálogo en [[SavingsGoalsScreen]]. De paso se corrigió un bug real: `addProgress()` **reemplazaba** el ahorro en vez de sumarle (`SavingsGoalDao.updateProgress` hace un `SET`, no un incremento). #pendiente/rapido ✅ 2026-08-14
 - [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14

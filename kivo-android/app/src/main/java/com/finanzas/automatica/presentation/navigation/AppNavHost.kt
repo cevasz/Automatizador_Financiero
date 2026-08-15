@@ -55,6 +55,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.finanzas.automatica.presentation.ui.components.AutoRequestPostNotificationsWhenRelevant
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
@@ -311,6 +312,12 @@ fun AppNavHost(database: FinanzasDatabase) {
                 val movements by movementViewModel.movements.collectAsState()
                 val pendingCount by movementViewModel.pendingCount.collectAsState()
                 val notificationAccessEnabled = rememberNotificationAccessEnabled()
+                // Pide POST_NOTIFICATIONS de forma gradual, no al abrir la app: justo
+                // cuando la captura de notificaciones bancarias queda activa (aca es
+                // cuando de verdad hacen falta las notificaciones locales de Kivo, p.ej.
+                // "movimientos capturados" o una meta lograda). Maximo una vez en la
+                // vida de la instalacion -- ver PostNotificationsPermissionState.kt.
+                AutoRequestPostNotificationsWhenRelevant(notificationCaptureActive = notificationAccessEnabled)
 
                 DashboardScreen(
                     movements = movements,
