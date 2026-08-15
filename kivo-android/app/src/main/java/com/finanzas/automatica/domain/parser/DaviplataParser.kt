@@ -11,7 +11,10 @@ import java.util.regex.Pattern
 
 class DaviplataParser : BaseBankParser(
     bankEntity = BankEntity.DAVIPLATA,
-    supportedPackageNames = listOf("com.daviplata.daviplata")
+    // com.davivienda.daviplataapp es el paquete real en Google Play (verificado
+    // 2026-08-15, ver docs/PENDIENTES.md) -- "com.daviplata.daviplata" no existe.
+    // Debe coincidir con notification_listener_config.xml.
+    supportedPackageNames = listOf("com.davivienda.daviplataapp", "com.daviplata.daviplata")
 ) {
 
     override fun parse(notificationText: String): ParseResult {

@@ -11,7 +11,17 @@ import java.util.regex.Pattern
 
 class BancolombiaParser : BaseBankParser(
     bankEntity = BankEntity.BANCOLOMBIA,
-    supportedPackageNames = listOf("com.bancolombia.certipersonas", "com.bancolombia.personas")
+    // co.com.bancolombia.personas.superapp es el paquete real de "Mi Bancolombia" en
+    // Google Play (verificado 2026-08-15, ver docs/PENDIENTES.md) -- Bancolombia paso
+    // de "Bancolombia Personas" (com.todo1.mobile, retirado de la tienda en 2025) a esta
+    // app nueva. Ninguno de los paquetes declarados antes coincidia con la app real.
+    // Debe coincidir con notification_listener_config.xml.
+    supportedPackageNames = listOf(
+        "co.com.bancolombia.personas.superapp",
+        "com.todo1.mobile",
+        "com.bancolombia.personas",
+        "com.bancolombia.certipersonas"
+    )
 ) {
 
     override fun parse(notificationText: String): ParseResult {

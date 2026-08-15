@@ -11,7 +11,10 @@ import java.util.regex.Pattern
 
 class NequiParser : BaseBankParser(
     bankEntity = BankEntity.NEQUI,
-    supportedPackageNames = listOf("com.nequi.app")
+    // com.nequi.MobileApp es el paquete real en Google Play (verificado 2026-08-15,
+    // ver docs/PENDIENTES.md) -- "com.nequi.app" no existe y nunca hubiera podido
+    // coincidir. Debe coincidir con notification_listener_config.xml.
+    supportedPackageNames = listOf("com.nequi.MobileApp", "com.nequi.app")
 ) {
 
     override fun parse(notificationText: String): ParseResult {

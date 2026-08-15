@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    IMPORTANTE: este filtro lo aplica el sistema operativo ANTES de que
+    NotificationCaptureService.onNotificationPosted() se ejecute: un paquete que no
+    esté aquí simplemente nunca llega al codigo de la app, sin importar que
+    BankParser.canParse() lo reconozca por texto. Los nombres de paquete de bancos
+    colombianos cambian con reestructuraciones/renombres de apps (Bancolombia paso de
+    "Bancolombia Personas" a "Mi Bancolombia" con un paquete nuevo, por ejemplo),
+    verificados en Google Play el 2026-08-15 (ver docs/PENDIENTES.md, bug real: un pago
+    recibido no se registraba "ni leyendo la notificacion" porque el paquete real de
+    Nequi/Bancolombia/Daviplata/Nu/Lulo no coincidia con ninguno de los declarados aca).
+    Se mantienen los nombres viejos ademas de los nuevos por si el usuario tiene una
+    version desactualizada de alguna app bancaria instalada.
+-->
 <notification-listener-config xmlns:android="http://schemas.android.com/apk/res/android">
     <notification-listener-include-filter>
+        <!-- Nequi -->
+        <package name="com.nequi.MobileApp" />
         <package name="com.nequi.app" />
+        <!-- Bancolombia: paso de "Bancolombia Personas" a "Mi Bancolombia" en 2025 -->
+        <package name="co.com.bancolombia.personas.superapp" />
+        <package name="com.todo1.mobile" />
+        <package name="com.bancolombia.personas" />
         <package name="com.bancolombia.certipersonas" />
+        <!-- Daviplata -->
+        <package name="com.davivienda.daviplataapp" />
         <package name="com.daviplata.daviplata" />
+        <!-- Nu Colombia (mismo paquete que Nu Mexico/Brasil) -->
+        <package name="com.nu.production" />
         <package name="co.nubank" />
+        <package name="br.com.nubank" />
+        <!-- Lulo Bank -->
+        <package name="co.com.lulobank.production" />
         <package name="com.lulobank.app" />
+        <package name="co.lulobank" />
     </notification-listener-include-filter>
 </notification-listener-config>

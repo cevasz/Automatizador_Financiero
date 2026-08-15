@@ -18,6 +18,35 @@ fuente: "[[docs/SDD]]"
 
 ## 🔴 Rápidos (bajo esfuerzo, alto impacto)
 
+### Sesión 2026-08-15: bug crítico — ningún paquete de banco era el real (pagos no se registraban)
+El usuario reportó: "acabo de recibir un pago y no se registró, ni leyendo la
+notificación". Investigando se encontró que **ninguno de los 5 paquetes de Android
+declarados en los `BankParser` coincidía con la app real en Google Play** — verificado
+con búsquedas reales, no adivinado:
+
+| Banco | Paquete declarado (viejo) | Paquete real (verificado 2026-08-15) |
+|---|---|---|
+| Nequi | `com.nequi.app` | `com.nequi.MobileApp` |
+| Bancolombia | `com.bancolombia.certipersonas` / `com.bancolombia.personas` | `co.com.bancolombia.personas.superapp` ("Mi Bancolombia"; la app vieja `com.todo1.mobile` fue retirada de la tienda en 2025) |
+| Daviplata | `com.daviplata.daviplata` | `com.davivienda.daviplataapp` |
+| Nu | `co.nubank` / `br.com.nubank` | `com.nu.production` |
+| Lulo Bank | `com.lulobank.app` / `co.lulobank` | `co.com.lulobank.production` |
+
+- [x] **Causa raíz**: `notification_listener_config.xml` declara un
+  `notification-listener-include-filter` — **el sistema operativo aplica ese filtro
+  antes de que `NotificationCaptureService.onNotificationPosted()` se ejecute**. Con el
+  paquete real ausente de esa lista, Android nunca entregaba la notificación al código
+  de la app, sin importar qué tan bien funcionara `BankParser.canParse()` — coincide
+  exactamente con "ni siquiera leyendo la notificación". Se corrigieron los 5 paquetes en
+  `notification_listener_config.xml` y en cada `BankParser.supportedPackageNames`
+  (manteniendo los nombres viejos como respaldo, por si alguien tiene una versión
+  desactualizada de la app bancaria). Se agregaron 5 tests de regresión que confirman que
+  `ParserRegistry` reconoce cada paquete real. #pendiente/rapido #bug ✅ 2026-08-15
+- **Importante para el usuario**: tras instalar esta actualización, puede que Android no
+  vuelva a leer la lista de paquetes permitidos hasta que se desactive y reactive el
+  permiso "Acceso a notificaciones" de Kivo en Ajustes del sistema (Ajustes → Apps →
+  Acceso especial → Acceso a notificaciones).
+
 - [x] Conectar el botón "Abonar" en Metas de ahorro — se agregó el botón + diálogo en [[SavingsGoalsScreen]]. De paso se corrigió un bug real: `addProgress()` **reemplazaba** el ahorro en vez de sumarle (`SavingsGoalDao.updateProgress` hace un `SET`, no un incremento). #pendiente/rapido ✅ 2026-08-14
 - [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14

@@ -148,6 +148,47 @@ class BankParserTest {
         assert(result is ParseResult.Failure)
     }
 
+    // --- Regresión: los paquetes de Android declarados deben coincidir con las apps
+    // reales en Google Play (verificados 2026-08-15, ver docs/PENDIENTES.md). Los
+    // paquetes anteriores ("com.nequi.app", "com.bancolombia.certipersonas",
+    // "com.daviplata.daviplata", "co.nubank", "com.lulobank.app") no correspondian a
+    // ninguna app real -- como notification_listener_config.xml usa un filtro de
+    // inclusion que aplica el sistema operativo ANTES de que el codigo de la app se
+    // ejecute, un paquete incorrecto ahi significa que la notificacion nunca llega ni
+    // siquiera a onNotificationPosted(), sin importar que tan bien funcione el parser.
+    // Este test cubre el otro extremo (que ParserRegistry SI reconozca el paquete real)
+    // para que un cambio futuro no vuelva a romper esto en silencio.
+
+    @Test
+    fun `recognizes the real Nequi package name from Google Play`() {
+        val result = registry.parse("com.nequi.MobileApp", "Recibiste $ 50.000 de 3204567890")
+        assert(result is ParseResult.Success) { "com.nequi.MobileApp es el paquete real de Nequi en Play Store: $result" }
+    }
+
+    @Test
+    fun `recognizes the real Bancolombia package name from Google Play`() {
+        val result = registry.parse("co.com.bancolombia.personas.superapp", "Abono a su cuenta ****1234 por $ 500.000")
+        assert(result is ParseResult.Success) { "co.com.bancolombia.personas.superapp es el paquete real de Mi Bancolombia en Play Store: $result" }
+    }
+
+    @Test
+    fun `recognizes the real Daviplata package name from Google Play`() {
+        val result = registry.parse("com.davivienda.daviplataapp", "Recibiste $ 75.000 de 3156677889")
+        assert(result is ParseResult.Success) { "com.davivienda.daviplataapp es el paquete real de Daviplata en Play Store: $result" }
+    }
+
+    @Test
+    fun `recognizes the real Nu package name from Google Play`() {
+        val result = registry.parse("com.nu.production", "Recibiste una transferencia de $ 300.000 COP")
+        assert(result is ParseResult.Success) { "com.nu.production es el paquete real de Nu en Play Store: $result" }
+    }
+
+    @Test
+    fun `recognizes the real Lulo Bank package name from Google Play`() {
+        val result = registry.parse("co.com.lulobank.production", "Abono de $ 500.000 en tu cuenta Lulo")
+        assert(result is ParseResult.Success) { "co.com.lulobank.production es el paquete real de Lulo Bank en Play Store: $result" }
+    }
+
     // --- Regresión: monto con decimales no debe inflarse 10x/100x (bug del "cero de más") ---
 
     @Test

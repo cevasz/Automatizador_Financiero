@@ -11,7 +11,10 @@ import java.util.regex.Pattern
 
 class LuloParser : BaseBankParser(
     bankEntity = BankEntity.LULO,
-    supportedPackageNames = listOf("com.lulobank.app", "co.lulobank")
+    // co.com.lulobank.production es el paquete real en Google Play (verificado
+    // 2026-08-15, ver docs/PENDIENTES.md) -- ni "com.lulobank.app" ni "co.lulobank"
+    // existen. Debe coincidir con notification_listener_config.xml.
+    supportedPackageNames = listOf("co.com.lulobank.production", "com.lulobank.app", "co.lulobank")
 ) {
 
     override fun parse(notificationText: String): ParseResult {

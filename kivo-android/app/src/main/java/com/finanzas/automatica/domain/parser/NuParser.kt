@@ -11,7 +11,10 @@ import java.util.regex.Pattern
 
 class NuParser : BaseBankParser(
     bankEntity = BankEntity.NU,
-    supportedPackageNames = listOf("co.nubank", "br.com.nubank")
+    // com.nu.production es el paquete real en Google Play, compartido por Nu Colombia,
+    // Mexico y Brasil (verificado 2026-08-15, ver docs/PENDIENTES.md) -- "co.nubank" no
+    // existe. Debe coincidir con notification_listener_config.xml.
+    supportedPackageNames = listOf("com.nu.production", "co.nubank", "br.com.nubank")
 ) {
 
     override fun parse(notificationText: String): ParseResult {
