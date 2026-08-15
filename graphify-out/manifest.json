@@ -25,9 +25,9 @@
     "semantic_hash": "0bc020d491fca99550c1ea3de0a5f862"
   },
   "kivo-android/app/build.gradle.kts": {
-    "mtime": 1786775848.5884268,
-    "ast_hash": "7a136a86b70f31a922ad3330d6c3f2d1",
-    "semantic_hash": "7a136a86b70f31a922ad3330d6c3f2d1"
+    "mtime": 1786807200.0685608,
+    "ast_hash": "b8c6f1178c7711a2f8cfafc578c43561",
+    "semantic_hash": "b8c6f1178c7711a2f8cfafc578c43561"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/FinanzasApplication.kt": {
     "mtime": 1786731294.4378757,
@@ -255,9 +255,9 @@
     "semantic_hash": "3a863837f7d48e624838bb51d3690d4a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt": {
-    "mtime": 1786731888.5626378,
-    "ast_hash": "1ee009eecad615ec57b2017fb70055f6",
-    "semantic_hash": "1ee009eecad615ec57b2017fb70055f6"
+    "mtime": 1786807101.5918448,
+    "ast_hash": "8da0494babc738bf5502c9301bee846f",
+    "semantic_hash": "8da0494babc738bf5502c9301bee846f"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/MainActivity.kt": {
     "mtime": 1786532458.8651543,
@@ -565,9 +565,9 @@
     "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
   },
   "docs/PENDIENTES.md": {
-    "mtime": 1786775864.7665095,
-    "ast_hash": "11e6f734d0a90e7a279b7a5039be8181",
-    "semantic_hash": "11e6f734d0a90e7a279b7a5039be8181"
+    "mtime": 1786807211.1986406,
+    "ast_hash": "81e5643ebc04043590cece97bf0c11b7",
+    "semantic_hash": "81e5643ebc04043590cece97bf0c11b7"
   },
   "graphify-out/converted/SDD_App_Finanzas_94a76240.md": {
     "mtime": 1786694086.4913433,
@@ -590,8 +590,8 @@
     "semantic_hash": "7abf8d6a594a7a9a18fc9e9d89f29dc9"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/PostNotificationsPermissionState.kt": {
-    "mtime": 1786736496.8457575,
-    "ast_hash": "f38c0c188e4831471d900771951229e4",
-    "semantic_hash": "f38c0c188e4831471d900771951229e4"
+    "mtime": 1786807077.0096629,
+    "ast_hash": "216028d9134c091a3e1f4ea9c0400dd5",
+    "semantic_hash": "216028d9134c091a3e1f4ea9c0400dd5"
   }
 }
