@@ -91,20 +91,28 @@ class NotificationCaptureService : NotificationListenerService() {
     }
 
     private suspend fun processNotification(packageName: String, text: String) {
-        val result = parserRegistry.parse(packageName, text)
+        // scope = CoroutineScope(Dispatchers.IO) sin manejador de excepciones propio: si
+        // algo aca (el parser, no solo EnrichmentPipeline) lanzara algo inesperado, sin
+        // este try/catch tumbaria el proceso cada vez que llega una notificacion
+        // bancaria -- la app quedaria crasheando en bucle en segundo plano.
+        try {
+            val result = parserRegistry.parse(packageName, text)
 
-        when (result) {
-            is ParseResult.Success -> {
-                val rawMovement = result.movement
-                Log.i(TAG, "Parseado: ${rawMovement.type} ${rawMovement.amount} ${rawMovement.counterpartyRaw} (${rawMovement.bankEntity})")
-                
-                // Pasar al pipeline de enriquecimiento y guardado
-                enrichmentPipeline?.process(rawMovement)
+            when (result) {
+                is ParseResult.Success -> {
+                    val rawMovement = result.movement
+                    Log.i(TAG, "Parseado: ${rawMovement.type} ${rawMovement.amount} ${rawMovement.counterpartyRaw} (${rawMovement.bankEntity})")
+
+                    // Pasar al pipeline de enriquecimiento y guardado
+                    enrichmentPipeline?.process(rawMovement)
+                }
+                is ParseResult.Failure -> {
+                    Log.w(TAG, "Error parseando notificación de $packageName: ${result.error}")
+                    Log.w(TAG, "Texto original: ${result.rawText}")
+                }
             }
-            is ParseResult.Failure -> {
-                Log.w(TAG, "Error parseando notificación de $packageName: ${result.error}")
-                Log.w(TAG, "Texto original: ${result.rawText}")
-            }
+        } catch (t: Throwable) {
+            Log.e(TAG, "Fallo inesperado procesando notificación de $packageName", t)
         }
     }
 }

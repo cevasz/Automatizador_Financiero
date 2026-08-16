@@ -65,6 +65,40 @@ con búsquedas reales, no adivinado:
   el switch en Ajustes). #pendiente/rapido ✅ 2026-08-15
 - versionCode 7 -> 8, versionName 1.5.1 -> 1.6.0.
 
+### Sesión 2026-08-15 (continuación): movimientos duplicados (SMS+correo) + app que no volvía a abrir
+El usuario reportó dos bugs: (1) Bancolombia manda SMS **y** correo para la misma
+transacción, y Kivo registraba el movimiento dos veces; (2) después de subir un extracto
+la app se cerró y ya no la dejaba abrir de nuevo (crash en cada intento, no solo una vez).
+
+- [x] **Movimientos duplicados por canal múltiple** — `EnrichmentPipeline.process()`
+  ahora revisa, antes de guardar, si ya existe un movimiento del mismo banco + tipo +
+  monto dentro de una ventana de 5 minutos (`MovementDao.findPossibleDuplicates()`,
+  nueva) — sin importar si vino por SMS, Gmail o la app oficial, porque el texto exacto
+  varía entre canales aunque describan la misma transacción real. **Trade-off asumido a
+  propósito**: si el usuario hace dos pagos genuinos del mismo monto al mismo banco
+  dentro de esos 5 minutos, el segundo se descartaría por error — se prefirió este riesgo
+  (bajo, poco común) sobre seguir duplicando cada SMS+correo (que pasa en *cada*
+  transacción de Bancolombia). #pendiente/rapido #bug ✅ 2026-08-15
+- [x] **App que dejaba de abrir por completo** — encontrados y corregidos varios puntos
+  donde una excepción sin atrapar en una `CoroutineScope` sin manejador propio podía
+  tumbar el proceso entero, no solo la operación en curso:
+  - `FinanzasApplication.onCreate()`: `DefaultCategories.seed()`/`dedupe()` corren en
+    **cada arranque**, antes de cualquier pantalla — sin try/catch, un fallo ahí
+    crashearía la app en todo intento de abrirla, no solo una vez. Ahora atrapa
+    `Throwable`.
+  - `EnrichmentPipeline.process()`: lo llaman tanto `NotificationCaptureService` (un
+    servicio en segundo plano) como los tres flujos de importación — ahora todo el
+    cuerpo está en un try/catch(Throwable), así un movimiento problemático nunca tumba
+    quien lo esté llamando.
+  - `NotificationCaptureService.processNotification()`: mismo problema, corre en un
+    `CoroutineScope` propio sin manejador — ahora atrapa `Throwable` y solo registra el
+    error en el log.
+  - `MovementViewModel.importMovements()` (comparte los 3 flujos: texto pegado, PDF,
+    captura de pantalla) e `importStatementText()`: el catch pasó de `Exception` a
+    `Throwable`.
+  #pendiente/rapido #bug ✅ 2026-08-15
+- versionCode 8 -> 9, versionName 1.6.0 -> 1.6.1.
+
 - [x] Conectar el botón "Abonar" en Metas de ahorro — se agregó el botón + diálogo en [[SavingsGoalsScreen]]. De paso se corrigió un bug real: `addProgress()` **reemplazaba** el ahorro en vez de sumarle (`SavingsGoalDao.updateProgress` hace un `SET`, no un incremento). #pendiente/rapido ✅ 2026-08-14
 - [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14

@@ -157,8 +157,8 @@ class MovementViewModel(
             _isLoading.value = true
             val text = try {
                 withContext(Dispatchers.IO) { ImageTextRecognizer.recognize(appContext, uri) }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } catch (t: Throwable) {
+                t.printStackTrace()
                 _isLoading.value = false
                 onComplete(ImportSummary(0, 0, 0, 0, 0, emptyList()))
                 return@launch
@@ -206,8 +206,11 @@ class MovementViewModel(
             }
 
             onComplete(summary)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (t: Throwable) {
+            // Throwable, no solo Exception: es el punto final compartido por los tres
+            // flujos de importacion (texto pegado, PDF, captura de pantalla) -- ninguno
+            // debe poder crashear la app por lo que pase leyendo datos del usuario.
+            t.printStackTrace()
             onComplete(ImportSummary(0, 0, 0, 0, 0, emptyList()))
         } finally {
             _isLoading.value = false

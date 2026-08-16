@@ -23,6 +23,25 @@ interface MovementDao {
     @Query("SELECT * FROM movements WHERE id = :id")
     suspend fun getById(id: Long): MovementEntity?
 
+    // Usado por EnrichmentPipeline para detectar el mismo movimiento reportado por mas
+    // de un canal (p.ej. Bancolombia manda SMS Y correo para la misma transferencia) --
+    // no filtra por source/rawText a proposito, porque el texto exacto varia entre
+    // canales aunque describan el mismo movimiento real.
+    @Query(
+        """
+        SELECT * FROM movements
+        WHERE bankEntity = :bankEntity AND type = :type AND amount = :amount
+          AND date BETWEEN :startDate AND :endDate
+        """
+    )
+    suspend fun findPossibleDuplicates(
+        bankEntity: String,
+        type: String,
+        amount: Long,
+        startDate: Long,
+        endDate: Long
+    ): List<MovementEntity>
+
     @Query("SELECT * FROM movements ORDER BY date DESC LIMIT :limit OFFSET :offset")
     suspend fun getPaginated(limit: Int, offset: Int): List<MovementEntity>
 

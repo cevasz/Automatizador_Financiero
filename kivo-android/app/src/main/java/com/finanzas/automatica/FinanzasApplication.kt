@@ -24,11 +24,20 @@ class FinanzasApplication : Application() {
         ).fallbackToDestructiveMigration()
             .build()
 
+        // Se ejecuta en CADA arranque de la app, sin manejador de excepciones propio --
+        // si seed()/dedupe() llegaran a lanzar algo no previsto (p.ej. un estado de
+        // datos inesperado en un dispositivo real), sin este try/catch la excepcion
+        // tumba el proceso completo y la app queda sin poder abrirse nunca mas (crashea
+        // en cada intento de abrir, porque esto corre antes que cualquier pantalla).
         CoroutineScope(Dispatchers.IO).launch {
-            DefaultCategories.seed(database!!)
-            // Limpia categorias duplicadas dejadas por versiones anteriores (seed() se
-            // ejecutaba en cada arranque sin verificar si ya existian). Idempotente.
-            DefaultCategories.dedupe(database!!)
+            try {
+                DefaultCategories.seed(database!!)
+                // Limpia categorias duplicadas dejadas por versiones anteriores (seed()
+                // se ejecutaba en cada arranque sin verificar si ya existian). Idempotente.
+                DefaultCategories.dedupe(database!!)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
         }
 
         ClassificationRepositoryProvider.categoryLookupRepository =

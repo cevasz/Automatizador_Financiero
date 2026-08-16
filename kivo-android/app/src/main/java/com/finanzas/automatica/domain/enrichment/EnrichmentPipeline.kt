@@ -23,6 +23,7 @@ import com.finanzas.automatica.domain.model.RawMovement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class EnrichmentPipeline(
     private val database: FinanzasDatabase
@@ -32,30 +33,69 @@ class EnrichmentPipeline(
     private val agendaDao = database.agendaDao()
     private val categoryDao = database.categoryDao()
     private val ruleDao = database.classificationRuleDao()
+    private val movementDao = database.movementDao()
 
+    /**
+     * Ventana de tiempo para detectar el mismo movimiento reportado por mas de un canal
+     * (Bancolombia, por ejemplo, manda SMS Y correo para la misma transferencia -- sin
+     * esto, cada canal generaba su propio movimiento y todo quedaba duplicado). 5 minutos
+     * es un balance: suficiente para SMS+correo del mismo evento (normalmente llegan con
+     * segundos de diferencia), pero corto para no confundir con una segunda transaccion
+     * real del mismo monto poco despues (p.ej. dos pagos de $50.000 seguidos).
+     */
+    private val duplicateWindowMs = TimeUnit.MINUTES.toMillis(5)
+
+    /**
+     * Nunca deja escapar una excepcion: este metodo lo llaman NotificationCaptureService
+     * (un servicio en segundo plano sin manejador de excepciones propio) y los distintos
+     * flujos de importacion -- un fallo aca no debe crashear la app ni el servicio. En el
+     * peor caso, un movimiento no se guarda; eso es preferible a que la app deje de
+     * abrir.
+     */
     suspend fun process(rawMovement: RawMovement) {
-        withContext(Dispatchers.IO) {
-            // 1. Buscar en agenda
-            val agendaEntry = agendaDao.getByIdentifier(rawMovement.counterpartyRaw)
-            
-            // 2. Buscar regla de clasificación
-            val suggestedCategory = findSuggestedCategory(rawMovement, agendaEntry)
-            
-            // 3. Determinar si necesita confirmación
-            val needsConfirmation = determineNeedsConfirmation(rawMovement, agendaEntry, suggestedCategory)
-            
-            // 4. Crear movimiento enriquecido
-            val enriched = EnrichedMovement(
-                rawMovement = rawMovement,
-                agendaEntry = agendaEntry?.toDomain(),
-                suggestedCategory = suggestedCategory?.toDomain(),
-                confidence = calculateConfidence(rawMovement, agendaEntry, suggestedCategory),
-                needsConfirmation = needsConfirmation
-            )
+        try {
+            withContext(Dispatchers.IO) {
+                // 0. Si el mismo movimiento ya llego por otro canal (SMS + correo del
+                //    mismo banco para la misma transaccion, por ejemplo), no duplicar.
+                if (isDuplicate(rawMovement)) return@withContext
 
-            // 5. Guardar
-            saveEnriched(enriched)
+                // 1. Buscar en agenda
+                val agendaEntry = agendaDao.getByIdentifier(rawMovement.counterpartyRaw)
+
+                // 2. Buscar regla de clasificación
+                val suggestedCategory = findSuggestedCategory(rawMovement, agendaEntry)
+
+                // 3. Determinar si necesita confirmación
+                val needsConfirmation = determineNeedsConfirmation(rawMovement, agendaEntry, suggestedCategory)
+
+                // 4. Crear movimiento enriquecido
+                val enriched = EnrichedMovement(
+                    rawMovement = rawMovement,
+                    agendaEntry = agendaEntry?.toDomain(),
+                    suggestedCategory = suggestedCategory?.toDomain(),
+                    confidence = calculateConfidence(rawMovement, agendaEntry, suggestedCategory),
+                    needsConfirmation = needsConfirmation
+                )
+
+                // 5. Guardar
+                saveEnriched(enriched)
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
         }
+    }
+
+    private suspend fun isDuplicate(rawMovement: RawMovement): Boolean {
+        val windowStart = rawMovement.date.toEpochMilli() - duplicateWindowMs
+        val windowEnd = rawMovement.date.toEpochMilli() + duplicateWindowMs
+        val candidates = movementDao.findPossibleDuplicates(
+            bankEntity = rawMovement.bankEntity.name,
+            type = rawMovement.type.name,
+            amount = rawMovement.amount,
+            startDate = windowStart,
+            endDate = windowEnd
+        )
+        return candidates.isNotEmpty()
     }
 
     private suspend fun findSuggestedCategory(
