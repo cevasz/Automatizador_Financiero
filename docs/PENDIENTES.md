@@ -99,6 +99,42 @@ la app se cerró y ya no la dejaba abrir de nuevo (crash en cada intento, no sol
   #pendiente/rapido #bug ✅ 2026-08-15
 - versionCode 8 -> 9, versionName 1.6.0 -> 1.6.1.
 
+### Sesión 2026-08-16: la app seguía sin abrir (causa distinta a la de 1.6.1)
+El usuario reportó que, pese a los try/catch de 1.6.1, la app **seguía sin abrir**. Los
+arreglos anteriores cubrían las corrutinas de arranque e importación, pero no el camino
+por el que la app realmente se cae al abrir: la lectura reactiva de la base de datos.
+
+- [x] **Causa raíz encontrada**: `MovementEntity.toDomain()` (y los demás mappers) usan
+  `MovementType.valueOf(...)`, `BankEntity.valueOf(...)`, etc. — si **una sola fila**
+  quedó con un valor que no corresponde a ningún enum (dato corrupto, un `BankEntity`
+  que ya no existe, una escritura a medias), `valueOf` lanza `IllegalArgumentException`.
+  Eso ocurre **dentro del `Flow`** que alimenta cada `StateFlow` de los ViewModel
+  (`repository.getAllFlow().map { it.toDomain() }.stateIn(...)`), que se suscribe apenas
+  se abre el Dashboard — sin ningún try/catch en ese camino. Resultado: una fila mala
+  guardada en la base = crash en **cada** apertura, para siempre, sin forma de
+  recuperarse desde la app. Solución: `toDomainSafely()` nueva en `ModelMappers.kt`, que
+  descarta (con log) solo las filas que no se puedan mapear en vez de tumbar la lista
+  entera; aplicada a los 6 puntos donde se mapean listas desde Room
+  ([[MovementViewModel]] ×2, [[BudgetsViewModel]] ×2, [[AgendaViewModel]] ×2,
+  [[SavingsGoalsViewModel]], [[InvoiceViewModel]] ×2). 3 tests de regresión nuevos
+  (`ModelMappersTest`) que reproducen exactamente el escenario. #pendiente/rapido #bug ✅ 2026-08-16
+- [x] **Dos instancias de Room sobre el mismo archivo** — `FinanzasApplication.onCreate()`
+  construía su propia base con `Room.databaseBuilder(...)` mientras el resto de la app
+  usa `FinanzasDatabase.getInstance()`: dos instancias distintas apuntando a
+  `finanzas.db`, lo que puede dejar la base en estado inconsistente (y además se saltaba
+  la config de migración centralizada). Ahora `FinanzasApplication` usa la instancia
+  compartida. De paso, `getInstance()` ganó doble verificación dentro del `synchronized`
+  (sin ella, dos hilos simultáneos podían crear dos instancias) y
+  `fallbackToDestructiveMigrationOnDowngrade()` — sin esto, reinstalar un APK anterior
+  hace que Room lance al abrir y la app crashee en cada arranque sin poder recuperarse.
+  #pendiente/rapido #bug ✅ 2026-08-16
+- **Si la app sigue sin abrir tras esta versión**: la única forma de confirmarlo es leer
+  el `logcat` real del dispositivo (`adb logcat --pid=$(adb shell pidof -s com.finanzas.automatica)`),
+  porque el error concreto no es deducible solo del código. Como último recurso, borrar
+  los datos de la app (Ajustes → Apps → Kivo → Almacenamiento → Borrar datos) elimina la
+  base corrupta — se pierden los movimientos locales, pero la app vuelve a abrir.
+- versionCode 9 -> 10, versionName 1.6.1 -> 1.6.2.
+
 - [x] Conectar el botón "Abonar" en Metas de ahorro — se agregó el botón + diálogo en [[SavingsGoalsScreen]]. De paso se corrigió un bug real: `addProgress()` **reemplazaba** el ahorro en vez de sumarle (`SavingsGoalDao.updateProgress` hace un `SET`, no un incremento). #pendiente/rapido ✅ 2026-08-14
 - [x] Arreglar el selector de formato de exportación — CSV ahora exporta un CSV real de movimientos; Excel/PDF avisan honestamente que aún no están disponibles (roadmap) en vez de entregar un JSON con el nombre equivocado. De paso se separó `exportData()` (formato elegido por el usuario) de `prepareSyncSnapshot()` (snapshot completo para "Sincronizar" en Login), que antes compartían la misma función sin relación. #pendiente/rapido #bug ✅ 2026-08-14
 - [x] Agregar `./gradlew test` al CI (`.github/workflows/build.yml`). #pendiente/rapido #ci ✅ 2026-08-14

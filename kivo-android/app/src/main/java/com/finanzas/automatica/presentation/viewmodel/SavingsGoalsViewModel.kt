@@ -7,6 +7,7 @@ import com.finanzas.automatica.data.local.dao.SavingsGoalDao
 import com.finanzas.automatica.data.local.entity.AppNotificationEntity
 import com.finanzas.automatica.data.repository.AppNotificationRepository
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toDomainSafely
 import com.finanzas.automatica.domain.enrichment.toEntity
 import com.finanzas.automatica.domain.model.SavingsGoal
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,7 @@ class SavingsGoalsViewModel(
     // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
     // al instante en la lista tambien (misma correccion que MovementViewModel.movements).
     val goals: StateFlow<List<SavingsGoal>> = goalDao.getAllFlow()
-        .map { entities -> entities.map { it.toDomain() } }
+        .map { entities -> entities.toDomainSafely { it.toDomain() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _isLoading = MutableStateFlow<Boolean>(false)

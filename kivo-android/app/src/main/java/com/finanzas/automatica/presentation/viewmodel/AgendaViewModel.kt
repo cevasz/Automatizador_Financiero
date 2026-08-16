@@ -6,6 +6,7 @@ import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.AgendaRepositoryImpl
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toDomainSafely
 import com.finanzas.automatica.domain.enrichment.toEntity
 import com.finanzas.automatica.domain.model.AgendaEntry
 import com.finanzas.automatica.domain.model.Category
@@ -28,7 +29,7 @@ class AgendaViewModel(
     // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
     // al instante en la lista tambien (misma correccion que MovementViewModel.movements).
     val entries: StateFlow<List<AgendaEntry>> = agendaRepo.observeAll()
-        .map { entities -> entities.map { it.toDomain() } }
+        .map { entities -> entities.toDomainSafely { it.toDomain() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
@@ -47,9 +48,9 @@ class AgendaViewModel(
     fun loadCategories() {
         viewModelScope.launch {
             try {
-                _categories.value = categoryRepo.getAll().map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                _categories.value = categoryRepo.getAll().toDomainSafely { it.toDomain() }
+            } catch (t: Throwable) {
+                t.printStackTrace()
             }
         }
     }

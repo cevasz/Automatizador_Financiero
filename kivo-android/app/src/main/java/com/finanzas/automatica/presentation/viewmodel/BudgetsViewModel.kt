@@ -9,6 +9,7 @@ import com.finanzas.automatica.data.repository.AppNotificationRepository
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.MovementRepositoryImpl
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toDomainSafely
 import com.finanzas.automatica.domain.enrichment.toEntity
 import com.finanzas.automatica.domain.model.Budget
 import com.finanzas.automatica.domain.model.Category
@@ -42,7 +43,7 @@ class BudgetsViewModel(
     // al instante en la lista tambien, sin refrescar nada a mano ni reiniciar la app
     // (misma correccion que MovementViewModel.movements, ver esa clase).
     val budgets: StateFlow<List<Budget>> = budgetDao.getAllFlow()
-        .map { entities -> entities.map { it.toDomain() } }
+        .map { entities -> entities.toDomainSafely { it.toDomain() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
@@ -85,9 +86,9 @@ class BudgetsViewModel(
     fun loadExpenseCategories() {
         viewModelScope.launch {
             try {
-                _categories.value = categoryRepo.getByType(MovementType.EXPENSE.name).map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                _categories.value = categoryRepo.getByType(MovementType.EXPENSE.name).toDomainSafely { it.toDomain() }
+            } catch (t: Throwable) {
+                t.printStackTrace()
             }
         }
     }

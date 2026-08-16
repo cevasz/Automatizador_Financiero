@@ -1,7 +1,6 @@
 package com.finanzas.automatica
 
 import android.app.Application
-import androidx.room.Room
 import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.repository.DefaultCategories
 import com.finanzas.automatica.domain.enrichment.ClassificationRepositoryProvider
@@ -17,12 +16,13 @@ class FinanzasApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        database = Room.databaseBuilder(
-            applicationContext,
-            FinanzasDatabase::class.java,
-            "finanzas.db"
-        ).fallbackToDestructiveMigration()
-            .build()
+        // Usa la MISMA instancia compartida que el resto de la app (MainActivity,
+        // NotificationCaptureService, etc. llaman a FinanzasDatabase.getInstance()).
+        // Antes esto construia una segunda instancia de Room apuntando al mismo archivo
+        // "finanzas.db" -- dos instancias del mismo archivo pueden dejar la base en un
+        // estado inconsistente, y ademas se saltaba la configuracion de migracion
+        // centralizada (fallbackToDestructiveMigrationOnDowngrade).
+        database = FinanzasDatabase.getInstance(applicationContext)
 
         // Se ejecuta en CADA arranque de la app, sin manejador de excepciones propio --
         // si seed()/dedupe() llegaran a lanzar algo no previsto (p.ej. un estado de

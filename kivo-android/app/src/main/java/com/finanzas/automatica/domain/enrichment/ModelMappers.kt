@@ -1,5 +1,6 @@
 package com.finanzas.automatica.domain.enrichment
 
+import android.util.Log
 import com.finanzas.automatica.data.local.entity.AgendaEntryEntity
 import com.finanzas.automatica.data.local.entity.BudgetEntity
 import com.finanzas.automatica.data.local.entity.MovementEntity
@@ -15,6 +16,29 @@ import com.finanzas.automatica.domain.model.MovementType
 import com.finanzas.automatica.domain.model.PaymentMethod
 import com.finanzas.automatica.domain.model.SavingsGoal
 import java.time.Instant
+
+/**
+ * Convierte una lista de entidades de Room a modelo de dominio, descartando en silencio
+ * (con un log) cualquier fila que no se pueda mapear -- por ejemplo, si un campo tipo
+ * enum quedo con un valor que no coincide con ningun `MovementType`/`BankEntity`/etc.
+ * (dato corrupto, version anterior con un enum distinto, etc.).
+ *
+ * Sin esto, UNA sola fila mal formada tumbaba la lista COMPLETA -- y con ella cualquier
+ * pantalla que la mostrara, incluido el Dashboard justo al abrir la app, porque
+ * `.toDomain()` corre dentro del `Flow` reactivo que alimenta cada `StateFlow` de los
+ * ViewModel (`categoryRepository.getAllFlow().map { it.toDomain() }.stateIn(...)`), sin
+ * ningun try/catch alrededor -- eso convertia un solo registro problemático en un
+ * crash en cada apertura de la app (bug reportado: "sigue sin abrir cuando entro").
+ */
+inline fun <E, D> List<E>.toDomainSafely(crossinline mapper: (E) -> D): List<D> =
+    mapNotNull { entity ->
+        try {
+            mapper(entity)
+        } catch (t: Throwable) {
+            Log.e("ModelMappers", "No se pudo mapear una fila a modelo de dominio, se omite: $entity", t)
+            null
+        }
+    }
 
 fun AgendaEntry.toEntity(): AgendaEntryEntity = AgendaEntryEntity(
     id = id,

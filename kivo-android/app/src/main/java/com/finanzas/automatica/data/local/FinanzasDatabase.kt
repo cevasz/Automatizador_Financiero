@@ -42,16 +42,25 @@ abstract class FinanzasDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): FinanzasDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    FinanzasDatabase::class.java,
-                    "finanzas.db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
-                instance
+                // Doble verificacion dentro del synchronized: sin esto, dos hilos que
+                // entran a la vez al bloque crean dos instancias distintas del MISMO
+                // archivo de base de datos (Room no lo impide), lo que puede dejar la
+                // base en un estado inconsistente.
+                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
         }
+
+        private fun buildDatabase(context: Context): FinanzasDatabase =
+            Room.databaseBuilder(
+                context.applicationContext,
+                FinanzasDatabase::class.java,
+                "finanzas.db"
+            )
+                .fallbackToDestructiveMigration()
+                // Tambien al BAJAR de version (p.ej. si el usuario reinstala un APK
+                // anterior): sin esto Room lanza IllegalStateException al abrir y la app
+                // crashea en cada arranque, sin forma de recuperarse desde la app.
+                .fallbackToDestructiveMigrationOnDowngrade()
+                .build()
     }
 }

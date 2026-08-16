@@ -10,6 +10,7 @@ import com.finanzas.automatica.data.repository.AgendaRepositoryImpl
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.InvoiceRepository
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toDomainSafely
 import com.finanzas.automatica.domain.importer.ImageTextRecognizer
 import com.finanzas.automatica.domain.importer.ReceiptOcrParser
 import com.finanzas.automatica.domain.model.AgendaEntry
@@ -56,10 +57,10 @@ class InvoiceViewModel(
     private fun loadContactsAndCategories() {
         viewModelScope.launch {
             try {
-                _contacts.value = agendaRepo.findAll().map { it.toDomain() }
-                _categories.value = categoryRepo.getAll().map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                _contacts.value = agendaRepo.findAll().toDomainSafely { it.toDomain() }
+                _categories.value = categoryRepo.getAll().toDomainSafely { it.toDomain() }
+            } catch (t: Throwable) {
+                t.printStackTrace()
             }
         }
     }

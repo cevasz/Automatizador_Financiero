@@ -11,6 +11,7 @@ import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.MovementRepositoryImpl
 import com.finanzas.automatica.domain.enrichment.EnrichmentPipeline
 import com.finanzas.automatica.domain.enrichment.toDomain
+import com.finanzas.automatica.domain.enrichment.toDomainSafely
 import com.finanzas.automatica.domain.importer.ImageTextRecognizer
 import com.finanzas.automatica.domain.importer.ImportSummary
 import com.finanzas.automatica.domain.importer.PdfStatementExtractor
@@ -47,7 +48,7 @@ class MovementViewModel(
     // Reactivo sobre Room: se usa para el dialogo de recategorizar un movimiento
     // (boton "Detalle" en MovementsListScreen), que antes no tenia ningun efecto.
     val categories: StateFlow<List<Category>> = categoryRepository.getAllFlow()
-        .map { entities -> entities.map { it.toDomain() } }
+        .map { entities -> entities.toDomainSafely { it.toDomain() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Reactivo sobre Room: cualquier escritura a la tabla "movements" (desde esta
@@ -56,7 +57,7 @@ class MovementViewModel(
     // que confirmar/rechazar un movimiento se refleja al instante en toda la app sin
     // necesidad de refrescar manualmente ni de reiniciar la app.
     val movements: StateFlow<List<Movement>> = repository.getAllFlow()
-        .map { entities -> entities.map { it.toDomain() } }
+        .map { entities -> entities.toDomainSafely { it.toDomain() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pendingCount: StateFlow<Int> = movements
