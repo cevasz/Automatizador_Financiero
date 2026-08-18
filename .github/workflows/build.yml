@@ -37,6 +37,15 @@ jobs:
         working-directory: kivo-android
         run: ./gradlew assembleDebug --no-daemon
 
+      # La variante release aplica R8 (ofuscacion + eliminacion de codigo no
+      # usado), que puede romper cosas que la debug nunca toca: Room resuelve sus
+      # implementaciones por nombre, y los servicios del manifiesto tambien. Sin
+      # este paso, esos fallos solo aparecerian al publicar. Sale sin firmar
+      # porque el keystore no vive en el repositorio.
+      - name: Build Release APK (sin firmar, valida R8)
+        working-directory: kivo-android
+        run: ./gradlew assembleRelease --no-daemon
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
