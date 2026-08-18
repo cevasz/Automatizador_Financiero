@@ -8,8 +8,27 @@ import androidx.room.Update
 import com.finanzas.automatica.data.local.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Cuantas filas dependen de una categoria. Se calcula con un GROUP BY unico y no
+ * con un COUNT por categoria: son ~33 categorias, y 33 consultas para pintar una
+ * pantalla es tiempo regalado.
+ */
+data class CategoryUsage(val categoryId: Long, val total: Int)
+
 @Dao
 interface CategoryDao {
+
+    @Query("SELECT categoryId AS categoryId, COUNT(*) AS total FROM movements WHERE categoryId IS NOT NULL GROUP BY categoryId")
+    suspend fun movementUsage(): List<CategoryUsage>
+
+    @Query("SELECT categoryId AS categoryId, COUNT(*) AS total FROM budgets GROUP BY categoryId")
+    suspend fun budgetUsage(): List<CategoryUsage>
+
+    @Query("SELECT categoryId AS categoryId, COUNT(*) AS total FROM classification_rules GROUP BY categoryId")
+    suspend fun ruleUsage(): List<CategoryUsage>
+
+    @Query("SELECT defaultCategoryId AS categoryId, COUNT(*) AS total FROM agenda_entries WHERE defaultCategoryId IS NOT NULL GROUP BY defaultCategoryId")
+    suspend fun agendaUsage(): List<CategoryUsage>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(category: CategoryEntity): Long
