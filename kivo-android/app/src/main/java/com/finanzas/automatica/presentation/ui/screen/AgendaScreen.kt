@@ -209,7 +209,6 @@ fun AgendaEntryCard(
                     Text(
                         text = entry.displayName,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

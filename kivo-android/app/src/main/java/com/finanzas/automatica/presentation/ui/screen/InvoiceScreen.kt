@@ -74,6 +74,7 @@ import com.finanzas.automatica.domain.model.DebtStatus
 import com.finanzas.automatica.domain.model.DebtSummary
 import com.finanzas.automatica.domain.model.Invoice
 import com.finanzas.automatica.domain.model.InvoiceItem
+import com.finanzas.automatica.presentation.ui.format.Money
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
@@ -84,7 +85,6 @@ import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
 import java.util.Locale
 
 private enum class InvoiceTab(val label: String) {
@@ -109,11 +109,6 @@ fun InvoiceScreen(
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
-    }
     var currentTab by remember { mutableStateOf(InvoiceTab.UPLOAD) }
 
     // Estado local para la creación de factura
@@ -359,7 +354,6 @@ fun InvoiceScreen(
                             InvoiceItemEditorCard(
                                 item = item,
                                 contacts = contacts,
-                                currencyFormat = currencyFormat,
                                 onItemChange = { updated ->
                                     draftItems[index] = updated
                                 },
@@ -384,7 +378,7 @@ fun InvoiceScreen(
                                 ) {
                                     Text("Total Factura:", style = MaterialTheme.typography.bodyMedium)
                                     Text(
-                                        currencyFormat.format(totalInvoiceAmount / 100.0),
+                                        Money.format(totalInvoiceAmount),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -395,7 +389,7 @@ fun InvoiceScreen(
                                 ) {
                                     Text("Tu gasto personal:", style = MaterialTheme.typography.bodyMedium)
                                     Text(
-                                        currencyFormat.format(totalPersonalAmount / 100.0),
+                                        Money.format(totalPersonalAmount),
                                         style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.SemiBold
@@ -407,7 +401,7 @@ fun InvoiceScreen(
                                 ) {
                                     Text("Total Deudas por Cobrar:", style = MaterialTheme.typography.bodyMedium)
                                     Text(
-                                        currencyFormat.format(totalDebtAmount / 100.0),
+                                        Money.format(totalDebtAmount),
                                         style = MaterialTheme.typography.titleSmall,
                                         color = IncomeGreen,
                                         fontWeight = FontWeight.Bold
@@ -467,7 +461,7 @@ fun InvoiceScreen(
                                     )
                                     val totalAllOwed = debtSummaries.sumOf { it.totalOwed }
                                     Text(
-                                        text = "Te deben en total: ${currencyFormat.format(totalAllOwed / 100.0)}",
+                                        text = "Te deben en total: ${Money.format(totalAllOwed)}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = IncomeGreen,
                                         fontWeight = FontWeight.Bold
@@ -491,7 +485,6 @@ fun InvoiceScreen(
                         items(debtSummaries, key = { it.debtorName }) { summary ->
                             DebtSummaryCard(
                                 summary = summary,
-                                currencyFormat = currencyFormat,
                                 onMarkItemPaid = onMarkDebtPaid,
                                 modifier = Modifier.animateItemPlacement()
                             )
@@ -515,7 +508,6 @@ fun InvoiceScreen(
                         items(invoices, key = { it.id }) { invoice ->
                             SavedInvoiceCard(
                                 invoice = invoice,
-                                currencyFormat = currencyFormat,
                                 onDelete = { onDeleteInvoice(invoice.id) },
                                 modifier = Modifier.animateItemPlacement()
                             )
@@ -532,7 +524,6 @@ fun InvoiceScreen(
 private fun InvoiceItemEditorCard(
     item: InvoiceItem,
     contacts: List<AgendaEntry>,
-    currencyFormat: NumberFormat,
     onItemChange: (InvoiceItem) -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -669,7 +660,6 @@ private fun InvoiceItemEditorCard(
 @Composable
 private fun DebtSummaryCard(
     summary: DebtSummary,
-    currencyFormat: NumberFormat,
     onMarkItemPaid: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -702,9 +692,8 @@ private fun DebtSummaryCard(
                 }
             }
             Text(
-                text = currencyFormat.format(summary.totalOwed / 100.0),
+                text = Money.format(summary.totalOwed),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
                 color = IncomeGreen
             )
         }
@@ -738,7 +727,7 @@ private fun DebtSummaryCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = currencyFormat.format(item.totalPrice / 100.0),
+                        text = Money.format(item.totalPrice),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -756,7 +745,6 @@ private fun DebtSummaryCard(
 @Composable
 private fun SavedInvoiceCard(
     invoice: Invoice,
-    currencyFormat: NumberFormat,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -784,7 +772,7 @@ private fun SavedInvoiceCard(
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = currencyFormat.format(invoice.totalAmount / 100.0),
+                    text = Money.format(invoice.totalAmount),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -796,13 +784,13 @@ private fun SavedInvoiceCard(
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FinanceTag(
-                text = "Tu gasto: ${currencyFormat.format(personalTotal / 100.0)}",
+                text = "Tu gasto: ${Money.format(personalTotal)}",
                 color = MaterialTheme.colorScheme.primary,
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             )
             if (debtTotal > 0) {
                 FinanceTag(
-                    text = "Deudas: ${currencyFormat.format(debtTotal / 100.0)}",
+                    text = "Deudas: ${Money.format(debtTotal)}",
                     color = IncomeGreen,
                     containerColor = IncomeGreen.copy(alpha = 0.12f)
                 )
@@ -820,7 +808,7 @@ private fun SavedInvoiceCard(
                     color = if (item.isDebt) IncomeGreen else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = currencyFormat.format(item.totalPrice / 100.0),
+                    text = Money.format(item.totalPrice),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -69,6 +69,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.R
 import com.finanzas.automatica.domain.model.SavingsGoal
+import com.finanzas.automatica.presentation.ui.format.Money
+import com.finanzas.automatica.presentation.ui.theme.KivoText
 import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
@@ -79,7 +81,6 @@ import com.finanzas.automatica.presentation.ui.components.rememberAnimatedFloat
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
-import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -97,11 +98,6 @@ fun SavingsGoalsScreen(
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
-    }
     val totalTarget = goals.sumOf { it.targetAmount }
     val totalSaved = goals.sumOf { it.currentAmount }
 
@@ -125,7 +121,7 @@ fun SavingsGoalsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = currencyFormat.money(totalSaved) + " de " + currencyFormat.money(totalTarget),
+                        text = Money.format(totalSaved) + " de " + Money.format(totalTarget),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -174,7 +170,6 @@ fun SavingsGoalsScreen(
                 items(goals, key = { it.id ?: it.name }) { goal ->
                     SavingsGoalCard(
                         goal = goal,
-                        currencyFormat = currencyFormat,
                         onClick = { onGoalClick(goal) },
                         onAddProgress = { id, amount ->
                             val wasIncomplete = goal.currentAmount < goal.targetAmount
@@ -192,7 +187,7 @@ fun SavingsGoalsScreen(
     }
 
     celebratingGoal?.let { goal ->
-        GoalCelebrationOverlay(goal = goal, currencyFormat = currencyFormat, onDismiss = { celebratingGoal = null })
+        GoalCelebrationOverlay(goal = goal, onDismiss = { celebratingGoal = null })
     }
 }
 
@@ -204,7 +199,6 @@ fun SavingsGoalsScreen(
 @Composable
 private fun GoalCelebrationOverlay(
     goal: SavingsGoal,
-    currencyFormat: NumberFormat,
     onDismiss: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -275,12 +269,11 @@ private fun GoalCelebrationOverlay(
                 Text(
                     text = "¡Meta lograda! 🎉",
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Completaste \"${goal.name}\" con ${currencyFormat.money(goal.currentAmount)}. Tu constancia rindió frutos.",
+                    text = "Completaste \"${goal.name}\" con ${Money.format(goal.currentAmount)}. Tu constancia rindió frutos.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -301,7 +294,6 @@ private fun GoalCelebrationOverlay(
 @Composable
 fun SavingsGoalCard(
     goal: SavingsGoal,
-    currencyFormat: NumberFormat,
     onClick: () -> Unit,
     onAddProgress: (Long, Long) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
@@ -341,7 +333,6 @@ fun SavingsGoalCard(
                     Text(
                         text = goal.name,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -374,13 +365,12 @@ fun SavingsGoalCard(
         ) {
             AnimatedAmountText(
                 target = goal.currentAmount,
-                format = { currencyFormat.money(it) },
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium,
+                format = { Money.format(it) },
+                style = KivoText.amountSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = currencyFormat.money(goal.targetAmount),
+                text = Money.format(goal.targetAmount),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -395,7 +385,7 @@ fun SavingsGoalCard(
                 text = if (isCompleted) {
                     "Objetivo alcanzado"
                 } else {
-                    "Faltan " + currencyFormat.money((goal.targetAmount - goal.currentAmount).coerceAtLeast(0))
+                    "Faltan " + Money.format((goal.targetAmount - goal.currentAmount).coerceAtLeast(0))
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -593,7 +583,6 @@ fun AddEditSavingsGoalScreen(
     }
 }
 
-private fun NumberFormat.money(amount: Long): String = format(amount / 100.0)
 
 private fun SavingsGoal.targetDateLabel(): String {
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es", "CO"))

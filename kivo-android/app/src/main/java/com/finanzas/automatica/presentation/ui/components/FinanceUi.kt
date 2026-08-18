@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -34,6 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.finanzas.automatica.presentation.ui.format.Money
+import com.finanzas.automatica.presentation.ui.theme.KivoText
+import com.finanzas.automatica.presentation.ui.theme.KivoSpacing
 
 /** Radio de esquina compartido por tarjetas -- estilo "rounded-2xl", mas moderno que el
  * 8dp anterior (que se sentia chato/anticuado, ver skill mobile-app-ui-design). */
@@ -47,6 +51,21 @@ fun FinanceCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // Una tarjeta con color translucido NO puede llevar sombra de elevacion: Android
+    // dibuja la sombra debajo de toda la silueta y, si lo de encima deja pasar la
+    // luz, esa silueta se ve *a traves* de la tarjeta como un rectangulo mas oscuro
+    // dentro de ella. Se notaba sobre todo en Ingresos y Gastos del Inicio, que son
+    // las mas translucidas de la app (10% de opacidad).
+    //
+    // La solucion no es quitar el color ni la sombra, sino **aplanar** el color
+    // contra el fondo: compositeOver da exactamente el mismo tono, pero opaco, y
+    // entonces la sombra vuelve a quedar donde corresponde (por fuera).
+    val fondo = if (containerColor.alpha < 1f) {
+        containerColor.compositeOver(MaterialTheme.colorScheme.surface)
+    } else {
+        containerColor
+    }
+
     val cardModifier = modifier
         .fillMaxWidth()
         // Sombra suave "tintada" con el color de marca en vez de negro/gris puro --
@@ -63,15 +82,17 @@ fun FinanceCard(
     Card(
         modifier = cardModifier,
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = containerColor),
+        colors = CardDefaults.cardColors(containerColor = fondo),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                // 24 y no 20: el relleno de tarjeta es token, no una decision por
+                // pantalla. Ver KivoSpacing.card.
+                .padding(KivoSpacing.card),
+            verticalArrangement = Arrangement.spacedBy(KivoSpacing.betweenGroups),
             content = content
         )
     }
@@ -93,7 +114,7 @@ fun FinanceTag(
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = KivoSpacing.md, vertical = KivoSpacing.xs),
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -143,8 +164,10 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
+            // Sin fontWeight suelto: titleMedium ya trae el peso de enfasis. Antes
+            // cada pantalla lo repetia y era parte de por que SemiBold aparecia 60
+            // veces sin crear ninguna jerarquia.
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
         )
         if (action != null) {
@@ -197,7 +220,6 @@ fun EmptyState(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(6.dp))
@@ -220,4 +242,56 @@ fun EmptyState(
             }
         }
     }
+}
+
+/**
+ * Texto de dinero.
+ *
+ * Existe para que ningun monto se pinte con un `Text` suelto: todos pasan por
+ * [KivoText.amount], que activa las cifras tabulares. Sin eso los digitos tienen
+ * anchos distintos y un saldo que cambia de $1.111 a $8.888 **mueve** lo que
+ * tiene al lado; en una columna de cifras, ademas, los numeros no alinean.
+ */
+@Composable
+fun AmountText(
+    cents: Long,
+    modifier: Modifier = Modifier,
+    size: AmountSize = AmountSize.Normal,
+    color: Color = Color.Unspecified,
+    signedAsIncome: Boolean? = null
+) {
+    Text(
+        text = signedAsIncome?.let { Money.formatSigned(cents, it) } ?: Money.format(cents),
+        modifier = modifier,
+        style = when (size) {
+            AmountSize.Hero -> KivoText.amountLarge
+            AmountSize.Normal -> KivoText.amount
+            AmountSize.Small -> KivoText.amountSmall
+        },
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+enum class AmountSize { Hero, Normal, Small }
+
+/**
+ * Etiqueta de seccion en mayusculas. Da jerarquia por tracking y tamaño en vez de
+ * gastar otro peso tipografico, que es lo que aplanaba las pantallas.
+ */
+@Composable
+fun Eyebrow(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Text(
+        text = text.uppercase(),
+        modifier = modifier,
+        style = KivoText.eyebrow,
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }

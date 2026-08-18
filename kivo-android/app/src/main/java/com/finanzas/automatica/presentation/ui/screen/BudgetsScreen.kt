@@ -48,6 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.Budget
 import com.finanzas.automatica.domain.model.Category
+import com.finanzas.automatica.presentation.ui.format.Money
+import com.finanzas.automatica.presentation.ui.theme.KivoText
 import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
@@ -60,7 +62,6 @@ import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
-import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
@@ -77,11 +78,6 @@ fun BudgetsScreen(
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
-    }
     val totalPlanned = budgets.sumOf { it.monthlyLimit }
 
     Column(
@@ -98,7 +94,7 @@ fun BudgetsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = currencyFormat.money(totalPlanned) + " presupuestados",
+                        text = Money.format(totalPlanned) + " presupuestados",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -149,7 +145,6 @@ fun BudgetsScreen(
                         budget = budget,
                         category = category,
                         spent = spentByBudgetKey[budgetKey(budget)] ?: 0L,
-                        currencyFormat = currencyFormat,
                         onClick = { onBudgetClick(budget) },
                         modifier = Modifier.animateItemPlacement()
                     )
@@ -164,7 +159,6 @@ fun BudgetCard(
     budget: Budget,
     category: Category?,
     spent: Long,
-    currencyFormat: NumberFormat,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {    val limit = budget.monthlyLimit
@@ -203,7 +197,6 @@ fun BudgetCard(
                     Text(
                         text = category?.name ?: "Sin categoria",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -236,12 +229,12 @@ fun BudgetCard(
             ) {
                 AnimatedAmountText(
                     target = spent,
-                    format = { currencyFormat.money(it) },
-                    style = MaterialTheme.typography.bodySmall,
+                    format = { Money.format(it) },
+                    style = KivoText.amountSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = currencyFormat.money(limit),
+                    text = Money.format(limit),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
@@ -251,9 +244,9 @@ fun BudgetCard(
 
         Text(
             text = if (isOverBudget) {
-                currencyFormat.money(spent - limit) + " por encima del limite"
+                Money.format(spent - limit) + " por encima del limite"
             } else {
-                currencyFormat.money((limit - spent).coerceAtLeast(0)) + " disponibles"
+                Money.format((limit - spent).coerceAtLeast(0)) + " disponibles"
             },
             style = MaterialTheme.typography.bodySmall,
             color = if (isOverBudget) ExpenseRose else MaterialTheme.colorScheme.onSurfaceVariant
@@ -394,7 +387,6 @@ fun AddEditBudgetScreen(
     }
 }
 
-private fun NumberFormat.money(amount: Long): String = format(amount / 100.0)
 
 private fun Budget.periodLabel(): String {
     val monthName = Month.of(month)
