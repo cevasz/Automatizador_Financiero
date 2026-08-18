@@ -1,18 +1,18 @@
 {
   ".github/workflows/build.yml": {
-    "mtime": 1786693654.059288,
-    "ast_hash": "aa3dfeff6d6d0ce8bac625cc98f822fa",
-    "semantic_hash": "aa3dfeff6d6d0ce8bac625cc98f822fa"
+    "mtime": 1787037788.346532,
+    "ast_hash": "6fdb52416060fe8bc291e05916d8aac7",
+    "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1786691344.7321558,
-    "ast_hash": "e8da73cf010e127f18983543f8bdf7f5",
-    "semantic_hash": "e8da73cf010e127f18983543f8bdf7f5"
+    "mtime": 1787038503.6682878,
+    "ast_hash": "66339276d85989cb209407b2efec0674",
+    "semantic_hash": ""
   },
   "docs/guia.md": {
-    "mtime": 1786691367.7292593,
-    "ast_hash": "9a91b75a081149c0ef1b280028cf6067",
-    "semantic_hash": "9a91b75a081149c0ef1b280028cf6067"
+    "mtime": 1787038485.1692736,
+    "ast_hash": "683e7b6aca470daa667b13eafcb84f5f",
+    "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
     "mtime": 1786491119.811442,
@@ -25,19 +25,19 @@
     "semantic_hash": "0bc020d491fca99550c1ea3de0a5f862"
   },
   "kivo-android/app/build.gradle.kts": {
-    "mtime": 1786847847.1210086,
-    "ast_hash": "5ced5dbcefdf1a8526cc7b97620c91f2",
-    "semantic_hash": "5ced5dbcefdf1a8526cc7b97620c91f2"
+    "mtime": 1787063941.090092,
+    "ast_hash": "92a065dd7b0ae2a50fc29093be6f1b90",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/FinanzasApplication.kt": {
-    "mtime": 1786847670.5623634,
-    "ast_hash": "50bfff3157045cb54f531ebf5801efd7",
-    "semantic_hash": "50bfff3157045cb54f531ebf5801efd7"
+    "mtime": 1786864016.4300463,
+    "ast_hash": "ddc3208e3550507b7376cd405e3e68b8",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/FinanzasDatabase.kt": {
-    "mtime": 1786516141.0865493,
-    "ast_hash": "753c5b54d6d22f7380b26670332ac1a5",
-    "semantic_hash": "753c5b54d6d22f7380b26670332ac1a5"
+    "mtime": 1787037068.4668243,
+    "ast_hash": "e708bacb6fe73372a235261c6566ed3d",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/converters/Converters.kt": {
     "mtime": 1784175625.4183552,
@@ -60,9 +60,9 @@
     "semantic_hash": "17d19c26911692021f4248e6d8b5c784"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/CategoryDao.kt": {
-    "mtime": 1786731252.1044636,
-    "ast_hash": "c6db59a353db4c1bf31b0d5b2a41da14",
-    "semantic_hash": "c6db59a353db4c1bf31b0d5b2a41da14"
+    "mtime": 1787038052.6722903,
+    "ast_hash": "26906fa74a892c44220e64986c7b6d7e",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/ClassificationRuleDao.kt": {
     "mtime": 1786731263.9175801,
@@ -85,9 +85,9 @@
     "semantic_hash": "8fff9f44237df230223ae2f480616367"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/AgendaEntryEntity.kt": {
-    "mtime": 1784100207.3352487,
-    "ast_hash": "7e759a378399f84f8437b02e6cb01f1b",
-    "semantic_hash": "7e759a378399f84f8437b02e6cb01f1b"
+    "mtime": 1787036899.704414,
+    "ast_hash": "f6633362dcf0e0d5f704e164e8c2ca8d",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/AppNotificationEntity.kt": {
     "mtime": 1786516133.0473976,
@@ -95,39 +95,39 @@
     "semantic_hash": "77bb300a045b7038af8bb31cac067761"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/BudgetEntity.kt": {
-    "mtime": 1784007232.1226392,
-    "ast_hash": "f0e2ec1448bfe1ef143351df0d498ead",
-    "semantic_hash": "f0e2ec1448bfe1ef143351df0d498ead"
+    "mtime": 1787036918.0316958,
+    "ast_hash": "31804a833a4590721bbae7e53d3a156a",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/CategoryEntity.kt": {
-    "mtime": 1784140943.839824,
-    "ast_hash": "af4ad310ae8745364fba174ac5a3e6ca",
-    "semantic_hash": "af4ad310ae8745364fba174ac5a3e6ca"
+    "mtime": 1787036923.5864723,
+    "ast_hash": "5829ecb9160c9933008a404bd8009f89",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/ClassificationRuleEntity.kt": {
-    "mtime": 1784007241.9556816,
-    "ast_hash": "c1f44a9fd3d6273f79df56410d10da9e",
-    "semantic_hash": "c1f44a9fd3d6273f79df56410d10da9e"
+    "mtime": 1787036899.7051704,
+    "ast_hash": "32fcd4f2ad5fd1b4c19db00a3b850390",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/InvoiceEntity.kt": {
-    "mtime": 1786491273.53305,
-    "ast_hash": "1f09bbeda6c1f19e5a612687fe950c3c",
-    "semantic_hash": "1f09bbeda6c1f19e5a612687fe950c3c"
+    "mtime": 1787036899.7053673,
+    "ast_hash": "d3b5514f79be21a6552346beabe8f969",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/InvoiceItemEntity.kt": {
-    "mtime": 1786491275.234063,
-    "ast_hash": "a3f1266ee9bc529cac557b22b3291fa4",
-    "semantic_hash": "a3f1266ee9bc529cac557b22b3291fa4"
+    "mtime": 1787036899.7055233,
+    "ast_hash": "7b32cb888ffdc229ad8cd84330407267",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/MovementEntity.kt": {
-    "mtime": 1784007229.1696265,
-    "ast_hash": "6b5a974055f5b0108f7303ab8559cef7",
-    "semantic_hash": "6b5a974055f5b0108f7303ab8559cef7"
+    "mtime": 1787036899.70418,
+    "ast_hash": "d0688308e1ff54663af1294d31db4f70",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/SavingsGoalEntity.kt": {
-    "mtime": 1784007237.3446615,
-    "ast_hash": "b7ca2aae8591c5440e249e9661a231e4",
-    "semantic_hash": "b7ca2aae8591c5440e249e9661a231e4"
+    "mtime": 1787036899.7050135,
+    "ast_hash": "873b4f9e0a9d828a3105344b22b8ce82",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/data/repository/AppNotificationRepository.kt": {
     "mtime": 1786516144.3956113,
@@ -175,9 +175,9 @@
     "semantic_hash": "b53ff9336d42c2c010ea538dca00e6fa"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/domain/enrichment/ModelMappers.kt": {
-    "mtime": 1786487824.743418,
-    "ast_hash": "39da5f89d3b364d0cb9d6b2fca2b31e8",
-    "semantic_hash": "39da5f89d3b364d0cb9d6b2fca2b31e8"
+    "mtime": 1786861333.3563468,
+    "ast_hash": "70d31a8f9488eec5d26bc79937fe1e91",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/domain/importer/PdfStatementExtractor.kt": {
     "mtime": 1786736424.054302,
@@ -255,9 +255,9 @@
     "semantic_hash": "3a863837f7d48e624838bb51d3690d4a"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/navigation/AppNavHost.kt": {
-    "mtime": 1786807101.5918448,
-    "ast_hash": "8da0494babc738bf5502c9301bee846f",
-    "semantic_hash": "8da0494babc738bf5502c9301bee846f"
+    "mtime": 1787038250.2555444,
+    "ast_hash": "580d01da91477d763e9dbc5bc43621c5",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/MainActivity.kt": {
     "mtime": 1786532458.8651543,
@@ -305,9 +305,9 @@
     "semantic_hash": "771ffd86fb89f2468bc6636733cf131d"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/LoginScreen.kt": {
-    "mtime": 1786729429.1408792,
-    "ast_hash": "bfdb8ebac42d57cd8783b10605e8d77c",
-    "semantic_hash": "bfdb8ebac42d57cd8783b10605e8d77c"
+    "mtime": 1787037457.5607715,
+    "ast_hash": "0bda4e898f6b99ccef8ee52a659ac469",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/MovementsListScreen.kt": {
     "mtime": 1786733338.6771278,
@@ -345,24 +345,24 @@
     "semantic_hash": "e48eabb1ed490f4e300ae9d41a7f3be1"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/AgendaViewModel.kt": {
-    "mtime": 1786693568.0268872,
-    "ast_hash": "5c51e7bf6f0a5b2dd6e43395387aeee4",
-    "semantic_hash": "5c51e7bf6f0a5b2dd6e43395387aeee4"
+    "mtime": 1787037566.734706,
+    "ast_hash": "d2e48371f0e555983d59081bb0f7e61a",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/BudgetsViewModel.kt": {
-    "mtime": 1786693545.1957808,
-    "ast_hash": "a5b883ea2e162d2e0814750b8d583e59",
-    "semantic_hash": "a5b883ea2e162d2e0814750b8d583e59"
+    "mtime": 1787037566.734546,
+    "ast_hash": "397a56fb1d50376c9912cf3fc1dacf22",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/InvoiceViewModel.kt": {
-    "mtime": 1786727875.3341932,
-    "ast_hash": "2a95c12e06c8bb0e905513293b56e0db",
-    "semantic_hash": "2a95c12e06c8bb0e905513293b56e0db"
+    "mtime": 1787037566.7347813,
+    "ast_hash": "d88c4efadfb580cfd2a5190b82537f7d",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/MovementViewModel.kt": {
-    "mtime": 1786847709.1935234,
-    "ast_hash": "689db8ceee4c09863d4521b54dc3bdcc",
-    "semantic_hash": "689db8ceee4c09863d4521b54dc3bdcc"
+    "mtime": 1786862217.5009153,
+    "ast_hash": "bffde034cb44d741b280225f9714b484",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/NotificationCenterViewModel.kt": {
     "mtime": 1786516148.6316905,
@@ -370,19 +370,19 @@
     "semantic_hash": "0272d59482b6b79ea8db21498245902e"
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SavingsGoalsViewModel.kt": {
-    "mtime": 1786693592.0679994,
-    "ast_hash": "4ba8a79f2427f5c04ac7e64ebce9daac",
-    "semantic_hash": "4ba8a79f2427f5c04ac7e64ebce9daac"
+    "mtime": 1787037566.7344198,
+    "ast_hash": "7362c9f52ea1faa9f4c94058fdd3c61b",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SessionViewModel.kt": {
-    "mtime": 1786488428.0853112,
-    "ast_hash": "8e25704dc6b413d6db4845f14403fbed",
-    "semantic_hash": "8e25704dc6b413d6db4845f14403fbed"
+    "mtime": 1787037396.4009652,
+    "ast_hash": "2ab85e509b88135d4347ca219c04b200",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/SettingsViewModel.kt": {
-    "mtime": 1786693259.7304442,
-    "ast_hash": "4e094ab0081ff0988edea6d72176aa14",
-    "semantic_hash": "4e094ab0081ff0988edea6d72176aa14"
+    "mtime": 1787063506.7155774,
+    "ast_hash": "58e8c9b2562ee5a48e42a020d4b90a24",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/main/java/com/finanzas/automatica/service/BiometricAccess.kt": {
     "mtime": 1786516403.1408417,
@@ -450,9 +450,9 @@
     "semantic_hash": "2d51add8a9c9873c5103f990395dbd4b"
   },
   "backend/README.md": {
-    "mtime": 1786516050.2937505,
-    "ast_hash": "3f1f21a25974ae96be1c1426ce83d3e1",
-    "semantic_hash": "3f1f21a25974ae96be1c1426ce83d3e1"
+    "mtime": 1787063740.280987,
+    "ast_hash": "62e382d685441f38f510d38cb7fb92af",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/test/resources/com/tom_roush/pdfbox/resources/glyphlist/additional.txt": {
     "mtime": 1786493731.7267945,
@@ -500,9 +500,9 @@
     "semantic_hash": "ee2ce824e3477307efc790a14a962bd4"
   },
   "web/README.md": {
-    "mtime": 1786516047.5306928,
-    "ast_hash": "4e6e8dd71f4535483cea9419d24d1eed",
-    "semantic_hash": "4e6e8dd71f4535483cea9419d24d1eed"
+    "mtime": 1787036770.4869857,
+    "ast_hash": "b5e59bd247ba16c78af8113704bcc083",
+    "semantic_hash": ""
   },
   "kivo-android/app/src/test/resources/fixtures/extracto_bancolombia.pdf": {
     "mtime": 1786493575.8565326,
@@ -555,9 +555,9 @@
     "semantic_hash": "e0f1f44f4b6d6233bd60f9ffef43943d"
   },
   "docs/SDD.md": {
-    "mtime": 1786691391.7123673,
-    "ast_hash": "3307f6bad776613b0ced7926de35a826",
-    "semantic_hash": "3307f6bad776613b0ced7926de35a826"
+    "mtime": 1787063672.406658,
+    "ast_hash": "edee6c0dad8fe0ceeec8e20986b4293d",
+    "semantic_hash": ""
   },
   "docs/brand/kivo-icon-reference.png": {
     "mtime": 1786531816.8526964,
@@ -565,9 +565,9 @@
     "semantic_hash": "1ba312f6c41f56347c12740722a34ee4"
   },
   "docs/PENDIENTES.md": {
-    "mtime": 1786847863.1800613,
-    "ast_hash": "541be8e60924cfc4687589c329541abe",
-    "semantic_hash": "541be8e60924cfc4687589c329541abe"
+    "mtime": 1787063941.112476,
+    "ast_hash": "9e93df5102d335ffca6d8b125ea0fc95",
+    "semantic_hash": ""
   },
   "graphify-out/converted/SDD_App_Finanzas_94a76240.md": {
     "mtime": 1786694086.4913433,
@@ -593,5 +593,275 @@
     "mtime": 1786807077.0096629,
     "ast_hash": "216028d9134c091a3e1f4ea9c0400dd5",
     "semantic_hash": "216028d9134c091a3e1f4ea9c0400dd5"
+  },
+  "backend/supabase/migrations/0001_kivo_schema.sql": {
+    "mtime": 1787038847.0243497,
+    "ast_hash": "c69b215d6b7604f5a00cf73d03b8de73",
+    "semantic_hash": ""
+  },
+  "backend/supabase/migrations/0002_kivo_sync_api.sql": {
+    "mtime": 1787038847.0247529,
+    "ast_hash": "9cd987c4335222685f43d5646a6eaab0",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/schemas/com.finanzas.automatica.data.local.FinanzasDatabase/4.json": {
+    "mtime": 1787036988.205689,
+    "ast_hash": "7e90188ea6ecd70bd9f528d21d374800",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/FinanzasMigrations.kt": {
+    "mtime": 1787036962.0336711,
+    "ast_hash": "4932cac0977138c9db20aabb4a11c8e8",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/SyncDao.kt": {
+    "mtime": 1787037543.1274276,
+    "ast_hash": "df29f23df275f859745463f8b3d2fbd5",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/dao/SyncDeletionDao.kt": {
+    "mtime": 1787036938.0510714,
+    "ast_hash": "0e62e5e033ad3eb7799aa4cef8a96ac7",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/SyncDeletionEntity.kt": {
+    "mtime": 1787036938.0496547,
+    "ast_hash": "c22d915bde5d936bd43ed22c1de81b2c",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/local/entity/SyncId.kt": {
+    "mtime": 1787036899.6806288,
+    "ast_hash": "ccea97a769a7d089c3922de7b93cf393",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/sync/SupabaseClient.kt": {
+    "mtime": 1787037112.3957732,
+    "ast_hash": "14024aecfa0e6d835b325bbad8ecb35e",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/sync/SyncEngine.kt": {
+    "mtime": 1787038788.960966,
+    "ast_hash": "45e39e4b9eac08010e8af3f633fb78a4",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/sync/SyncMappers.kt": {
+    "mtime": 1787037297.320731,
+    "ast_hash": "72005360ec0428eade18475273fd7939",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/sync/SyncStore.kt": {
+    "mtime": 1787038788.966168,
+    "ast_hash": "3bdafa53b1a9ba7fcdf3dc522fc2ceb0",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/data/sync/Tombstones.kt": {
+    "mtime": 1787037543.1320646,
+    "ast_hash": "78ef07adae11b664f8da89c56609e0e3",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/components/CategoryIcons.kt": {
+    "mtime": 1787038081.8547528,
+    "ast_hash": "1001143f5d7ac9af8e53a6b86f43e00d",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/CategoriesScreen.kt": {
+    "mtime": 1787038138.790526,
+    "ast_hash": "ef6c706e043cfda3505263c15f11ac05",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/ui/screen/ClassificationRulesScreen.kt": {
+    "mtime": 1787038228.0864482,
+    "ast_hash": "607d8c5512f2a7ffdf4258e4af99f6f5",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/CategoriesViewModel.kt": {
+    "mtime": 1787038052.6726704,
+    "ast_hash": "8ca1c8f1ab24aea14f7195e485743b0d",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/main/java/com/finanzas/automatica/presentation/viewmodel/ClassificationRulesViewModel.kt": {
+    "mtime": 1787038170.5345013,
+    "ast_hash": "a6477ce51b76659aaf67fdf5823aedc3",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/test/kotlin/com/finanzas/automatica/enrichment/ModelMappersTest.kt": {
+    "mtime": 1786863791.0373306,
+    "ast_hash": "7cde8b532ac3e65746294bb4628b14a6",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/test/kotlin/com/finanzas/automatica/sync/ClassificationRuleValidationTest.kt": {
+    "mtime": 1787038295.1576612,
+    "ast_hash": "19152896a12ea5ab061666b77575d90d",
+    "semantic_hash": ""
+  },
+  "kivo-android/app/src/test/kotlin/com/finanzas/automatica/sync/SyncMappersTest.kt": {
+    "mtime": 1787037689.0982165,
+    "ast_hash": "1f2ddae34a3402462cd234db3dac884a",
+    "semantic_hash": ""
+  },
+  "web/next.config.mjs": {
+    "mtime": 1787036301.5580435,
+    "ast_hash": "d1d4eca5adccfa095782478ca7aebd52",
+    "semantic_hash": ""
+  },
+  "web/package.json": {
+    "mtime": 1787036267.777196,
+    "ast_hash": "790fcc864b3e730232dabc81cd4e42ee",
+    "semantic_hash": ""
+  },
+  "web/src/app/api/exportar/route.ts": {
+    "mtime": 1787036720.887502,
+    "ast_hash": "64e680e017c9aebfd552363c4c67220b",
+    "semantic_hash": ""
+  },
+  "web/src/app/entrar/LoginForm.tsx": {
+    "mtime": 1787036431.0729673,
+    "ast_hash": "7365724e3614aa7bf12927986dadd8d8",
+    "semantic_hash": ""
+  },
+  "web/src/app/entrar/page.tsx": {
+    "mtime": 1787036431.071687,
+    "ast_hash": "89047a38b200d537b6041b9cb427db1f",
+    "semantic_hash": ""
+  },
+  "web/src/app/layout.tsx": {
+    "mtime": 1787036431.070046,
+    "ast_hash": "de4cc06b3634203eb31d981fc1f333a8",
+    "semantic_hash": ""
+  },
+  "web/src/app/page.tsx": {
+    "mtime": 1787036431.0707607,
+    "ast_hash": "357d0d07bd6ae0c60bbc114e936b7cad",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/actions.ts": {
+    "mtime": 1787036487.6037304,
+    "ast_hash": "2c2fd07f7831d468af198682de1d0d86",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/agenda/EditorContacto.tsx": {
+    "mtime": 1787036679.671479,
+    "ast_hash": "6bf77669b99f31625be6613889e9189e",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/agenda/page.tsx": {
+    "mtime": 1787036679.670479,
+    "ast_hash": "fe6d9aa26915d2347d583755d047567d",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/cuenta/BorrarTodo.tsx": {
+    "mtime": 1787036720.8893702,
+    "ast_hash": "11aec3f4e17d172930b9c831165d65d9",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/cuenta/page.tsx": {
+    "mtime": 1787036720.8886602,
+    "ast_hash": "3a489dbd0d9bb816227a0fbea8e3970d",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/layout.tsx": {
+    "mtime": 1787036447.89425,
+    "ast_hash": "02d74354a1b734df87244e205533bd8f",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/metas/AbonarMeta.tsx": {
+    "mtime": 1787036655.127857,
+    "ast_hash": "24dafb2b1d7e4fded094e61b91d7ee64",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/metas/EditorMeta.tsx": {
+    "mtime": 1787036655.1284516,
+    "ast_hash": "d59e00383e996cfab03a7d2af175f679",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/metas/page.tsx": {
+    "mtime": 1787036655.1272616,
+    "ast_hash": "8e59f8ebe99382e42e5a5059f0ae0e18",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/movimientos/FiltrosMovimientos.tsx": {
+    "mtime": 1787036561.656148,
+    "ast_hash": "19df5b36632c5f55e18f6d6da3750113",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/movimientos/TablaMovimientos.tsx": {
+    "mtime": 1787036590.1199043,
+    "ast_hash": "2ea782a49bf62ed58c8219111f4efba8",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/movimientos/page.tsx": {
+    "mtime": 1787036561.6549315,
+    "ast_hash": "bef2486a8d8a3884724095f309968bef",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/page.tsx": {
+    "mtime": 1787036770.481541,
+    "ast_hash": "95d6bd9e677c14265d553435f889c1b3",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/presupuestos/EditorPresupuesto.tsx": {
+    "mtime": 1787036655.1265876,
+    "ast_hash": "39f201cdce26085b1342ecd7d03c48ca",
+    "semantic_hash": ""
+  },
+  "web/src/app/panel/presupuestos/page.tsx": {
+    "mtime": 1787036617.2466528,
+    "ast_hash": "8bc939653be915ba995302774d678bb2",
+    "semantic_hash": ""
+  },
+  "web/src/components/BarrasMensuales.tsx": {
+    "mtime": 1787036528.4793928,
+    "ast_hash": "f7450d1d5b3a224a8cfb39f4c910c9db",
+    "semantic_hash": ""
+  },
+  "web/src/components/BotonBorrar.tsx": {
+    "mtime": 1787036617.2479522,
+    "ast_hash": "9e11cfa3b00fab0490677df4f76113fa",
+    "semantic_hash": ""
+  },
+  "web/src/components/CerrarSesion.tsx": {
+    "mtime": 1787036447.8936164,
+    "ast_hash": "51b18f8772393168c75d24e207758ee7",
+    "semantic_hash": ""
+  },
+  "web/src/components/NavLink.tsx": {
+    "mtime": 1787036447.8929322,
+    "ast_hash": "a51bd916b6283c3e6bf9c752fa448232",
+    "semantic_hash": ""
+  },
+  "web/src/lib/format.ts": {
+    "mtime": 1787036350.8146696,
+    "ast_hash": "47c346bf5be7fdaa17f57303d4fd8b89",
+    "semantic_hash": ""
+  },
+  "web/src/lib/supabase/client.ts": {
+    "mtime": 1787036328.720409,
+    "ast_hash": "df1af5698137eb9bf081bbad65dcfd0a",
+    "semantic_hash": ""
+  },
+  "web/src/lib/supabase/env.ts": {
+    "mtime": 1787036328.7188938,
+    "ast_hash": "e13d5cd798fecdf70b0b2f932c64cea6",
+    "semantic_hash": ""
+  },
+  "web/src/lib/supabase/server.ts": {
+    "mtime": 1787036328.729238,
+    "ast_hash": "723d82a0fa1773f50ff32c97b953f798",
+    "semantic_hash": ""
+  },
+  "web/src/lib/types.ts": {
+    "mtime": 1787036350.8139074,
+    "ast_hash": "9931c0e9e98e54bcb6d73754dd7efa84",
+    "semantic_hash": ""
+  },
+  "web/src/middleware.ts": {
+    "mtime": 1787036328.7302382,
+    "ast_hash": "9234bdf4c42f8c5cd20cec4b0405ef63",
+    "semantic_hash": ""
+  },
+  "web/tsconfig.json": {
+    "mtime": 1787036740.08852,
+    "ast_hash": "510e3bbf03065efe75928789446dd41e",
+    "semantic_hash": ""
   }
 }
