@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Tune
@@ -47,6 +48,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -60,6 +62,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.finanzas.automatica.presentation.ui.theme.KivoSpacing
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -75,6 +78,8 @@ import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
 import com.finanzas.automatica.domain.model.MovementType
+import com.finanzas.automatica.presentation.ui.format.Money
+import com.finanzas.automatica.presentation.ui.theme.KivoText
 import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
@@ -87,7 +92,6 @@ import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.NumberFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -114,22 +118,21 @@ fun MovementsListScreen(
     onConfirm: (Long) -> Unit = {},
     onReject: (Long) -> Unit = {},
     onCorrect: (Long, Long) -> Unit = { _, _ -> },
+    onCreateMovement: (MovementType, Long, String, Long?, Long) -> Unit = { _, _, _, _, _ -> },
+    onUpdateMovement: (Long, MovementType, Long, String, Long?, Long) -> Unit = { _, _, _, _, _, _ -> },
+    onDeleteMovement: (Long) -> Unit = {},
     onImportStatement: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _, _ -> },
     onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, String?, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit, () -> Unit) -> Unit = { _, _, _, _, _ -> },
     onImportScreenshot: (android.net.Uri, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit = { _, _ -> },
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
-    }
     var selectedFilter by remember(initialFilter) {
         mutableStateOf(MovementFilter.fromRoute(initialFilter))
     }
     var showImportDialog by remember { mutableStateOf(false) }
     var recategorizeTarget by remember { mutableStateOf<Movement?>(null) }
+    var creandoMovimiento by remember { mutableStateOf(false) }
 
     val filteredMovements = remember(movements, selectedFilter) {
         movements
@@ -146,7 +149,6 @@ fun MovementsListScreen(
 
     if (showImportDialog) {
         ImportStatementDialog(
-            currencyFormat = currencyFormat,
             onDismiss = { showImportDialog = false },
             onImport = { text, bank, onComplete ->
                 onImportStatement(text, bank) { summary ->
@@ -164,20 +166,43 @@ fun MovementsListScreen(
         )
     }
 
+    // Tocar un movimiento ya no abre solo "recategorizar": abre el editor completo.
+    // Poder cambiar la categoria pero no el monto dejaba sin salida el caso mas
+    // comun de todos — que la cifra capturada no sea la correcta.
     recategorizeTarget?.let { movement ->
-        RecategorizeDialog(
-            movement = movement,
-            categories = categories.filter { it.type == movement.type },
-            onDismiss = { recategorizeTarget = null },
-            onConfirm = { categoryId ->
-                onCorrect(movement.id, categoryId)
+        MovementEditorDialog(
+            existente = movement,
+            categories = categories,
+            onGuardar = { tipo, monto, contraparte, categoria, fecha ->
+                onUpdateMovement(movement.id, tipo, monto, contraparte, categoria, fecha)
                 recategorizeTarget = null
-            }
+            },
+            onEliminar = {
+                onDeleteMovement(movement.id)
+                recategorizeTarget = null
+            },
+            onCerrar = { recategorizeTarget = null }
         )
     }
 
+    if (creandoMovimiento) {
+        MovementEditorDialog(
+            existente = null,
+            categories = categories,
+            onGuardar = { tipo, monto, contraparte, categoria, fecha ->
+                onCreateMovement(tipo, monto, contraparte, categoria, fecha)
+                creandoMovimiento = false
+            },
+            onCerrar = { creandoMovimiento = false }
+        )
+    }
+
+    // Box + FAB en vez de otro boton en la barra superior: registrar un movimiento
+    // es la accion mas repetida de esta pantalla y el skill de diseño pide que la
+    // accion principal quede en el tercio inferior, al alcance del pulgar.
+    Box(modifier = modifier.fillMaxSize()) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
@@ -262,7 +287,6 @@ fun MovementsListScreen(
                 items(filteredMovements, key = { it.id }) { movement ->
                     SwipeableMovementCard(
                         movement = movement,
-                        currencyFormat = currencyFormat,
                         onClick = { recategorizeTarget = movement },
                         onConfirm = { onConfirm(movement.id) },
                         onReject = { onReject(movement.id) },
@@ -272,73 +296,20 @@ fun MovementsListScreen(
             }
         }
     }
-}
 
-/**
- * Botón "Detalle" de un movimiento ya procesado: deja recategorizarlo (el motor de
- * reglas puede acertar la categoría equivocada). Antes este botón no tenía ningún
- * efecto -- MovementViewModel.correctMovement() ya existía pero nada lo llamaba.
- */
-@Composable
-private fun RecategorizeDialog(
-    movement: Movement,
-    categories: List<Category>,
-    onDismiss: () -> Unit,
-    onConfirm: (categoryId: Long) -> Unit
-) {
-    var selectedCategoryId by remember(movement.id) { mutableStateOf(movement.categoryId) }
-
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Recategorizar movimiento", fontWeight = FontWeight.Bold) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    text = movement.counterpartyRaw,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                if (categories.isEmpty()) {
-                    Text(
-                        text = "No hay categorías de este tipo todavía.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                } else {
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        categories.forEach { category ->
-                            FilterChip(
-                                selected = selectedCategoryId == category.id,
-                                onClick = { selectedCategoryId = category.id },
-                                label = { Text(category.name) }
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            androidx.compose.material3.Button(
-                onClick = { selectedCategoryId?.let(onConfirm) },
-                enabled = selectedCategoryId != null && selectedCategoryId != movement.categoryId
-            ) {
-                Text("Guardar")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
-            }
-        }
-    )
+        ExtendedFloatingActionButton(
+            onClick = { creandoMovimiento = true },
+            icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
+            text = { Text("Registrar") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(KivoSpacing.lg)
+        )
+    }
 }
 
 @Composable
 private fun ImportStatementDialog(
-    currencyFormat: NumberFormat,
     onDismiss: () -> Unit,
     onImport: (String, com.finanzas.automatica.domain.model.BankEntity, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit) -> Unit,
     onImportPdf: (ByteArray, com.finanzas.automatica.domain.model.BankEntity, String?, (com.finanzas.automatica.domain.importer.ImportSummary) -> Unit, () -> Unit) -> Unit,
@@ -533,8 +504,8 @@ private fun ImportStatementDialog(
                         FinanceCard(containerColor = IncomeGreen.copy(alpha = 0.1f)) {
                             Text("Resumen de importacion:", fontWeight = FontWeight.Bold)
                             Text("• Transacciones analizadas: ${summary.totalCount}")
-                            Text("• Ingresos (${summary.incomeCount}): ${currencyFormat.format(summary.totalIncomeAmount / 100.0)}")
-                            Text("• Egresos (${summary.expenseCount}): ${currencyFormat.format(summary.totalExpenseAmount / 100.0)}")
+                            Text("• Ingresos (${summary.incomeCount}): ${Money.format(summary.totalIncomeAmount)}")
+                            Text("• Egresos (${summary.expenseCount}): ${Money.format(summary.totalExpenseAmount)}")
                         }
                     }
                 }
@@ -668,7 +639,6 @@ private fun PdfPasswordDialog(
 @Composable
 private fun SwipeableMovementCard(
     movement: Movement,
-    currencyFormat: NumberFormat,
     onClick: () -> Unit,
     onConfirm: () -> Unit,
     onReject: () -> Unit,
@@ -677,7 +647,6 @@ private fun SwipeableMovementCard(
     if (movement.confirmationState != ConfirmationState.PENDING) {
         MovementCard(
             movement = movement,
-            currencyFormat = currencyFormat,
             onClick = onClick,
             onConfirm = onConfirm,
             onReject = onReject,
@@ -715,7 +684,6 @@ private fun SwipeableMovementCard(
     ) {
         MovementCard(
             movement = movement,
-            currencyFormat = currencyFormat,
             onClick = onClick,
             onConfirm = onConfirm,
             onReject = onReject
@@ -763,7 +731,6 @@ private data class SwipeBackgroundSpec(
 @Composable
 private fun MovementCard(
     movement: Movement,
-    currencyFormat: NumberFormat,
     onClick: () -> Unit,
     onConfirm: () -> Unit,
     onReject: () -> Unit,
@@ -807,7 +774,6 @@ private fun MovementCard(
                     Text(
                         text = movement.counterpartyRaw,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -824,10 +790,9 @@ private fun MovementCard(
                 target = movement.amount,
                 format = { animated ->
                     val prefix = if (isIncome) "+" else "-"
-                    "$prefix${currencyFormat.money(animated)}"
+                    "$prefix${Money.format(animated)}"
                 },
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = KivoText.amount,
                 color = if (isIncome) IncomeGreen else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1
             )
@@ -881,7 +846,6 @@ private fun MovementCard(
     }
 }
 
-private fun NumberFormat.money(amount: Long): String = format(amount / 100.0)
 
 private fun Movement.shortDate(): String {
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es", "CO"))

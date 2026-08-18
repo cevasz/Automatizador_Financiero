@@ -12,12 +12,14 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance
+import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Rule
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Divider
@@ -71,6 +73,8 @@ import com.finanzas.automatica.presentation.ui.screen.AddEditAgendaEntryScreen
 import com.finanzas.automatica.presentation.ui.screen.AddEditBudgetScreen
 import com.finanzas.automatica.presentation.ui.screen.AddEditSavingsGoalScreen
 import com.finanzas.automatica.presentation.ui.screen.AgendaScreen
+import com.finanzas.automatica.presentation.ui.screen.CategoriesScreen
+import com.finanzas.automatica.presentation.ui.screen.ClassificationRulesScreen
 import com.finanzas.automatica.presentation.ui.screen.LoginScreen
 import com.finanzas.automatica.presentation.ui.screen.BudgetsScreen
 import com.finanzas.automatica.presentation.ui.screen.DashboardScreen
@@ -84,6 +88,8 @@ import com.finanzas.automatica.presentation.viewmodel.BudgetsViewModel
 import com.finanzas.automatica.presentation.viewmodel.InvoiceViewModel
 import com.finanzas.automatica.presentation.viewmodel.MovementViewModel
 import com.finanzas.automatica.presentation.viewmodel.NotificationCenterViewModel
+import com.finanzas.automatica.presentation.viewmodel.CategoriesViewModel
+import com.finanzas.automatica.presentation.viewmodel.ClassificationRulesViewModel
 import com.finanzas.automatica.presentation.viewmodel.SessionViewModel
 import com.finanzas.automatica.presentation.viewmodel.SavingsGoalsViewModel
 import com.finanzas.automatica.presentation.viewmodel.SettingsViewModel
@@ -101,7 +107,7 @@ fun AppNavHost(database: FinanzasDatabase) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val sessionViewModel: SessionViewModel = databaseViewModel {
-        SessionViewModel(context)
+        SessionViewModel(context, database)
     }
     val sessionState by sessionViewModel.sessionState.collectAsState()
     val notificationCenterViewModel: NotificationCenterViewModel = databaseViewModel {
@@ -216,6 +222,20 @@ fun AppNavHost(database: FinanzasDatabase) {
                         colors = NavigationDrawerItemDefaults.colors()
                     )
                     NavigationDrawerItem(
+                        label = { Text("Categorías") },
+                        selected = currentRoute.startsWith(Screen.Categories.selectedPrefix),
+                        onClick = { navigateTo(Screen.Categories.route) },
+                        icon = { Icon(Icons.Outlined.Category, contentDescription = null) },
+                        colors = NavigationDrawerItemDefaults.colors()
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Reglas de clasificación") },
+                        selected = currentRoute.startsWith(Screen.Rules.selectedPrefix),
+                        onClick = { navigateTo(Screen.Rules.route) },
+                        icon = { Icon(Icons.Outlined.Rule, contentDescription = null) },
+                        colors = NavigationDrawerItemDefaults.colors()
+                    )
+                    NavigationDrawerItem(
                         label = { Text("Notificaciones") },
                         selected = currentRoute.startsWith(Screen.Notifications.selectedPrefix),
                         onClick = { navigateTo(Screen.Notifications.route) },
@@ -319,9 +339,13 @@ fun AppNavHost(database: FinanzasDatabase) {
                 // vida de la instalacion -- ver PostNotificationsPermissionState.kt.
                 AutoRequestPostNotificationsWhenRelevant(notificationCaptureActive = notificationAccessEnabled)
 
+                val netBalance by movementViewModel.netBalance.collectAsState()
+
                 DashboardScreen(
                     movements = movements,
                     pendingCount = pendingCount,
+                    netBalance = netBalance,
+                    onAdjustBalance = { real, nota -> movementViewModel.adjustBalance(real, nota) },
                     notificationAccessEnabled = notificationAccessEnabled,
                     onEnableNotificationAccess = { NotificationAccess.openSettings(context) },
                     onPendingClick = { navigateTo(Screen.Movements.pendingRoute) },
@@ -353,6 +377,13 @@ fun AppNavHost(database: FinanzasDatabase) {
                     onConfirm = movementViewModel::confirmMovement,
                     onReject = movementViewModel::rejectMovement,
                     onCorrect = movementViewModel::correctMovement,
+                    onCreateMovement = { tipo, monto, contraparte, categoria, fecha ->
+                        movementViewModel.createMovement(tipo, monto, contraparte, categoria, fecha)
+                    },
+                    onUpdateMovement = { id, tipo, monto, contraparte, categoria, fecha ->
+                        movementViewModel.updateMovement(id, tipo, monto, contraparte, categoria, fecha)
+                    },
+                    onDeleteMovement = { id -> movementViewModel.deleteMovement(id) },
                     onImportStatement = movementViewModel::importStatementText,
                     onImportPdf = movementViewModel::importStatementPdf,
                     onImportScreenshot = movementViewModel::importScreenshot,
@@ -562,25 +593,65 @@ fun AppNavHost(database: FinanzasDatabase) {
                 )
             }
 
-            composable(Screen.Login.route) {
-                val context = LocalContext.current
-                val sessionVm: SessionViewModel = databaseViewModel { SessionViewModel(context) }
-                val settingsViewModel: SettingsViewModel = databaseViewModel {
-                    SettingsViewModel(database, context)
+            composable(Screen.Categories.route) {
+                val categoriesViewModel: CategoriesViewModel = databaseViewModel {
+                    CategoriesViewModel(database)
                 }
-                val sessionState by sessionVm.sessionState.collectAsState()
+                val categorias by categoriesViewModel.categories.collectAsState()
+                val impactos by categoriesViewModel.impacts.collectAsState()
+                val errorCategorias by categoriesViewModel.error.collectAsState()
 
+                CategoriesScreen(
+                    categories = categorias,
+                    impacts = impactos,
+                    error = errorCategorias,
+                    onCreate = categoriesViewModel::create,
+                    onUpdate = categoriesViewModel::update,
+                    onDelete = categoriesViewModel::delete,
+                    onConsumeError = categoriesViewModel::consumeError,
+                    onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(Screen.Rules.route) {
+                val rulesViewModel: ClassificationRulesViewModel = databaseViewModel {
+                    ClassificationRulesViewModel(database)
+                }
+                val reglas by rulesViewModel.rules.collectAsState()
+                val categoriasDeReglas by rulesViewModel.categories.collectAsState()
+                val errorReglas by rulesViewModel.error.collectAsState()
+
+                ClassificationRulesScreen(
+                    rules = reglas,
+                    categories = categoriasDeReglas,
+                    error = errorReglas,
+                    onSave = rulesViewModel::save,
+                    onSetActive = rulesViewModel::setActive,
+                    onDelete = rulesViewModel::delete,
+                    onConsumeError = rulesViewModel::consumeError,
+                    onOpenMenu = ::openDrawer
+                )
+            }
+
+            composable(Screen.Login.route) {
+                // Se reusa el SessionViewModel de arriba (el mismo que alimenta el
+                // menu lateral) en vez de crear otro: antes eran dos instancias
+                // distintas, asi que iniciar sesion aqui no actualizaba el estado
+                // que muestra el menu hasta reiniciar la app.
                 LoginScreen(
+                    isConfigured = sessionState.isConfigured,
                     isConnected = sessionState.isConnected,
                     email = sessionState.email,
-                    backendUrl = sessionState.backendUrl,
-                    lastSyncLabel = sessionVm.lastSyncLabel(),
-                    onConnect = sessionVm::connect,
-                    onDisconnect = sessionVm::disconnect,
-                    onSyncNow = {
-                        settingsViewModel.prepareSyncSnapshot()
-                        sessionVm.markSynced()
-                    },
+                    lastSyncLabel = sessionViewModel.lastSyncLabel(),
+                    syncing = sessionState.syncing,
+                    uploadRawText = sessionState.uploadRawText,
+                    message = sessionState.message,
+                    error = sessionState.error,
+                    onSignIn = sessionViewModel::signIn,
+                    onSignUp = sessionViewModel::signUp,
+                    onSignOut = sessionViewModel::signOut,
+                    onSyncNow = sessionViewModel::syncNow,
+                    onUploadRawTextChange = sessionViewModel::setUploadRawText,
                     onOpenMenu = ::openDrawer
                 )
             }
@@ -619,6 +690,8 @@ sealed class Screen(
     object Agenda : Screen("agenda", "agenda", "Agenda", Icons.Outlined.Contacts)
     object Budgets : Screen("budgets", "budgets", "Planes", Icons.Outlined.AccountBalance)
     object Savings : Screen("savings", "savings", "Metas", Icons.Outlined.Savings)
+    object Categories : Screen("categories", "categories", "Categorías", Icons.Outlined.Category)
+    object Rules : Screen("rules", "rules", "Reglas", Icons.Outlined.Rule)
     object Notifications : Screen("notifications", "notifications", "Notificaciones", Icons.Outlined.Notifications)
     object Login : Screen("login", "login", "Cuenta", Icons.Outlined.Person)
     object Settings : Screen("settings", "settings", "Ajustes", Icons.Outlined.Settings)

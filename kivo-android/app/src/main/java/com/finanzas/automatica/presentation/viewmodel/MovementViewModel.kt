@@ -2,6 +2,11 @@ package com.finanzas.automatica.presentation.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import com.finanzas.automatica.data.local.entity.CategoryEntity
+import com.finanzas.automatica.data.local.entity.MovementEntity
+import com.finanzas.automatica.data.sync.Tombstones
+import com.finanzas.automatica.domain.model.PaymentMethod
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
@@ -16,6 +21,7 @@ import com.finanzas.automatica.domain.importer.ImageTextRecognizer
 import com.finanzas.automatica.domain.importer.ImportSummary
 import com.finanzas.automatica.domain.importer.PdfStatementExtractor
 import com.finanzas.automatica.domain.importer.StatementImporter
+import com.finanzas.automatica.domain.model.BalanceAdjustment
 import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.Category
 import com.finanzas.automatica.domain.model.ConfirmationState
@@ -79,11 +85,221 @@ class MovementViewModel(
         }
     }
 
+    /**
+     * Recategoriza un movimiento y lo da por confirmado — corregir la categoria es,
+     * en la practica, revisarlo y aceptarlo.
+     *
+     * **Bug corregido (2026-08-18)**: antes escribia el estado `"CORRECTED"`, que
+     * **no existe** en [ConfirmationState]. Al releer la fila,
+     * `ConfirmationState.valueOf("CORRECTED")` lanzaba y `toDomainSafely` descartaba
+     * ese movimiento: recategorizar algo lo hacia **desaparecer de la lista para
+     * siempre**, porque el valor invalido quedaba guardado en la base. Ademas, desde
+     * que existe la sincronizacion, Postgres tiene un CHECK sobre esa columna, asi
+     * que una sola fila con "CORRECTED" habria hecho fallar el push entero.
+     */
     fun correctMovement(id: Long, newCategoryId: Long) {
         viewModelScope.launch {
             repository.updateCategory(id, newCategoryId)
-            repository.updateConfirmationState(id, "CORRECTED")
+            repository.updateConfirmationState(id, ConfirmationState.CONFIRMED.name)
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  Manejo manual del dinero
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Saldo neto segun Kivo: todo lo que entro menos todo lo que salio, contando
+     * solo lo confirmado.
+     *
+     * Los movimientos por confirmar quedan fuera a proposito: mientras no se
+     * revisan, no se sabe si son reales. Los rechazados tambien, obviamente.
+     */
+    val netBalance: StateFlow<Long> = movements
+        .map { lista ->
+            lista.filter {
+                it.confirmationState == ConfirmationState.CONFIRMED ||
+                    it.confirmationState == ConfirmationState.AUTO_CONFIRMED
+            }.sumOf { if (it.type == MovementType.INCOME) it.amount else -it.amount }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
+    /** Registra un movimiento a mano. Nace confirmado: lo escribio el usuario. */
+    fun createMovement(
+        type: MovementType,
+        amountCents: Long,
+        counterparty: String,
+        categoryId: Long?,
+        dateMillis: Long,
+        bank: BankEntity = BankEntity.UNKNOWN,
+        note: String = "",
+        onDone: (Boolean) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val ok = try {
+                require(amountCents > 0) { "El monto debe ser mayor que cero" }
+                repository.insert(
+                    MovementEntity(
+                        type = type.name,
+                        amount = amountCents,
+                        paymentMethod = PaymentMethod.OTHER.name,
+                        counterpartyRaw = counterparty.trim(),
+                        categoryId = categoryId,
+                        date = dateMillis,
+                        source = MovementSource.MANUAL.name,
+                        confirmationState = ConfirmationState.CONFIRMED.name,
+                        bankEntity = bank.name,
+                        rawText = note
+                    )
+                )
+                true
+            } catch (e: Throwable) {
+                Log.e(TAG, "No se pudo registrar el movimiento manual", e)
+                false
+            }
+            onDone(ok)
+        }
+    }
+
+    /**
+     * Edita un movimiento ya registrado.
+     *
+     * Se conservan `createdAt`, `source` y `rawText`: son el rastro de **como
+     * llego** ese movimiento. Si al corregir un monto se borrara el texto original
+     * de la notificacion, se perderia la unica forma de comprobar despues por que
+     * Kivo registro esa cifra.
+     */
+    fun updateMovement(
+        id: Long,
+        type: MovementType,
+        amountCents: Long,
+        counterparty: String,
+        categoryId: Long?,
+        dateMillis: Long,
+        onDone: (Boolean) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val ok = try {
+                require(amountCents > 0) { "El monto debe ser mayor que cero" }
+                val actual = repository.getById(id) ?: error("El movimiento ya no existe")
+                repository.update(
+                    actual.copy(
+                        type = type.name,
+                        amount = amountCents,
+                        counterpartyRaw = counterparty.trim(),
+                        categoryId = categoryId,
+                        date = dateMillis,
+                        confirmationState = ConfirmationState.CONFIRMED.name,
+                        updatedAt = System.currentTimeMillis()
+                    )
+                )
+                true
+            } catch (e: Throwable) {
+                Log.e(TAG, "No se pudo editar el movimiento $id", e)
+                false
+            }
+            onDone(ok)
+        }
+    }
+
+    /** Borra un movimiento. La lapida va antes: ver [Tombstones]. */
+    fun deleteMovement(id: Long, onDone: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            val ok = try {
+                Tombstones(database).antesDeBorrarMovimiento(id)
+                repository.deleteById(id) > 0
+            } catch (e: Throwable) {
+                Log.e(TAG, "No se pudo borrar el movimiento $id", e)
+                false
+            }
+            onDone(ok)
+        }
+    }
+
+    /**
+     * "Cuadrar saldo": el usuario dice cuanto tiene de verdad y Kivo registra la
+     * diferencia como un movimiento de ajuste.
+     *
+     * **Por que un movimiento y no un numero escondido.** La tentacion es guardar
+     * un "saldo inicial" aparte y sumarlo al total. Pero entonces el balance deja
+     * de poder explicarse: dentro de seis meses nadie sabria de donde salieron esos
+     * $2.000 de diferencia. Como movimiento, el ajuste **se ve en la lista, dice
+     * cuando se hizo, se puede editar o borrar, y se sincroniza** como cualquier
+     * otro. Es la diferencia entre corregir y disimular.
+     *
+     * Devuelve por [onDone] los centavos ajustados (positivo si sobraba dinero,
+     * negativo si faltaba) o null si no habia nada que cuadrar.
+     */
+    fun adjustBalance(
+        realBalanceCents: Long,
+        note: String = "",
+        onDone: (Long?) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val ajuste = BalanceAdjustment.between(realBalanceCents, netBalance.value)
+            if (ajuste.isNoOp) {
+                onDone(null)
+                return@launch
+            }
+
+            val esIngreso = ajuste.type == MovementType.INCOME
+            val categoria = findOrCreateAdjustmentCategory(esIngreso)
+
+            val ok = try {
+                repository.insert(
+                    MovementEntity(
+                        type = ajuste.type.name,
+                        amount = ajuste.amountCents,
+                        paymentMethod = PaymentMethod.OTHER.name,
+                        counterpartyRaw = "Ajuste de saldo",
+                        categoryId = categoria,
+                        date = System.currentTimeMillis(),
+                        source = MovementSource.MANUAL.name,
+                        confirmationState = ConfirmationState.CONFIRMED.name,
+                        bankEntity = BankEntity.UNKNOWN.name,
+                        rawText = note.ifBlank {
+                            "Cuadre manual: el saldo real era ${realBalanceCents / 100} y Kivo " +
+                                "tenia ${netBalance.value / 100}."
+                        }
+                    )
+                )
+                notifications.notify(
+                    type = AppNotificationEntity.TYPE_SYSTEM,
+                    title = "Saldo cuadrado",
+                    message = "Se registro un ajuste de ${ajuste.amountCents / 100} pesos."
+                )
+                true
+            } catch (e: Throwable) {
+                Log.e(TAG, "No se pudo cuadrar el saldo", e)
+                false
+            }
+            onDone(if (ok) ajuste.differenceCents else null)
+        }
+    }
+
+    /**
+     * La categoria del ajuste se busca por nombre y solo se crea si no existe, para
+     * no sembrar una copia nueva cada vez que alguien cuadra el saldo — el mismo
+     * problema de categorias duplicadas que ya se corrigio en DefaultCategories.
+     */
+    private suspend fun findOrCreateAdjustmentCategory(isIncome: Boolean): Long? = try {
+        val tipo = (if (isIncome) MovementType.INCOME else MovementType.EXPENSE).name
+        val nombre = "Ajuste de saldo"
+        categoryRepository.getAll()
+            .firstOrNull { it.name.equals(nombre, ignoreCase = true) && it.type == tipo }
+            ?.id
+            ?: categoryRepository.insert(
+                CategoryEntity(
+                    name = nombre,
+                    type = tipo,
+                    iconName = "build",
+                    isCustom = true,
+                    sortOrder = 9_000
+                )
+            ).takeIf { it > 0 }
+    } catch (e: Throwable) {
+        Log.w(TAG, "No se pudo preparar la categoria de ajuste; el ajuste queda sin clasificar", e)
+        null
     }
 
     fun importStatementText(
@@ -216,5 +432,9 @@ class MovementViewModel(
         } finally {
             _isLoading.value = false
         }
+    }
+
+    private companion object {
+        const val TAG = "MovementViewModel"
     }
 }

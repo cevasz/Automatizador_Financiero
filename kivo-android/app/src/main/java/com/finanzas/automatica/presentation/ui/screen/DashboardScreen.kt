@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import com.finanzas.automatica.domain.model.ConfirmationState
 import com.finanzas.automatica.domain.model.Movement
 import com.finanzas.automatica.domain.model.MovementType
+import com.finanzas.automatica.presentation.ui.format.Money
+import com.finanzas.automatica.presentation.ui.theme.KivoText
 import com.finanzas.automatica.presentation.ui.components.AnimatedAmountText
 import com.finanzas.automatica.presentation.ui.components.EmptyState
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
@@ -67,7 +69,6 @@ import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
-import java.text.NumberFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -83,18 +84,28 @@ private enum class DashboardPeriod(val label: String) {
 fun DashboardScreen(
     movements: List<Movement> = emptyList(),
     pendingCount: Int = 0,
+    /** Saldo neto de todo lo confirmado. Es lo que se cuadra contra la realidad. */
+    netBalance: Long = 0L,
+    onAdjustBalance: (Long, String) -> Unit = { _, _ -> },
     notificationAccessEnabled: Boolean = true,
     onEnableNotificationAccess: () -> Unit = {},
     onPendingClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onOpenMenu: (() -> Unit)? = null
 ) {
-    val currencyFormat = remember {
-        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
-            maximumFractionDigits = 0
-        }
-    }
     var selectedPeriod by remember { mutableStateOf(DashboardPeriod.Month) }
+    var cuadrandoSaldo by remember { mutableStateOf(false) }
+
+    if (cuadrandoSaldo) {
+        BalanceAdjustDialog(
+            saldoActual = netBalance,
+            onCuadrar = { real, nota ->
+                onAdjustBalance(real, nota)
+                cuadrandoSaldo = false
+            },
+            onCerrar = { cuadrandoSaldo = false }
+        )
+    }
     val visibleMovements = remember(movements) {
         movements
             .filterNot { it.confirmationState == ConfirmationState.REJECTED }
@@ -131,7 +142,6 @@ fun DashboardScreen(
                             Text(
                                 text = "Kivo",
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             FinanceTag(
@@ -251,9 +261,8 @@ fun DashboardScreen(
                         )
                         AnimatedAmountText(
                             target = balance,
-                            format = { currencyFormat.money(it) },
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            format = { Money.format(it) },
+                            style = KivoText.amountLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -273,11 +282,24 @@ fun DashboardScreen(
                     color = if (spendingRatio > 0.85f) WarningAmber else IncomeGreen,
                     trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
                 )
-                Text(
-                    text = "${(spendingRatio * 100).toInt()}% de ingresos comprometidos en gastos",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${(spendingRatio * 100).toInt()}% de ingresos comprometidos en gastos",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                    // El cuadre vive aqui, pegado al saldo: es donde el usuario nota
+                    // que la cifra no coincide con la realidad, y por tanto donde va a
+                    // buscar como arreglarlo.
+                    TextButton(onClick = { cuadrandoSaldo = true }) {
+                        Text("Cuadrar")
+                    }
+                }
             }
         }
 
@@ -292,7 +314,6 @@ fun DashboardScreen(
                 MetricCard(
                     title = "Ingresos",
                     amount = income,
-                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.TrendingUp,
                     tint = IncomeGreen,
                     modifier = Modifier.weight(1f)
@@ -300,7 +321,6 @@ fun DashboardScreen(
                 MetricCard(
                     title = "Gastos",
                     amount = expenses,
-                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.TrendingDown,
                     tint = ExpenseRose,
                     modifier = Modifier.weight(1f)
@@ -308,7 +328,6 @@ fun DashboardScreen(
                 MetricCard(
                     title = "Pendientes",
                     amount = pendingCount.toLong(),
-                    currencyFormat = currencyFormat,
                     icon = Icons.Outlined.PendingActions,
                     tint = WarningAmber,
                     modifier = Modifier.weight(1f)
@@ -375,7 +394,6 @@ fun DashboardScreen(
                             pendingMovements.forEach { movement ->
                                 PendingMovementRow(
                                     movement = movement,
-                                    currencyFormat = currencyFormat
                                 )
                             }
                         }
@@ -406,7 +424,6 @@ fun DashboardScreen(
             items(recentMovements.size, key = { index -> recentMovements[index].id }) { index ->
                 MovementLine(
                     movement = recentMovements[index],
-                    currencyFormat = currencyFormat,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .animateItemPlacement()
@@ -420,7 +437,6 @@ fun DashboardScreen(
 private fun MetricCard(
     title: String,
     amount: Long,
-    currencyFormat: NumberFormat,
     icon: ImageVector,
     tint: Color,
     modifier: Modifier = Modifier
@@ -444,9 +460,8 @@ private fun MetricCard(
             )
             AnimatedAmountText(
                 target = amount,
-                format = { value -> if (title == "Pendientes") value.toString() else currencyFormat.money(value) },
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                format = { value -> if (title == "Pendientes") value.toString() else Money.format(value) },
+                style = KivoText.amount,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1
             )
@@ -457,7 +472,6 @@ private fun MetricCard(
 @Composable
 private fun PendingMovementRow(
     movement: Movement,
-    currencyFormat: NumberFormat
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -471,7 +485,6 @@ private fun PendingMovementRow(
             Text(
                 text = movement.counterpartyRaw,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -488,9 +501,8 @@ private fun PendingMovementRow(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = movement.signedAmount(currencyFormat),
+                text = Money.formatSigned(movement.amount, movement.type == MovementType.INCOME),
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
                 color = if (movement.type == MovementType.INCOME) IncomeGreen else ExpenseRose
             )
             FinanceTag(
@@ -505,7 +517,6 @@ private fun PendingMovementRow(
 @Composable
 private fun MovementLine(
     movement: Movement,
-    currencyFormat: NumberFormat,
     modifier: Modifier = Modifier
 ) {
     FinanceCard(modifier = modifier) {
@@ -531,7 +542,6 @@ private fun MovementLine(
                     Text(
                         text = movement.counterpartyRaw,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -546,21 +556,14 @@ private fun MovementLine(
             }
             Spacer(Modifier.padding(horizontal = 4.dp))
             Text(
-                text = movement.signedAmount(currencyFormat),
+                text = Money.formatSigned(movement.amount, movement.type == MovementType.INCOME),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
                 color = if (movement.type == MovementType.INCOME) IncomeGreen else MaterialTheme.colorScheme.onSurface
             )
         }
     }
 }
 
-private fun NumberFormat.money(amount: Long): String = format(amount / 100.0)
-
-private fun Movement.signedAmount(currencyFormat: NumberFormat): String {
-    val prefix = if (type == MovementType.INCOME) "+" else "-"
-    return "$prefix${currencyFormat.money(amount)}"
-}
 
 private fun Movement.shortDate(): String {
     val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale("es", "CO"))
