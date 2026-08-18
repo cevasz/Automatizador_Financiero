@@ -22,7 +22,8 @@
 - `web/`: panel web en Next.js + TypeScript (`npm run dev` desde `web/`).
 - `backend/`: no hay servidor propio — es el esquema SQL versionado de Supabase
   (`backend/supabase/migrations/`) más las funciones de sincronización.
-- `docs/`: esta guía, el SDD, la lista de pendientes y el material de marca.
+- `docs/`: esta guía, el SDD, la lista de pendientes, la guía de publicación
+  (`PUBLICAR.md`) y el material de marca.
 - `graphify-out/`: grafo de dependencias (regenerar con `graphify --update` tras cambios).
 
 ## Alcance

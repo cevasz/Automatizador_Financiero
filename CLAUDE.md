@@ -9,7 +9,7 @@ Este archivo son las **reglas y convenciones** del proyecto. Para identidad de m
 arquitectura interna detallada, permisos y sincronización, ver `docs/guia.md` (resumen
 operativo). Para visión de producto, contexto regulatorio completo, modelo de datos y
 roadmap por fases, ver `docs/SDD.md`. Para la lista de trabajo pendiente, ver
-`docs/PENDIENTES.md`.
+`docs/PENDIENTES.md`. Para firmar y publicar la app, ver `docs/PUBLICAR.md`.
 
 ## Estructura del repositorio (monorepo)
 - `kivo-android/`: app Android nativa (Kotlin + Compose). Proyecto Gradle autocontenido.

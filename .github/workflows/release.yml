@@ -1,0 +1,175 @@
+name: Publicar release
+
+# Se dispara al empujar una etiqueta de version:
+#
+#     git tag v1.9.0 && git push origin v1.9.0
+#
+# y deja el APK firmado publicado como GitHub Release. Obtainium (u otro cliente
+# que vigile releases) lo detecta y ofrece la actualizacion en el telefono, sin
+# tener que descargar artifacts a mano.
+#
+# `workflow_dispatch` permite tambien lanzarlo desde la pestaña Actions, util para
+# repetir una publicacion fallida sin inventar una etiqueta nueva.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Necesario para que `gh release create` pueda escribir en el repositorio.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: APK firmado
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Se comprueba ANTES de compilar. Sin esto, con un secret ausente el build
+      # saldria bien pero produciria un APK *sin firmar*, y se publicaria sin que
+      # nadie lo note hasta que el telefono se niegue a instalarlo.
+      - name: Verificar que los secrets existen
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: |
+          faltan=""
+          for s in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEYSTORE_ALIAS KEYSTORE_KEY_PASSWORD; do
+            [ -z "${!s}" ] && faltan="$faltan $s"
+          done
+          if [ -n "$faltan" ]; then
+            echo "::error::Faltan secrets:$faltan — ver docs/PUBLICAR.md"
+            exit 1
+          fi
+          echo "Los cuatro secrets de firma están presentes."
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      # El keystore es binario y los secrets de GitHub son texto: por eso viaja en
+      # base64. Se escribe fuera del arbol de git y se borra al final.
+      - name: Restaurar el keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/kivo-release.jks"
+          echo "Keystore restaurado ($(stat -c%s "$RUNNER_TEMP/kivo-release.jks") bytes)."
+
+      - name: Permisos de gradlew
+        run: chmod +x kivo-android/gradlew
+
+      # Publicar v1.9.0 con versionName 1.8.0 dentro deja el repositorio y el
+      # telefono contando versiones distintas, y no hay forma de arreglarlo
+      # despues salvo publicando otra. Mejor fallar aqui.
+      - name: La etiqueta debe coincidir con versionName
+        if: github.ref_type == 'tag'
+        run: |
+          EN_GRADLE=$(grep -oP 'versionName\s*=\s*"\K[^"]+' kivo-android/app/build.gradle.kts)
+          EN_TAG="${GITHUB_REF_NAME#v}"
+          echo "build.gradle.kts: $EN_GRADLE | etiqueta: $EN_TAG"
+          if [ "$EN_GRADLE" != "$EN_TAG" ]; then
+            echo "::error::La etiqueta v$EN_TAG no coincide con versionName $EN_GRADLE"
+            exit 1
+          fi
+
+      - name: Tests
+        working-directory: kivo-android
+        run: ./gradlew test --no-daemon
+
+      - name: Compilar release firmado
+        working-directory: kivo-android
+        env:
+          # build.gradle.kts resuelve KEYSTORE_FILE con rootProject.file(), asi que
+          # una ruta absoluta funciona igual que una relativa a kivo-android/.
+          KEYSTORE_FILE: ${{ runner.temp }}/kivo-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          # Sin estos, el APK publicado saldria con la sincronizacion apagada.
+          # La anon key es publica por diseño (viaja dentro del APK de todos modos),
+          # pero se guarda como secret para no versionarla.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: ./gradlew assembleRelease --no-daemon
+
+      # Que el archivo exista no prueba que este firmado. Esto lo comprueba de
+      # verdad y ademas imprime la huella del certificado: si algun dia cambia,
+      # significa que se firmo con OTRA llave y ningun telefono aceptara la
+      # actualizacion.
+      - name: Verificar la firma
+        run: |
+          SALIDA=kivo-android/app/build/outputs/apk/release
+          # Se excluye explicitamente cualquier *-unsigned.apk: si quedaran los dos,
+          # coger el equivocado publicaria un APK que ningun telefono instala.
+          APK=$(find "$SALIDA" -name "*.apk" ! -name "*unsigned*" | head -1)
+          if [ -z "$APK" ]; then
+            echo "::error::No se genero ningun APK firmado. Contenido de $SALIDA:"
+            ls -la "$SALIDA" || true
+            exit 1
+          fi
+          echo "APK: $APK"
+
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner 2>/dev/null | sort -V | tail -1)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::No se encontro apksigner en $ANDROID_HOME/build-tools"
+            exit 1
+          fi
+          # La huella SHA-256 que imprime es la identidad de la app para Android.
+          # Si cambia entre releases, las actualizaciones dejan de instalarse.
+          "$APKSIGNER" verify --print-certs "$APK"
+          echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+
+      # El nombre del archivo lleva la version: en Obtainium y en la pagina de
+      # releases se distingue de un vistazo cual es cual.
+      - name: Renombrar con la version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          [ "$GITHUB_REF_TYPE" = "tag" ] || VERSION="manual-${GITHUB_SHA::7}"
+          DESTINO="kivo-$VERSION.apk"
+          cp "$APK_PATH" "$DESTINO"
+          echo "APK_FINAL=$DESTINO" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Publicar el release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Si el release ya existe (re-ejecucion tras un fallo), se reemplaza el
+          # APK en vez de fallar: --clobber evita tener que borrarlo a mano.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "El release ya existe; se reemplaza el APK."
+            gh release upload "$GITHUB_REF_NAME" "$APK_FINAL" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$APK_FINAL" \
+              --title "Kivo $VERSION" \
+              --generate-notes
+          fi
+
+      # Si no hay etiqueta (ejecucion manual), no se publica nada: queda como
+      # artifact para probar sin ensuciar la lista de releases.
+      - name: Guardar como artifact
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kivo-release-apk
+          path: ${{ env.APK_FINAL }}
+          retention-days: 7
+
+      - name: Borrar el keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/kivo-release.jks"

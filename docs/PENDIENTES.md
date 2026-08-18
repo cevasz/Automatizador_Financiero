@@ -348,6 +348,35 @@ cuadrarlo**.
 rectángulo está razonado y compilado, no visto. Si tras instalar 1.9.0 siguiera
 apareciendo, hace falta una captura para descartar el resto.
 
+## 📦 Sesión 2026-08-18 (cierre): distribución y firma
+
+El usuario pedía dejar de descargar el APK del CI a mano en cada cambio.
+
+- [x] **Publicación automática** (`.github/workflows/release.yml`): al empujar una
+  etiqueta `v*`, el CI compila, **firma**, verifica la firma con `apksigner` y publica
+  el APK como GitHub Release. En el teléfono, Obtainium vigila el repositorio y avisa.
+  Tres guardas que no son adorno: (1) si falta cualquiera de los cuatro secrets de firma
+  **falla antes de compilar** — sin eso el build saldría bien pero publicaría un APK sin
+  firmar que ningún teléfono instala; (2) la etiqueta debe coincidir con `versionName`,
+  porque publicar `v1.9.0` con `1.8.0` dentro no se puede arreglar después; (3) se excluye
+  explícitamente cualquier `*-unsigned.apk` al buscar el artefacto. ✅ 2026-08-18
+- [x] **`docs/PUBLICAR.md`**: qué es firmar (la identidad de una app en Android no es su
+  `applicationId`, es su clave), por qué la clave es irrecuperable, cómo crear el
+  keystore, los secrets del CI, y **la secuencia para no perder datos** al saltar del APK
+  de depuración actual al primero firmado — sincronizar, desinstalar, instalar, volver a
+  sincronizar, y reconceder el acceso a notificaciones. ✅ 2026-08-18
+
+- [ ] **Crear el keystore y cargar los 6 secrets.** Solo lo puede hacer el usuario: la
+  clave privada es suya y no debe pasar por aquí. Pasos en `docs/PUBLICAR.md` § 2 y 4.
+  #pendiente/rapido
+- [ ] **Rotar el token de GitHub.** Está en texto plano dentro de la URL del remoto en
+  `.git/config`, con permiso de escritura sobre el repositorio; se compartió al inspeccionar
+  el remoto. Revocarlo y pasar a SSH. #pendiente/rapido #seguridad
+- [ ] **Google Play (canal de pruebas internas)** si se quiere actualización silenciosa de
+  verdad. Bloqueado por la política de privacidad publicada y la justificación del acceso
+  a notificaciones, ambas ya en los pendientes legales. Al hacerlo, **activar Play App
+  Signing**: sin él, perder la clave mata la app para siempre. #pendiente/fase2
+
 ## 🔴 Rápidos (bajo esfuerzo, alto impacto)
 
 ### Sesión 2026-08-15: bug crítico — ningún paquete de banco era el real (pagos no se registraban)
