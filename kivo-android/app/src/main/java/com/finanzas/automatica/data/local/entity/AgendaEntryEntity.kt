@@ -1,5 +1,6 @@
 package com.finanzas.automatica.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -17,6 +18,7 @@ import java.time.Instant
         )
     ],
     indices = [
+        Index("syncId"),
         Index(value = ["accountIdentifier"], unique = true),
         Index("defaultCategoryId")
     ]
@@ -29,5 +31,8 @@ data class AgendaEntryEntity(
     val color: Int = 0xFF8D6E63.toInt(),
     val origin: String = "MANUAL",
     val createdAt: Long = Instant.now().toEpochMilli(),
-    val updatedAt: Long = Instant.now().toEpochMilli()
+    val updatedAt: Long = Instant.now().toEpochMilli(),
+    /** Identidad estable entre dispositivos. Ver [newSyncId]. */
+    @ColumnInfo(defaultValue = "")
+    val syncId: String = newSyncId()
 )

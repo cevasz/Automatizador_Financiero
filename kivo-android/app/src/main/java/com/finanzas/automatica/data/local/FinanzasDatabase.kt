@@ -19,9 +19,10 @@ import com.finanzas.automatica.data.local.entity.*
         ClassificationRuleEntity::class,
         InvoiceEntity::class,
         InvoiceItemEntity::class,
-        AppNotificationEntity::class
+        AppNotificationEntity::class,
+        SyncDeletionEntity::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -35,6 +36,8 @@ abstract class FinanzasDatabase : RoomDatabase() {
     abstract fun classificationRuleDao(): ClassificationRuleDao
     abstract fun invoiceDao(): InvoiceDao
     abstract fun appNotificationDao(): AppNotificationDao
+    abstract fun syncDeletionDao(): SyncDeletionDao
+    abstract fun syncDao(): SyncDao
 
     companion object {
         @Volatile
@@ -56,6 +59,9 @@ abstract class FinanzasDatabase : RoomDatabase() {
                 FinanzasDatabase::class.java,
                 "finanzas.db"
             )
+                // Las migraciones explicitas van primero: solo si no hay camino
+                // desde la version instalada entra el fallback destructivo.
+                .addMigrations(*FinanzasMigrations.TODAS)
                 .fallbackToDestructiveMigration()
                 // Tambien al BAJAR de version (p.ej. si el usuario reinstala un APK
                 // anterior): sin esto Room lanza IllegalStateException al abrir y la app

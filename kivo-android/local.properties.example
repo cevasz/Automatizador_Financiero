@@ -1,0 +1,21 @@
+# Copiar a local.properties (que NO se versiona) y rellenar con los datos del
+# proyecto de Supabase — Project Settings → API. Ver backend/README.md.
+#
+# Sin estos valores la app compila y funciona igual: todo lo local-first sigue
+# andando y la pantalla de Cuenta explica que la sincronizacion no esta
+# configurada, en vez de fallar al pulsar el boton.
+supabase.url=https://TU-PROYECTO.supabase.co
+supabase.anonKey=tu-anon-key
+
+# Firma de la variante release (opcional). Sin esto, `assembleRelease` produce un
+# APK sin firmar — util para probar la ofuscacion sin tener el keystore real.
+# El keystore NUNCA se versiona (.gitignore ya excluye *.jks y *.keystore).
+#
+# Para crear uno:
+#   keytool -genkey -v -keystore kivo-release.jks -keyalg RSA -keysize 2048 \
+#           -validity 10000 -alias kivo
+#
+# keystore.file=kivo-release.jks
+# keystore.password=...
+# keystore.alias=kivo
+# keystore.keyPassword=...

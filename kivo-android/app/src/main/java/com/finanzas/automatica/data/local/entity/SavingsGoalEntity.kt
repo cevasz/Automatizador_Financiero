@@ -1,10 +1,15 @@
 package com.finanzas.automatica.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
 
-@Entity(tableName = "savings_goals")
+@Entity(
+    tableName = "savings_goals",
+    indices = [Index("syncId")]
+)
 data class SavingsGoalEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
@@ -12,5 +17,8 @@ data class SavingsGoalEntity(
     val currentAmount: Long = 0,
     val targetDate: Long, // Unix timestamp en millis
     val createdAt: Long = Instant.now().toEpochMilli(),
-    val updatedAt: Long = Instant.now().toEpochMilli()
+    val updatedAt: Long = Instant.now().toEpochMilli(),
+    /** Identidad estable entre dispositivos. Ver [newSyncId]. */
+    @ColumnInfo(defaultValue = "")
+    val syncId: String = newSyncId()
 )

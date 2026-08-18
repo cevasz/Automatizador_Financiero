@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
+import com.finanzas.automatica.data.sync.Tombstones
 import com.finanzas.automatica.data.repository.AgendaRepositoryImpl
 import com.finanzas.automatica.data.repository.CategoryRepositoryImpl
 import com.finanzas.automatica.data.repository.InvoiceRepository
@@ -34,6 +35,7 @@ class InvoiceViewModel(
     private val invoiceRepo = InvoiceRepository(database)
     private val agendaRepo = AgendaRepositoryImpl(database)
     private val categoryRepo = CategoryRepositoryImpl(database)
+    private val tombstones = Tombstones(database)
 
     val invoices: StateFlow<List<Invoice>> = invoiceRepo.getInvoicesFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -108,6 +110,10 @@ class InvoiceViewModel(
     fun deleteInvoice(invoiceId: Long) {
         viewModelScope.launch {
             try {
+                // Antes del borrado, y tambien por los productos: la factura
+                // los arrastra en cascada, asi que hay que dejar su lapida
+                // mientras todavia existen.
+                tombstones.antesDeBorrarFactura(invoiceId)
                 invoiceRepo.deleteInvoice(invoiceId)
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -8,10 +8,9 @@ import com.finanzas.automatica.data.local.FinanzasDatabase
 import com.finanzas.automatica.data.local.entity.AppNotificationEntity
 import com.finanzas.automatica.data.repository.AppNotificationRepository
 import com.finanzas.automatica.data.repository.DefaultCategories
+import com.finanzas.automatica.data.sync.Tombstones
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -166,29 +165,14 @@ class SettingsViewModel(
         }
     }
 
-    /**
-     * Genera el snapshot completo (todas las tablas) en JSON para preparar la
-     * sincronizacion con el panel web -- separado de exportData() porque son dos
-     * usos distintos que antes compartian la misma funcion: "Sincronizar" en Login
-     * no debe depender del formato de exportacion (CSV/Excel/PDF) elegido en Ajustes.
-     */
-    fun prepareSyncSnapshot() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val exportDir = File(appContext.filesDir, "exports").apply { mkdirs() }
-                val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
-                val file = File(exportDir, "kivo-sync-$timestamp.json")
-                file.writeText(buildExportSnapshot().toString(2))
-                Log.i(TAG, "Snapshot de sincronizacion generado: ${file.absolutePath}")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error preparando snapshot de sincronizacion", e)
-            }
-        }
-    }
-
     fun deleteAllData() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Primero las lapidas de todo. Sin esto, "borrar mis datos" dejaria
+                // la app vacia y la siguiente sincronizacion la repoblaria entera
+                // desde la nube — es decir, el boton no borraria nada de verdad.
+                Tombstones(database).antesDeBorrarTodo()
+
                 database.movementDao().deleteAll()
                 database.budgetDao().deleteAll()
                 database.savingsGoalDao().deleteAll()
@@ -205,32 +189,6 @@ class SettingsViewModel(
 
     private fun persistBoolean(key: String, value: Boolean) {
         preferences.edit().putBoolean(key, value).apply()
-    }
-
-    private suspend fun buildExportSnapshot(): JSONObject {
-        val snapshot = JSONObject()
-        snapshot.put("exportedAt", System.currentTimeMillis())
-        snapshot.put("settings", buildSettingsObject())
-        snapshot.put("movements", buildMovementsArray())
-        snapshot.put("agendaEntries", buildAgendaArray())
-        snapshot.put("categories", buildCategoriesArray())
-        snapshot.put("budgets", buildBudgetsArray())
-        snapshot.put("savingsGoals", buildSavingsGoalsArray())
-        snapshot.put("classificationRules", buildClassificationRulesArray())
-        return snapshot
-    }
-
-    private fun buildSettingsObject(): JSONObject {
-        return JSONObject()
-            .put("notificationsEnabled", _notificationsEnabled.value)
-            .put("biometricEnabled", _biometricEnabled.value)
-            .put("autoConfirmHighConfidence", _autoConfirmHighConfidence.value)
-            .put("isContributor", _isContributor.value)
-            .put("contributionAmount", _contributionAmount.value)
-            .put("showOnboarding", _showOnboarding.value)
-            .put("exportDataFormat", _exportDataFormat.value)
-            .put("themeMode", themeMode.value.name)
-            .put("themePalette", themePalette.value.name)
     }
 
     private suspend fun buildMovementsCsv(): String {
@@ -260,100 +218,6 @@ class SettingsViewModel(
             "\"" + replace("\"", "\"\"") + "\""
         } else {
             this
-        }
-    }
-
-    private suspend fun buildMovementsArray(): JSONArray {
-        return database.movementDao().getAll().toJsonArray { movement ->
-            JSONObject()
-                .put("id", movement.id)
-                .put("type", movement.type)
-                .put("amount", movement.amount)
-                .put("paymentMethod", movement.paymentMethod)
-                .put("counterpartyRaw", movement.counterpartyRaw)
-                .put("counterpartyId", movement.counterpartyId ?: JSONObject.NULL)
-                .put("categoryId", movement.categoryId ?: JSONObject.NULL)
-                .put("date", movement.date)
-                .put("source", movement.source)
-                .put("confirmationState", movement.confirmationState)
-                .put("bankEntity", movement.bankEntity)
-                .put("rawText", movement.rawText)
-                .put("createdAt", movement.createdAt)
-                .put("updatedAt", movement.updatedAt)
-        }
-    }
-
-    private suspend fun buildAgendaArray(): JSONArray {
-        return database.agendaDao().getAll().toJsonArray { entry ->
-            JSONObject()
-                .put("id", entry.id)
-                .put("accountIdentifier", entry.accountIdentifier)
-                .put("displayName", entry.displayName)
-                .put("defaultCategoryId", entry.defaultCategoryId ?: JSONObject.NULL)
-                .put("color", entry.color)
-                .put("origin", entry.origin)
-                .put("createdAt", entry.createdAt)
-                .put("updatedAt", entry.updatedAt)
-        }
-    }
-
-    private suspend fun buildCategoriesArray(): JSONArray {
-        return database.categoryDao().getAll().toJsonArray { category ->
-            JSONObject()
-                .put("id", category.id)
-                .put("name", category.name)
-                .put("type", category.type)
-                .put("iconName", category.iconName)
-                .put("isCustom", category.isCustom)
-                .put("parentCategoryId", category.parentCategoryId ?: JSONObject.NULL)
-                .put("sortOrder", category.sortOrder)
-                .put("createdAt", category.createdAt)
-        }
-    }
-
-    private suspend fun buildBudgetsArray(): JSONArray {
-        return database.budgetDao().getAll().toJsonArray { budget ->
-            JSONObject()
-                .put("id", budget.id)
-                .put("categoryId", budget.categoryId)
-                .put("monthlyLimit", budget.monthlyLimit)
-                .put("month", budget.month)
-                .put("year", budget.year)
-                .put("createdAt", budget.createdAt)
-        }
-    }
-
-    private suspend fun buildSavingsGoalsArray(): JSONArray {
-        return database.savingsGoalDao().getAll().toJsonArray { goal ->
-            JSONObject()
-                .put("id", goal.id)
-                .put("name", goal.name)
-                .put("targetAmount", goal.targetAmount)
-                .put("currentAmount", goal.currentAmount)
-                .put("targetDate", goal.targetDate)
-                .put("createdAt", goal.createdAt)
-                .put("updatedAt", goal.updatedAt)
-        }
-    }
-
-    private suspend fun buildClassificationRulesArray(): JSONArray {
-        return database.classificationRuleDao().getAll().toJsonArray { rule ->
-            JSONObject()
-                .put("id", rule.id)
-                .put("pattern", rule.pattern)
-                .put("bankEntity", rule.bankEntity)
-                .put("categoryId", rule.categoryId)
-                .put("priority", rule.priority)
-                .put("isActive", rule.isActive)
-                .put("createdAt", rule.createdAt)
-        }
-    }
-
-    private inline fun <T> Iterable<T>.toJsonArray(builder: (T) -> JSONObject): JSONArray {
-        return JSONArray().apply {
-            for (item in this@toJsonArray) {
-                put(builder(item))
-            }
         }
     }
 

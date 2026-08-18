@@ -1,5 +1,6 @@
 package com.finanzas.automatica.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -29,6 +30,7 @@ import java.time.Instant
         )
     ],
     indices = [
+        Index("syncId"),
         Index("invoiceId"),
         Index("categoryId"),
         Index("debtorContactId"),
@@ -49,5 +51,8 @@ data class InvoiceItemEntity(
     val debtorName: String? = null, // Nombre visible del deudor
     val debtStatus: String = "PENDING", // "PENDING" (por cobrar) o "PAID" (saldado)
     val notes: String? = null,
-    val createdAt: Long = Instant.now().toEpochMilli()
+    val createdAt: Long = Instant.now().toEpochMilli(),
+    /** Identidad estable entre dispositivos. Ver [newSyncId]. */
+    @ColumnInfo(defaultValue = "")
+    val syncId: String = newSyncId()
 )

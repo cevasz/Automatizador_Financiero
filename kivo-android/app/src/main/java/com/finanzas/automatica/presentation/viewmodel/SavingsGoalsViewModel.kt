@@ -3,6 +3,7 @@ package com.finanzas.automatica.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
+import com.finanzas.automatica.data.sync.Tombstones
 import com.finanzas.automatica.data.local.dao.SavingsGoalDao
 import com.finanzas.automatica.data.local.entity.AppNotificationEntity
 import com.finanzas.automatica.data.repository.AppNotificationRepository
@@ -23,6 +24,7 @@ class SavingsGoalsViewModel(
 
     private val goalDao = database.savingsGoalDao()
     private val notifications = AppNotificationRepository(database)
+    private val tombstones = Tombstones(database)
 
     // Reactivo sobre Room: crear/editar/abonar/eliminar una meta desde la pantalla de
     // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
@@ -48,6 +50,10 @@ class SavingsGoalsViewModel(
 
     fun deleteGoal(id: Long) {
         viewModelScope.launch {
+            // La lapida se registra ANTES del borrado: despues ya no hay fila de
+            // donde leer el syncId, y sin lapida el proximo pull traeria la meta
+            // de vuelta desde la nube.
+            tombstones.antesDeBorrarMeta(id)
             goalDao.deleteById(id)
         }
     }

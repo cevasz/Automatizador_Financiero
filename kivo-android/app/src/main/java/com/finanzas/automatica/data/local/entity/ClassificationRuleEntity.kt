@@ -1,5 +1,6 @@
 package com.finanzas.automatica.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -17,6 +18,7 @@ import java.time.Instant
         )
     ],
     indices = [
+        Index("syncId"),
         Index("bankEntity"),
         Index("categoryId"),
         Index(value = ["bankEntity", "priority"])
@@ -29,5 +31,8 @@ data class ClassificationRuleEntity(
     val categoryId: Long,
     val priority: Int = 0,
     val isActive: Boolean = true,
-    val createdAt: Long = Instant.now().toEpochMilli()
+    val createdAt: Long = Instant.now().toEpochMilli(),
+    /** Identidad estable entre dispositivos. Ver [newSyncId]. */
+    @ColumnInfo(defaultValue = "")
+    val syncId: String = newSyncId()
 )

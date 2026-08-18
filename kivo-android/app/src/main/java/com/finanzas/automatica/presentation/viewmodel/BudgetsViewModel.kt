@@ -3,6 +3,7 @@ package com.finanzas.automatica.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.finanzas.automatica.data.local.FinanzasDatabase
+import com.finanzas.automatica.data.sync.Tombstones
 import com.finanzas.automatica.data.local.dao.BudgetDao
 import com.finanzas.automatica.data.local.entity.AppNotificationEntity
 import com.finanzas.automatica.data.repository.AppNotificationRepository
@@ -37,6 +38,7 @@ class BudgetsViewModel(
     private val categoryRepo = CategoryRepositoryImpl(database)
     private val movementRepository = MovementRepositoryImpl(database)
     private val notifications = AppNotificationRepository(database)
+    private val tombstones = Tombstones(database)
 
     // Reactivo sobre Room: crear/editar/eliminar un presupuesto desde la pantalla de
     // edicion (que abre su propia instancia de este ViewModel, ver AppNavHost) se ve
@@ -126,6 +128,8 @@ class BudgetsViewModel(
     
     fun deleteBudget(id: Long) {
         viewModelScope.launch {
+            // Antes del borrado: ver Tombstones.
+            tombstones.antesDeBorrarPresupuesto(id)
             budgetDao.deleteById(id)
         }
     }

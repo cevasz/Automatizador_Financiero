@@ -1,8 +1,35 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
 }
+
+// Credenciales del proyecto Supabase. Salen de local.properties (que no se
+// versiona) o, en CI, de variables de entorno. Ver local.properties.example.
+//
+// Si faltan, la app compila igual y queda con la sincronizacion apagada: la
+// pantalla de Cuenta lo explica en vez de fallar al pulsar "Sincronizar". Nadie
+// que solo quiera compilar el MVP local necesita una cuenta de Supabase.
+val localProperties = Properties().apply {
+    val archivo = rootProject.file("local.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
+}
+
+fun ajusteSupabase(clave: String, variableEntorno: String): String =
+    localProperties.getProperty(clave) ?: System.getenv(variableEntorno) ?: ""
+
+// Firma de la variante release. Igual que las credenciales de Supabase: de
+// local.properties o de variables de entorno en CI, nunca del repositorio (un
+// keystore versionado es un keystore comprometido).
+//
+// Si no hay firma configurada, `release` se construye SIN firmar en vez de
+// fallar: cualquiera puede compilar y probar la variante ofuscada sin tener el
+// keystore de publicacion.
+val keystoreFile = (localProperties.getProperty("keystore.file") ?: System.getenv("KEYSTORE_FILE"))
+    ?.let { rootProject.file(it) }
+    ?.takeIf { it.exists() }
 
 android {
     namespace = "com.finanzas.automatica"
@@ -14,10 +41,17 @@ android {
         targetSdk = 34
         // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
         // fixes, minor para features nuevas).
-        versionCode = 10
-        versionName = "1.6.2"
+        versionCode = 14
+        versionName = "1.9.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField("String", "SUPABASE_URL", "\"${ajusteSupabase("supabase.url", "SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${ajusteSupabase("supabase.anonKey", "SUPABASE_ANON_KEY")}\"")
+    }
+
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 
     buildFeatures {
@@ -52,15 +86,47 @@ android {
         jvmTarget = "17"
     }
 
+    signingConfigs {
+        create("release") {
+            keystoreFile?.let { archivo ->
+                storeFile = archivo
+                storePassword = localProperties.getProperty("keystore.password")
+                    ?: System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = localProperties.getProperty("keystore.alias") ?: System.getenv("KEYSTORE_ALIAS")
+                keyPassword = localProperties.getProperty("keystore.keyPassword")
+                    ?: System.getenv("KEYSTORE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 activado: quita el codigo no usado y ofusca. Las reglas de
+            // proguard-rules.pro protegen lo que se resuelve por nombre en
+            // tiempo de ejecucion (Room, los servicios del manifiesto, los enums
+            // que se guardan como texto en la base).
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (keystoreFile != null) signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
+            // A proposito NO se le pone applicationIdSuffix: cambiar el
+            // applicationId de debug convertiria la app ya instalada en el
+            // telefono de prueba en otra aplicacion distinta — se perderian los
+            // movimientos capturados y habria que volver a conceder el permiso
+            // de acceso a notificaciones.
         }
     }
+}
+
+// Room exporta el esquema de cada version aqui. Sirve para dos cosas concretas:
+// comparar a mano el DDL que Room espera contra el que escribe cada Migration
+// (donde un desajuste minimo hace que la app crashee al abrir), y poder
+// escribir tests de migracion mas adelante.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

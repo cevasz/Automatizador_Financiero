@@ -1,5 +1,6 @@
 package com.finanzas.automatica.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -16,7 +17,10 @@ import java.time.Instant
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["categoryId", "month", "year"], unique = true)]
+    indices = [
+        Index("syncId"),
+        Index(value = ["categoryId", "month", "year"], unique = true)
+    ]
 )
 data class BudgetEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -24,5 +28,8 @@ data class BudgetEntity(
     val monthlyLimit: Long, // En centavos
     val month: Int, // 1-12
     val year: Int,
-    val createdAt: Long = Instant.now().toEpochMilli()
+    val createdAt: Long = Instant.now().toEpochMilli(),
+    /** Identidad estable entre dispositivos. Ver [newSyncId]. */
+    @ColumnInfo(defaultValue = "")
+    val syncId: String = newSyncId()
 )

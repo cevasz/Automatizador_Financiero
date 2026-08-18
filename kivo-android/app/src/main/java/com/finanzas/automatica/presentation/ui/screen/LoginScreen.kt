@@ -1,5 +1,6 @@
 package com.finanzas.automatica.presentation.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,58 +24,75 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
 import com.finanzas.automatica.R
 import com.finanzas.automatica.presentation.ui.components.FinanceCard
 import com.finanzas.automatica.presentation.ui.components.FinanceTag
 import com.finanzas.automatica.presentation.ui.components.IconBadge
 import com.finanzas.automatica.presentation.ui.components.appearFromBelow
+import com.finanzas.automatica.presentation.ui.theme.ExpenseRose
 import com.finanzas.automatica.presentation.ui.theme.InfoBlue
 import com.finanzas.automatica.presentation.ui.theme.IncomeGreen
 import com.finanzas.automatica.presentation.ui.theme.WarningAmber
 
+/**
+ * Cuenta de Kivo y sincronizacion.
+ *
+ * Antes esta pantalla pedia "URL del backend" y "token de acceso" escritos a
+ * mano: nadie fuera del proyecto podia rellenar eso, y el boton "Sincronizar"
+ * en realidad solo guardaba un JSON dentro del propio telefono. Ahora es correo
+ * y contraseña, y la sincronizacion sube y baja de verdad contra Supabase.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    isConfigured: Boolean,
     isConnected: Boolean,
     email: String,
-    backendUrl: String,
     lastSyncLabel: String,
-    onConnect: (String, String, String) -> Unit,
-    onDisconnect: () -> Unit,
+    syncing: Boolean,
+    uploadRawText: Boolean,
+    message: String?,
+    error: String?,
+    onSignIn: (String, String) -> Unit,
+    onSignUp: (String, String) -> Unit,
+    onSignOut: () -> Unit,
     onSyncNow: () -> Unit,
+    onUploadRawTextChange: (Boolean) -> Unit,
     onOpenMenu: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var emailInput by rememberSaveable { mutableStateOf(email) }
-    var backendUrlInput by rememberSaveable { mutableStateOf(backendUrl) }
-    var accessTokenInput by rememberSaveable { mutableStateOf("") }
+    var passwordInput by rememberSaveable { mutableStateOf("") }
+    var creandoCuenta by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(email, backendUrl) {
-        if (emailInput.isBlank()) emailInput = email
-        if (backendUrlInput.isBlank()) backendUrlInput = backendUrl
-    }
+    val credencialesListas = emailInput.contains('@') && passwordInput.length >= 8
 
     Column(
         modifier = modifier
@@ -98,10 +117,7 @@ fun LoginScreen(
             navigationIcon = {
                 onOpenMenu?.let {
                     IconButton(onClick = it) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = "Menu"
-                        )
+                        Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
                     }
                 }
             },
@@ -128,13 +144,29 @@ fun LoginScreen(
                 contentScale = ContentScale.Crop
             )
 
+            // Sin credenciales de Supabase la sincronizacion no existe en esta
+            // compilacion. Se dice de frente en vez de dejar botones que fallan.
+            if (!isConfigured) {
+                FinanceCard(containerColor = MaterialTheme.colorScheme.tertiaryContainer) {
+                    Text(
+                        text = "Sincronizacion no configurada",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Esta version de la app se compilo sin datos de servidor, asi que todo " +
+                            "funciona solo en este telefono. Kivo esta pensado para funcionar asi: la " +
+                            "nube es opcional.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
             FinanceCard(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.appearFromBelow(delayMillis = 80)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     IconBadge(
                         icon = Icons.Outlined.CloudSync,
                         contentDescription = "Sincronizacion",
@@ -148,9 +180,10 @@ fun LoginScreen(
                         )
                         Text(
                             text = if (isConnected) {
-                                "Tus datos se preparan para sincronizarse con la app web."
+                                "Tus movimientos se sincronizan con el panel web cuando lo pidas."
                             } else {
-                                "Inicia sesion con tu cuenta del panel web para habilitar la sincronizacion."
+                                "Crea una cuenta de Kivo (no es la de tu banco) para ver tus " +
+                                    "movimientos tambien desde el computador."
                             },
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -161,7 +194,11 @@ fun LoginScreen(
                     FinanceTag(
                         text = if (isConnected) "Conectado" else "Desconectado",
                         color = if (isConnected) IncomeGreen else WarningAmber,
-                        containerColor = if (isConnected) IncomeGreen.copy(alpha = 0.12f) else WarningAmber.copy(alpha = 0.12f)
+                        containerColor = if (isConnected) {
+                            IncomeGreen.copy(alpha = 0.12f)
+                        } else {
+                            WarningAmber.copy(alpha = 0.12f)
+                        }
                     )
                     FinanceTag(
                         text = lastSyncLabel,
@@ -171,8 +208,18 @@ fun LoginScreen(
                 }
             }
 
-            Crossfade(targetState = isConnected, label = "loginConnectionState") { connected ->
-                if (connected) {
+            AnimatedVisibility(visible = message != null || error != null) {
+                FinanceCard {
+                    Text(
+                        text = error ?: message.orEmpty(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (error != null) ExpenseRose else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            Crossfade(targetState = isConnected, label = "loginConnectionState") { conectado ->
+                if (conectado) {
                     FinanceCard {
                         Text(
                             text = "Cuenta vinculada",
@@ -183,81 +230,81 @@ fun LoginScreen(
                             text = email.ifBlank { "Cuenta sin correo guardado" },
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        Text(
-                            text = backendUrl.ifBlank { "Sin URL de backend" },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = onSyncNow) {
-                                Icon(
-                                    imageVector = Icons.Outlined.CloudSync,
-                                    contentDescription = null
-                                )
+                            Button(onClick = onSyncNow, enabled = !syncing) {
+                                if (syncing) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                } else {
+                                    Icon(Icons.Outlined.CloudSync, contentDescription = null)
+                                }
                                 Spacer(Modifier.padding(horizontal = 4.dp))
-                                Text("Sincronizar")
+                                Text(if (syncing) "Sincronizando" else "Sincronizar")
                             }
-                            TextButton(onClick = onDisconnect) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Logout,
-                                    contentDescription = null
-                                )
+                            TextButton(onClick = onSignOut, enabled = !syncing) {
+                                Icon(Icons.Outlined.Logout, contentDescription = null)
                                 Spacer(Modifier.padding(horizontal = 4.dp))
                                 Text("Cerrar sesion")
                             }
                         }
                     }
                 } else {
-                    FinanceCard {
+                    FinanceCard(modifier = Modifier.appearFromBelow(delayMillis = 60)) {
                         Text(
-                            text = "Conecta tu cuenta web",
+                            text = if (creandoCuenta) "Crear cuenta de Kivo" else "Entrar a tu cuenta",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
-                        Text(
-                            text = "Usa la misma cuenta del panel web para preparar la sincronizacion de movimientos, agenda y categorias.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
 
-            FinanceCard(modifier = Modifier.appearFromBelow(delayMillis = 60)) {
-                OutlinedTextField(
-                    value = emailInput,
-                    onValueChange = { emailInput = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Correo del panel web") },
-                    singleLine = true
-                )
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = backendUrlInput,
-                    onValueChange = { backendUrlInput = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("URL del backend") },
-                    singleLine = true
-                )
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = accessTokenInput,
-                    onValueChange = { accessTokenInput = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Token de acceso") },
-                    singleLine = true
-                )
-                Spacer(Modifier.height(8.dp))
-                Button(
-                    onClick = { onConnect(emailInput, backendUrlInput, accessTokenInput) },
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(vertical = 14.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Login,
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text(if (isConnected) "Actualizar sesion" else "Iniciar sesion")
+                        OutlinedTextField(
+                            value = emailInput,
+                            onValueChange = { emailInput = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Correo") },
+                            singleLine = true,
+                            enabled = isConfigured && !syncing,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = passwordInput,
+                            onValueChange = { passwordInput = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Contraseña") },
+                            singleLine = true,
+                            enabled = isConfigured && !syncing,
+                            visualTransformation = PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            supportingText = { Text("Minimo 8 caracteres") }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Button(
+                            onClick = {
+                                if (creandoCuenta) onSignUp(emailInput, passwordInput)
+                                else onSignIn(emailInput, passwordInput)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = isConfigured && credencialesListas && !syncing,
+                            contentPadding = PaddingValues(vertical = 14.dp)
+                        ) {
+                            Icon(Icons.Outlined.Login, contentDescription = null)
+                            Spacer(Modifier.padding(horizontal = 4.dp))
+                            Text(if (creandoCuenta) "Crear cuenta" else "Entrar")
+                        }
+                        OutlinedButton(
+                            onClick = { creandoCuenta = !creandoCuenta },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = isConfigured && !syncing
+                        ) {
+                            Text(
+                                if (creandoCuenta) "Ya tengo cuenta, entrar"
+                                else "No tengo cuenta, crear una"
+                            )
+                        }
+                    }
                 }
             }
 
@@ -275,11 +322,33 @@ fun LoginScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text = "La sesion es solo para el panel web y la sincronizacion de tus propios datos.",
+                            text = "Esta cuenta es solo de Kivo y sirve para ver tus propios datos " +
+                                "desde el computador. Tu banco no interviene.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.padding(end = 12.dp)) {
+                        Text(
+                            text = "Subir el texto original del banco",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Es lo que permite al panel web explicar de donde salio cada " +
+                                "movimiento. Si lo apagas, el movimiento se sincroniza igual pero sin " +
+                                "el texto de la notificacion.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(checked = uploadRawText, onCheckedChange = onUploadRawTextChange)
                 }
             }
         }
