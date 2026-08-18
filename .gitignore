@@ -16,11 +16,10 @@
 *.jks
 
 # ===========================
-# Gradle
+# Gradle  (gradle-8.7*.zip lo cubre gradle-*.zip)
 # ===========================
-gradle-8.7/
-gradle-8.7-bin.zip
 gradle-*.zip
+gradle-*/
 .gradle/
 
 # ===========================
@@ -41,10 +40,28 @@ kivo-android/.gradle/
 kivo-android/local.properties
 
 # ===========================
-# IDE
+# graphify: instantaneas fechadas que duplican graph.json de dias anteriores.
+# El historial de git ya guarda cada version; versionarlas ademas como copias
+# hace crecer el repositorio unos MB por sesion sin aportar nada.
 # ===========================
-.idea/
-*.iml
+graphify-out/20??-??-??/
+
+# ===========================
+# Panel web (Next.js). El .gitignore propio de web/ cubre lo mismo; aqui se
+# repite para que un `git add` desde la raiz tampoco los recoja.
+# ===========================
+web/node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
+web/*.tsbuildinfo
+web/.env
+web/.env.local
+web/.env*.local
+
+# ===========================
+# IDE  (*.iml y /.idea ya estan arriba, en la seccion de Android)
+# ===========================
 .vscode/
 
 # ===========================

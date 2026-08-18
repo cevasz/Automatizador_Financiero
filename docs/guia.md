@@ -6,17 +6,22 @@
 
 ## Identidad
 - Nombre: **Kivo**, tagline "Tu dinero, en orden".
-- Paleta: coral `#F56565`/`#FC8181`, pizarra `#2D3748`, crema `#FEFCF5`;
-  complementarios teal `#2C7A7B` (ingresos), ámbar `#D69E2E` (avisos), azul `#3182CE`
-  (información). Definición en código:
-  `kivo-android/app/src/main/java/.../presentation/ui/theme/Color.kt`.
+- Paleta **"Barro & Ocre"** (tonos tierra, reemplazó a la coral/teal original en la
+  sesión del 2026-08-14): barro `#9C4A3C` (primario y gastos), oliva `#6B7D4F`
+  (secundario e ingresos), ocre `#C68A3D` (terciario y avisos), piedra cálida `#DED1B8`
+  (fondo), azul piedra `#5E7A8C` (único acento frío, solo semántico). Definición en
+  código: `kivo-android/app/src/main/java/.../presentation/ui/theme/Color.kt`, y
+  duplicada como tokens CSS en `web/src/app/globals.css` (son dos plataformas sin
+  pipeline de tokens compartido: si cambia una, hay que cambiar la otra).
 - Ícono adaptativo vectorial (monograma K crema + moneda teal sobre fondo coral) en
   `kivo-android/app/src/main/res/` — sin PNGs de lanzador. Referencia de diseño original
   en `docs/brand/`.
 
 ## Estructura (monorepo)
 - `kivo-android/`: proyecto Gradle autocontenido (compilar/testear desde ahí).
-- `web/` y `backend/`: pendientes de desarrollo (solo README).
+- `web/`: panel web en Next.js + TypeScript (`npm run dev` desde `web/`).
+- `backend/`: no hay servidor propio — es el esquema SQL versionado de Supabase
+  (`backend/supabase/migrations/`) más las funciones de sincronización.
 - `docs/`: esta guía, el SDD, la lista de pendientes y el material de marca.
 - `graphify-out/`: grafo de dependencias (regenerar con `graphify --update` tras cambios).
 
@@ -53,14 +58,37 @@
    movimientos capturados, importaciones, presupuestos ajustados y metas logradas.
    Pantalla en el menú lateral con contador de no leídas.
 
-## Sincronización con la web
-- El inicio de sesión no es bancario: sirve para vincular la app Android con la cuenta
-  del panel web y preparar la sincronización de movimientos, agenda y configuraciones —
-  el backend y la web ya aparecen en el SDD como parte de la arquitectura objetivo.
-- Si la sesión web no existe, la app sigue funcionando localmente sin bloquear el uso
-  principal.
-- No guardar ni pedir credenciales de bancos. Solo correo, URL del backend y token de
-  acceso de la cuenta web.
+## Panel web y sincronización con la nube
+
+Kivo sigue siendo **local-first**: la captura y la edición viven en Room y la app
+funciona entera sin red ni cuenta. La nube es una réplica opcional que existe para dos
+cosas: ver el historial en una pantalla grande y no perderlo si se pierde el teléfono.
+
+- **Dónde vive**: Supabase (Postgres gestionado + Auth + PostgREST). No hay servidor
+  propio que mantener corriendo. Puesta en marcha y credenciales: `backend/README.md`.
+- **Aislamiento entre usuarios**: Row Level Security en Postgres, no código de
+  aplicación. La `anon key` es pública por diseño (viaja en el APK y en el bundle del
+  navegador); sin un JWT de sesión válido, `auth.uid()` es `null` y ninguna política
+  devuelve una sola fila.
+- **Identidad de fila**: cada registro lleva un `syncId` (UUID) generado **en el
+  dispositivo** al crearlo — el `id` de Room es un autoincremental que solo significa
+  algo en ese teléfono. Generarlo en el cliente es lo que permite crear movimientos sin
+  red.
+- **Orden**: primero bajar, después subir. Un teléfono nuevo que entra a una cuenta ya
+  poblada sembró sus propias categorías con UUID distintos; bajando primero, las
+  reconcilia por llave natural y adopta el UUID de la nube en vez de chocar contra los
+  índices únicos del servidor.
+- **Conflictos**: gana la escritura más reciente (`updated_at`). Los dos lados casi
+  nunca editan lo mismo — el teléfono captura, la web corrige.
+- **Borrados**: lógicos (`deleted = true`) más lápidas locales (`sync_deletions`). Un
+  borrado físico sin lápida reaparece en la siguiente bajada.
+- **Qué NO se sube**: imágenes de comprobantes (solo su URI local) y, si el usuario
+  apaga el interruptor en Cuenta, el texto crudo de la notificación bancaria.
+- **Sin credenciales bancarias, nunca.** La cuenta es de Kivo, no del banco.
+
+Piezas: `data/sync/` en Android (`SupabaseClient`, `SyncEngine`, `SyncMappers`,
+`SyncStore`, `Tombstones`), `backend/supabase/migrations/` en SQL, `web/src/app/panel/`
+en la web.
 
 ## Permiso de notificaciones (importante)
 - Android exige que el "Acceso a notificaciones" se habilite MANUALMENTE en
