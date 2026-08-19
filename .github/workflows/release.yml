@@ -62,12 +62,69 @@ jobs:
 
       # El keystore es binario y los secrets de GitHub son texto: por eso viaja en
       # base64. Se escribe fuera del arbol de git y se borra al final.
-      - name: Restaurar el keystore
+      #
+      # Ademas se ABRE aqui mismo con keytool. Sin esta comprobacion, un base64
+      # truncado o una contraseña con un salto de linea invisible al final no se
+      # notan hasta que Gradle falla tres minutos despues con un mensaje que no
+      # distingue entre las dos causas.
+      - name: Restaurar y validar el keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/kivo-release.jks"
-          echo "Keystore restaurado ($(stat -c%s "$RUNNER_TEMP/kivo-release.jks") bytes)."
+          KS="$RUNNER_TEMP/kivo-release.jks"
+
+          # Se quitan espacios y saltos de linea: al pegar en la web de GitHub es
+          # facil arrastrar uno, y base64 los ignora pero el resto no.
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$KS" || {
+            echo "::error::KEYSTORE_BASE64 no es base64 valido. Regeneralo con: base64 -w0 kivo-release.jks"
+            exit 1
+          }
+
+          BYTES=$(stat -c%s "$KS")
+          echo "Keystore restaurado: $BYTES bytes."
+          if [ "$BYTES" -lt 1000 ]; then
+            echo "::error::El keystore restaurado pesa $BYTES bytes: el secret quedo truncado."
+            exit 1
+          fi
+
+          # Las contraseñas y el alias tambien se limpian. Un '\n' al final pasa la
+          # comprobacion de "no esta vacio" y luego rompe la firma.
+          PW=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d '[:space:]')
+          KPW=$(printf '%s' "$KEYSTORE_KEY_PASSWORD" | tr -d '[:space:]')
+          ALIAS=$(printf '%s' "$KEYSTORE_ALIAS" | tr -d '[:space:]')
+
+          if [ "$PW" != "$KEYSTORE_PASSWORD" ] || [ "$KPW" != "$KEYSTORE_KEY_PASSWORD" ] || [ "$ALIAS" != "$KEYSTORE_ALIAS" ]; then
+            echo "::warning::Algun secret de firma traia espacios o saltos de linea; se ignoraron. Conviene corregirlo en GitHub."
+          fi
+
+          # Se enmascaran antes de escribirlos: si no, la version recortada dejaria
+          # de coincidir con el secret original y GitHub ya no la ocultaria.
+          echo "::add-mask::$PW"
+          echo "::add-mask::$KPW"
+          {
+            echo "KS_PASSWORD=$PW"
+            echo "KS_KEY_PASSWORD=$KPW"
+            echo "KS_ALIAS=$ALIAS"
+          } >> "$GITHUB_ENV"
+
+          if ! keytool -list -keystore "$KS" -storepass "$PW" -alias "$ALIAS" > /dev/null 2>&1; then
+            echo "::error::No se pudo abrir el keystore. Causas posibles, en orden de probabilidad:"
+            echo "::error::  1. KEYSTORE_PASSWORD no coincide con la del archivo."
+            echo "::error::  2. KEYSTORE_ALIAS ('$ALIAS') no existe dentro del keystore."
+            echo "::error::  3. KEYSTORE_BASE64 corresponde a otro archivo."
+            echo "Alias que SI contiene el keystore:"
+            keytool -list -keystore "$KS" -storepass "$PW" 2>&1 | grep -i 'PrivateKeyEntry' || \
+              echo "  (no se pudo listar: la contraseña del almacen es incorrecta)"
+            exit 1
+          fi
+
+          # Publico: identifica la app y sirve para comparar entre releases.
+          echo "Keystore valido. Certificado:"
+          keytool -list -v -keystore "$KS" -storepass "$PW" -alias "$ALIAS" \
+            | grep -E 'Owner|Propietario|SHA256|SHA-256|Valid|Valido|Válido' | head -4
 
       - name: Permisos de gradlew
         run: chmod +x kivo-android/gradlew
@@ -96,9 +153,10 @@ jobs:
           # build.gradle.kts resuelve KEYSTORE_FILE con rootProject.file(), asi que
           # una ruta absoluta funciona igual que una relativa a kivo-android/.
           KEYSTORE_FILE: ${{ runner.temp }}/kivo-release.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
-          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          # Ya validados y sin espacios sobrantes en el paso anterior.
+          KEYSTORE_PASSWORD: ${{ env.KS_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ env.KS_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ env.KS_KEY_PASSWORD }}
           # Sin estos, el APK publicado saldria con la sincronizacion apagada.
           # La anon key es publica por diseño (viaja dentro del APK de todos modos),
           # pero se guarda como secret para no versionarla.
