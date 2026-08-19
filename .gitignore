@@ -68,3 +68,6 @@ web/.env*.local
 # Misc
 # ===========================
 *.log
+
+# Documentacion interna del proyecto: no se publica.
+docs/

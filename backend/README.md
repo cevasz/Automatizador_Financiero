@@ -21,10 +21,8 @@ extremo el 2026-08-18 contra la base en producción: alta de usuario, subida, ba
 incremental con cursor, resolución de conflictos en los dos sentidos, propagación de
 borrados, aislamiento entre usuarios y borrado total.
 
-```
-Proyecto : etmudmitqszrawenimoi
-URL      : https://etmudmitqszrawenimoi.supabase.co
-```
+El identificador del proyecto y su URL viven en los archivos ignorados por git que
+se listan abajo, no aquí: cada quien apunta a su propia instancia de Supabase.
 
 ### Dónde viven las credenciales
 
