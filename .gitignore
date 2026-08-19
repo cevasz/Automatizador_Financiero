@@ -71,3 +71,8 @@ web/.env*.local
 
 # Documentacion interna del proyecto: no se publica.
 docs/
+
+# Material interno de agentes: instrucciones y grafo de dependencias.
+CLAUDE.md
+graphify-out/
+.agents/

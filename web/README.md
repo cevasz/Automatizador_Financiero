@@ -2,7 +2,7 @@
 
 Panel de consulta y correccion del historial financiero que la app Android
 sincroniza a Supabase. **No captura movimientos**: la lectura de notificaciones
-bancarias solo existe en el telefono (ver `CLAUDE.md`). Aqui se revisa con calma
+bancarias solo existe en el telefono (ver `ARQUITECTURA.md`). Aqui se revisa con calma
 lo que ya se capturo, en una pantalla grande.
 
 ## Stack

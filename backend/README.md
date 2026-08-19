@@ -83,9 +83,9 @@ supabase db push          # aplica supabase/migrations/ en orden
 ## Cómo funciona la sincronización
 
 Los porqués de cada decisión (identidad de fila, orden de las fases, conflictos,
-borrados, cursor) están explicados una sola vez en **`docs/guia.md` § Panel web y
-sincronización con la nube**, para no mantener dos versiones del mismo texto. El detalle
-línea a línea está en los comentarios de las dos migraciones.
+borrados, cursor) están explicados una sola vez en **`ARQUITECTURA.md` § Sincronización**,
+para no mantener dos versiones del mismo texto. El detalle línea a línea está en los
+comentarios de las dos migraciones.
 
 Resumen del flujo:
 
@@ -106,4 +106,4 @@ Resumen del flujo:
 - Imágenes de facturas y capturas de pantalla (solo la URI local del teléfono).
 - Contenido de notificaciones que el usuario no haya confirmado como movimiento.
 - El texto crudo del banco, si el usuario apaga ese interruptor en la pantalla de Cuenta.
-- Credenciales bancarias — Kivo nunca las pide (ver `CLAUDE.md`).
+- Credenciales bancarias — Kivo nunca las pide (ver `README.md` § Privacidad).
