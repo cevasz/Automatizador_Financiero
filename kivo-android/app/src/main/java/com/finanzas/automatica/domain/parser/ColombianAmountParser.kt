@@ -28,6 +28,7 @@ object ColombianAmountParser {
 
         var integerPart = raw
         var decimalPart = "00"
+        var decimalFound = false
 
         if (lastComma != -1 || lastDot != -1) {
             // El separador que aparece más a la derecha es el candidato a decimal.
@@ -44,15 +45,20 @@ object ColombianAmountParser {
             if (trailing.length in 1..2 && trailing.all { it.isDigit() } && appearsOnce) {
                 decimalPart = trailing
                 integerPart = raw.substring(0, decimalSepIndex)
+                decimalFound = true
             }
         }
 
         val cleanInt = integerPart.filter { it.isDigit() }
-        if (cleanInt.isEmpty()) return null
+        // Sin digitos y sin parte decimal no hay monto que leer. Pero un monto menor
+        // a un peso escrito sin cero delante (".31") si es valido, y los extractos lo
+        // usan en los abonos de intereses: ahi la parte entera esta vacia y vale 0.
+        // Rechazarlo descartaba el renglon completo.
+        if (cleanInt.isEmpty() && !decimalFound) return null
 
         val decimalDigits = decimalPart.padEnd(2, '0').take(2)
         return try {
-            cleanInt.toLong() * 100 + decimalDigits.toLong()
+            (if (cleanInt.isEmpty()) 0L else cleanInt.toLong()) * 100 + decimalDigits.toLong()
         } catch (e: NumberFormatException) {
             null
         }

@@ -43,7 +43,15 @@ object PdfStatementExtractor {
      */
     fun extractText(pdfBytes: ByteArray, password: String? = null): String {
         return PDDocument.load(pdfBytes, password ?: "").use { document ->
-            PDFTextStripper().getText(document)
+            PDFTextStripper().apply {
+                // Sin esto PDFBox entrega el texto en el orden en que esta escrito
+                // dentro del PDF, que en una tabla no es el orden visual: la fecha
+                // sale en una linea suelta y la descripcion y los montos en otras.
+                // Medido sobre un extracto real de Bancolombia: 33 renglones
+                // completos de 739. El resto se perdia entero, porque el
+                // importador trabaja renglon por renglon.
+                sortByPosition = true
+            }.getText(document)
         }
     }
 }

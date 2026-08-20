@@ -76,3 +76,6 @@ docs/
 CLAUDE.md
 graphify-out/
 .agents/
+
+# Extractos bancarios reales para calibrar el importador. Datos personales.
+extracto ejemplos/
