@@ -109,5 +109,33 @@ object FinanzasMigrations {
         }
     }
 
-    val TODAS = arrayOf(MIGRATION_3_4, MIGRATION_4_5)
+    /**
+     * v5 → v6: registro de diagnostico de captura (`capture_log`).
+     *
+     * Tabla solo local: no lleva `syncId` ni entra en la sincronizacion con Supabase.
+     * El DDL debe coincidir EXACTAMENTE con lo que Room genera para `CaptureLogEntity`
+     * (ver app/schemas/...6.json); un desajuste minimo deja la app sin abrir.
+     */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS capture_log (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    packageName TEXT NOT NULL,
+                    bankEntity TEXT,
+                    outcome TEXT NOT NULL,
+                    reasonCode TEXT,
+                    reason TEXT NOT NULL,
+                    rawText TEXT NOT NULL,
+                    movementSummary TEXT,
+                    createdAt INTEGER NOT NULL
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS index_capture_log_createdAt ON capture_log (createdAt)")
+        }
+    }
+
+    val TODAS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 }

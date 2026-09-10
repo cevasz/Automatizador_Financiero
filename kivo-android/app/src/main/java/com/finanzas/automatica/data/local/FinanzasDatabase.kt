@@ -20,9 +20,10 @@ import com.finanzas.automatica.data.local.entity.*
         InvoiceEntity::class,
         InvoiceItemEntity::class,
         AppNotificationEntity::class,
-        SyncDeletionEntity::class
+        SyncDeletionEntity::class,
+        CaptureLogEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -36,6 +37,7 @@ abstract class FinanzasDatabase : RoomDatabase() {
     abstract fun classificationRuleDao(): ClassificationRuleDao
     abstract fun invoiceDao(): InvoiceDao
     abstract fun appNotificationDao(): AppNotificationDao
+    abstract fun captureLogDao(): CaptureLogDao
     abstract fun syncDeletionDao(): SyncDeletionDao
     abstract fun syncDao(): SyncDao
 
