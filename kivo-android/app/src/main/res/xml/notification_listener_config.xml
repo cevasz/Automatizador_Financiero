@@ -33,5 +33,20 @@
         <package name="co.com.lulobank.production" />
         <package name="com.lulobank.app" />
         <package name="co.lulobank" />
+        <!--
+            SMS y correo del banco. Bancolombia (y en menor medida los demas) avisa por
+            SMS de transferencias que la app no notifica, y BaseBankParser ya sabe leerlos,
+            pero sin estos paquetes aca el sistema nunca entrega esas notificaciones y ese
+            soporte quedaba muerto en Android 14+.
+            Recibirlas no es guardarlas: canParse() exige que el texto nombre
+            explicitamente al banco antes de mirar siquiera el monto, asi que cualquier
+            otro mensaje se descarta en memoria en el acto y nunca toca la base de datos.
+        -->
+        <package name="com.google.android.apps.messaging" />
+        <package name="com.samsung.android.messaging" />
+        <package name="com.android.mms" />
+        <package name="com.android.messaging" />
+        <package name="com.google.android.gm" />
+        <package name="com.samsung.android.email.provider" />
     </notification-listener-include-filter>
 </notification-listener-config>
