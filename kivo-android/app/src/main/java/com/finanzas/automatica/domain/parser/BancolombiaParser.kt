@@ -2,12 +2,8 @@ package com.finanzas.automatica.domain.parser
 
 import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.MovementType
-import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.PaymentMethod
-import com.finanzas.automatica.domain.model.RawMovement
-import java.time.Instant
-import java.util.Locale
-import java.util.regex.Pattern
+import com.finanzas.automatica.domain.parser.TransactionLexicon.signal
 
 class BancolombiaParser : BaseBankParser(
     bankEntity = BankEntity.BANCOLOMBIA,
@@ -21,67 +17,36 @@ class BancolombiaParser : BaseBankParser(
         "com.todo1.mobile",
         "com.bancolombia.personas",
         "com.bancolombia.certipersonas"
-    )
+    ),
+    bankNamePattern = Regex("\\bbancolombia\\b"),
+    defaultPaymentMethod = PaymentMethod.BANCOLOMBIA,
+    displayName = "Bancolombia",
+    baseConfidence = 0.90
 ) {
 
-    override fun parse(notificationText: String): ParseResult {
-        val lowerText = notificationText.lowercase(Locale.getDefault())
-        val type = when {
-            lowerText.contains("abono") ||
-            lowerText.contains("recibido") ||
-            lowerText.contains("recibiste") ||
-            lowerText.contains("transferencia recibida") ||
-            lowerText.contains("recibiste una transferencia") -> MovementType.INCOME
-            lowerText.contains("retiro") ||
-            lowerText.contains("compra") ||
-            lowerText.contains("pago") ||
-            lowerText.contains("pagaste") ||
-            lowerText.contains("transferencia enviada") -> MovementType.EXPENSE
-            else -> determineType(lowerText)
-        }
+    /**
+     * Bancolombia usa registro formal e impersonal ("le informa que se realizó...") tanto
+     * en la app como en el SMS y el correo, y ese "se + verbo" no lo cubren las formas
+     * coloquiales del léxico compartido. También distingue productos (Ahorro a la Mano,
+     * tarjeta de crédito, PSE) que aparecen en el mismo texto.
+     */
+    override val extraSignals = listOf(
+        signal("\\bse (realizo|efectuo|registro) (un|una) (abono|consignacion|deposito)\\b", MovementType.INCOME, 6),
+        signal("\\b(le|te) (informa|informamos) .{0,40}\\b(abono|consignacion|deposito)\\b", MovementType.INCOME, 5),
+        signal("\\bse (realizo|efectuo|registro) (un|una) (compra|pago|retiro|transferencia|avance)\\b", MovementType.EXPENSE, 6),
+        signal("\\b(compra|pago|retiro|avance|transferencia) (por|de) valor\\b", MovementType.EXPENSE, 5),
+        signal("\\brealizaste (una|un) (compra|pago|transferencia|retiro|avance)\\b", MovementType.EXPENSE, 5),
+        signal("\\bpago (de|a) (tu|su) tarjeta de credito\\b", MovementType.EXPENSE, 5),
+        signal("\\bcuota de manejo\\b", MovementType.EXPENSE, 5)
+    )
 
-        val amount = parseAmount(notificationText)
-            ?: return ParseResult.Failure("No se pudo extraer monto", notificationText)
-
-        val counterparty = extractCounterparty(notificationText)
-        val paymentMethod = determinePaymentMethod(lowerText)
-        val date = parseDate(notificationText) ?: Instant.now()
-
-        return buildRawMovement(
-            type = type,
-            amount = amount,
-            paymentMethod = paymentMethod,
-            counterpartyRaw = counterparty,
-            date = date,
-            rawText = notificationText,
-            confidence = 0.90
-        )
-    }
-
-    private fun extractCounterparty(text: String): String {
-        val patterns = listOf(
-            Pattern.compile("a\\s+nombre\\s+de\\s+([^\\.,\\n]+?)(?=\\s+en|\\s+desde|\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("de\\s+([^\\.,\\n]+?)(?=\\s+en|\\s+desde|\\s+por|\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("en\\s+([^\\.,\\n]+?)(?=\\s+el|\\.|,|$)", Pattern.CASE_INSENSITIVE)
-        )
-        for (pattern in patterns) {
-            val matcher = pattern.matcher(text)
-            if (matcher.find()) {
-                val extracted = matcher.group(1).trim()
-                if (extracted.isNotBlank() && !extracted.equals("bancolombia", ignoreCase = true)) {
-                    return extracted
-                }
-            }
-        }
-        return "Bancolombia"
-    }
-
-    private fun determinePaymentMethod(text: String): PaymentMethod {
-        return when {
-            text.contains("qr") -> PaymentMethod.QR
-            text.contains("pse") -> PaymentMethod.PSE
-            text.contains("nequi") -> PaymentMethod.NEQUI
-            else -> PaymentMethod.BANCOLOMBIA
-        }
+    override fun paymentMethodFor(normalized: String): PaymentMethod = when {
+        Regex("\\bqr\\b").containsMatchIn(normalized) -> PaymentMethod.QR
+        Regex("\\bpse\\b").containsMatchIn(normalized) -> PaymentMethod.PSE
+        // Una transferencia de Bancolombia hacia Nequi sigue saliendo de Bancolombia:
+        // la entidad es Bancolombia y el medio, la transferencia a la billetera.
+        Regex("\\bnequi\\b").containsMatchIn(normalized) -> PaymentMethod.NEQUI
+        Regex("\\b(cajero|efectivo|corresponsal)\\b").containsMatchIn(normalized) -> PaymentMethod.CASH
+        else -> PaymentMethod.BANCOLOMBIA
     }
 }

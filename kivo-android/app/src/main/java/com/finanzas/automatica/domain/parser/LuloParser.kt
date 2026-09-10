@@ -2,56 +2,32 @@ package com.finanzas.automatica.domain.parser
 
 import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.MovementType
-import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.PaymentMethod
-import com.finanzas.automatica.domain.model.RawMovement
-import java.time.Instant
-import java.util.Locale
-import java.util.regex.Pattern
+import com.finanzas.automatica.domain.parser.TransactionLexicon.signal
 
 class LuloParser : BaseBankParser(
     bankEntity = BankEntity.LULO,
     // co.com.lulobank.production es el paquete real en Google Play (verificado
     // 2026-08-15, ver docs/PENDIENTES.md) -- ni "com.lulobank.app" ni "co.lulobank"
     // existen. Debe coincidir con notification_listener_config.xml.
-    supportedPackageNames = listOf("co.com.lulobank.production", "com.lulobank.app", "co.lulobank")
+    supportedPackageNames = listOf("co.com.lulobank.production", "com.lulobank.app", "co.lulobank"),
+    bankNamePattern = Regex("\\blulo\\b"),
+    defaultPaymentMethod = PaymentMethod.LULO,
+    displayName = "Lulo Bank",
+    baseConfidence = 0.85
 ) {
 
-    override fun parse(notificationText: String): ParseResult {
-        val lowerText = notificationText.lowercase(Locale.getDefault())
-
-        val type = when {
-            lowerText.contains("abono") || lowerText.contains("recibiste") || lowerText.contains("te depositaron") -> MovementType.INCOME
-            lowerText.contains("compra") || lowerText.contains("pago") || lowerText.contains("retiro") || lowerText.contains("enviaste") -> MovementType.EXPENSE
-            else -> determineType(lowerText)
-        }
-
-        val amount = parseAmount(notificationText) ?: return ParseResult.Failure("No se pudo extraer monto", notificationText)
-        val counterparty = extractCounterparty(notificationText)
-        val paymentMethod = if (lowerText.contains("qr")) PaymentMethod.QR else PaymentMethod.LULO
-        val date = parseDate(notificationText) ?: Instant.now()
-
-        return buildRawMovement(
-            type = type,
-            amount = amount,
-            paymentMethod = paymentMethod,
-            counterpartyRaw = counterparty,
-            date = date,
-            rawText = notificationText,
-            confidence = 0.8
-        )
-    }
-
-    private fun extractCounterparty(text: String): String {
-        val patterns = listOf(
-            Pattern.compile("en\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("de\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("a\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-        )
-        for (pattern in patterns) {
-            val matcher = pattern.matcher(text)
-            if (matcher.find()) return matcher.group(1).trim()
-        }
-        return "Lulo Bank"
-    }
+    /**
+     * Lulo es 100% digital: casi todo llega como abono/transferencia entre cuentas, pago
+     * con la tarjeta débito o retiro en cajero, y paga intereses sobre el saldo (ingreso
+     * recurrente que no debe leerse como gasto).
+     */
+    override val extraSignals = listOf(
+        signal("\\b(te depositaron|te transfirieron|entro (plata|dinero))\\b", MovementType.INCOME, 6),
+        signal("\\b(intereses|rendimientos) (de tu|del) (ahorro|cuenta|saldo)\\b", MovementType.INCOME, 5),
+        signal("\\btransferencia (de|desde) otra? (banco|entidad|cuenta)\\b", MovementType.INCOME, 4),
+        signal("\\bcompra (con|en) (tu )?(tarjeta|lulo)\\b", MovementType.EXPENSE, 6),
+        signal("\\bpago (qr|con qr|en comercio)\\b", MovementType.EXPENSE, 6),
+        signal("\\bretiro (en|por) (cajero|corresponsal)\\b", MovementType.EXPENSE, 6)
+    )
 }

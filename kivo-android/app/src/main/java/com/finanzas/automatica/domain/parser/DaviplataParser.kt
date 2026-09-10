@@ -2,57 +2,32 @@ package com.finanzas.automatica.domain.parser
 
 import com.finanzas.automatica.domain.model.BankEntity
 import com.finanzas.automatica.domain.model.MovementType
-import com.finanzas.automatica.domain.model.ParseResult
 import com.finanzas.automatica.domain.model.PaymentMethod
-import com.finanzas.automatica.domain.model.RawMovement
-import java.time.Instant
-import java.util.Locale
-import java.util.regex.Pattern
+import com.finanzas.automatica.domain.parser.TransactionLexicon.signal
 
 class DaviplataParser : BaseBankParser(
     bankEntity = BankEntity.DAVIPLATA,
     // com.davivienda.daviplataapp es el paquete real en Google Play (verificado
     // 2026-08-15, ver docs/PENDIENTES.md) -- "com.daviplata.daviplata" no existe.
     // Debe coincidir con notification_listener_config.xml.
-    supportedPackageNames = listOf("com.davivienda.daviplataapp", "com.daviplata.daviplata")
+    supportedPackageNames = listOf("com.davivienda.daviplataapp", "com.daviplata.daviplata"),
+    bankNamePattern = Regex("\\b(daviplata|davivienda)\\b"),
+    defaultPaymentMethod = PaymentMethod.DAVIPLATA,
+    displayName = "Daviplata",
+    baseConfidence = 0.88
 ) {
 
-    override fun parse(notificationText: String): ParseResult {
-        val lowerText = notificationText.lowercase(Locale.getDefault())
-        val type = when {
-            lowerText.contains("recibiste") || lowerText.contains("abono") || lowerText.contains("te enviaron") -> MovementType.INCOME
-            lowerText.contains("enviaste") || lowerText.contains("pagaste") || lowerText.contains("retiro") || lowerText.contains("compra") -> MovementType.EXPENSE
-            else -> determineType(lowerText)
-        }
-
-        val amount = parseAmount(notificationText)
-            ?: return ParseResult.Failure("No se pudo extraer monto", notificationText)
-
-        val counterparty = extractCounterparty(lowerText)
-        val paymentMethod = if (lowerText.contains("qr")) PaymentMethod.QR else PaymentMethod.DAVIPLATA
-        val date = parseDate(notificationText) ?: Instant.now()
-
-        return buildRawMovement(
-            type = type,
-            amount = amount,
-            paymentMethod = paymentMethod,
-            counterpartyRaw = counterparty,
-            date = date,
-            rawText = notificationText,
-            confidence = 0.85
-        )
-    }
-
-    private fun extractCounterparty(text: String): String {
-        val patterns = listOf(
-            Pattern.compile("de\\s+(\\d{10})", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("a\\s+(\\d{10})", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("en\\s+([^\\.\\n]+)", Pattern.CASE_INSENSITIVE),
-        )
-        for (pattern in patterns) {
-            val matcher = pattern.matcher(text)
-            if (matcher.find()) return matcher.group(1).trim()
-        }
-        return "Daviplata"
-    }
+    /**
+     * DaviPlata mezcla el trato coloquial de billetera ("te enviaron", "sacaste") con
+     * términos de Davivienda ("traslado", "recaudo"), y sus retiros en corresponsal o sin
+     * tarjeta son de las salidas más frecuentes del producto.
+     */
+    override val extraSignals = listOf(
+        signal("\\bte (enviaron|mandaron|pasaron) (plata|dinero|un giro)\\b", MovementType.INCOME, 6),
+        signal("\\b(recaudo|traslado) recibido\\b", MovementType.INCOME, 5),
+        signal("\\btraslado (a|hacia) (tu|su) (cuenta|daviplata)\\b", MovementType.INCOME, 5),
+        signal("\\bretiro (sin tarjeta|en corresponsal|por cajero)\\b", MovementType.EXPENSE, 6),
+        signal("\\b(sacaste|enviaste|pasaste) (plata|dinero)\\b", MovementType.EXPENSE, 6),
+        signal("\\bpagaste (con|en|por|tu)\\b", MovementType.EXPENSE, 5)
+    )
 }
