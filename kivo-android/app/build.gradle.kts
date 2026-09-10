@@ -41,8 +41,8 @@ android {
         targetSdk = 34
         // Cada cambio funcional sube versionCode en 1 y versionName acorde (patch para
         // fixes, minor para features nuevas).
-        versionCode = 15
-        versionName = "1.9.1"
+        versionCode = 17
+        versionName = "1.11.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
