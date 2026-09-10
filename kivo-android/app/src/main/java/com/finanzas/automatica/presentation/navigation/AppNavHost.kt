@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Rule
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Troubleshoot
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,6 +81,7 @@ import com.finanzas.automatica.presentation.ui.screen.BudgetsScreen
 import com.finanzas.automatica.presentation.ui.screen.DashboardScreen
 import com.finanzas.automatica.presentation.ui.screen.InvoiceScreen
 import com.finanzas.automatica.presentation.ui.screen.MovementsListScreen
+import com.finanzas.automatica.presentation.ui.screen.CaptureLogScreen
 import com.finanzas.automatica.presentation.ui.screen.NotificationCenterScreen
 import com.finanzas.automatica.presentation.ui.screen.SavingsGoalsScreen
 import com.finanzas.automatica.presentation.ui.screen.SettingsScreen
@@ -87,6 +89,7 @@ import com.finanzas.automatica.presentation.viewmodel.AgendaViewModel
 import com.finanzas.automatica.presentation.viewmodel.BudgetsViewModel
 import com.finanzas.automatica.presentation.viewmodel.InvoiceViewModel
 import com.finanzas.automatica.presentation.viewmodel.MovementViewModel
+import com.finanzas.automatica.presentation.viewmodel.CaptureLogViewModel
 import com.finanzas.automatica.presentation.viewmodel.NotificationCenterViewModel
 import com.finanzas.automatica.presentation.viewmodel.CategoriesViewModel
 import com.finanzas.automatica.presentation.viewmodel.ClassificationRulesViewModel
@@ -249,6 +252,13 @@ fun AppNavHost(database: FinanzasDatabase) {
                                 )
                             }
                         },
+                        colors = NavigationDrawerItemDefaults.colors()
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Diagnostico de captura") },
+                        selected = currentRoute.startsWith(Screen.CaptureLog.selectedPrefix),
+                        onClick = { navigateTo(Screen.CaptureLog.route) },
+                        icon = { Icon(Icons.Outlined.Troubleshoot, contentDescription = null) },
                         colors = NavigationDrawerItemDefaults.colors()
                     )
 
@@ -551,6 +561,21 @@ fun AppNavHost(database: FinanzasDatabase) {
                 )
             }
 
+            composable(Screen.CaptureLog.route) {
+                val captureLogViewModel: CaptureLogViewModel = databaseViewModel {
+                    CaptureLogViewModel(database)
+                }
+                val entries by captureLogViewModel.entries.collectAsState()
+                val onlyIgnored by captureLogViewModel.onlyIgnored.collectAsState()
+                CaptureLogScreen(
+                    entries = entries,
+                    onlyIgnored = onlyIgnored,
+                    onOnlyIgnoredChange = captureLogViewModel::setOnlyIgnored,
+                    onClear = captureLogViewModel::clear,
+                    onOpenMenu = ::openDrawer
+                )
+            }
+
             composable(Screen.Settings.route) {
                 val context = LocalContext.current
                 val settingsViewModel: SettingsViewModel = databaseViewModel {
@@ -571,6 +596,7 @@ fun AppNavHost(database: FinanzasDatabase) {
                     themeMode = themeMode,
                     themePalette = themePalette,
                     onEnableNotificationAccess = { NotificationAccess.openSettings(context) },
+                    onOpenCaptureLog = { navigateTo(Screen.CaptureLog.route) },
                     onAutoConfirmChange = settingsViewModel::setAutoConfirmHighConfidence,
                     onBiometricChange = { enabled ->
                         if (enabled && !BiometricAccess.isAvailable(context)) {
@@ -693,6 +719,7 @@ sealed class Screen(
     object Categories : Screen("categories", "categories", "Categorías", Icons.Outlined.Category)
     object Rules : Screen("rules", "rules", "Reglas", Icons.Outlined.Rule)
     object Notifications : Screen("notifications", "notifications", "Notificaciones", Icons.Outlined.Notifications)
+    object CaptureLog : Screen("capture-log", "capture-log", "Diagnostico de captura", Icons.Outlined.Troubleshoot)
     object Login : Screen("login", "login", "Cuenta", Icons.Outlined.Person)
     object Settings : Screen("settings", "settings", "Ajustes", Icons.Outlined.Settings)
 

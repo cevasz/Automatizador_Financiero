@@ -25,7 +25,9 @@ import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Troubleshoot
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Palette
@@ -73,6 +75,7 @@ fun SettingsScreen(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     themePalette: AppThemePalette = AppThemePalette.KIVO_CORAL,
     onEnableNotificationAccess: () -> Unit = {},
+    onOpenCaptureLog: () -> Unit = {},
     onAutoConfirmChange: (Boolean) -> Unit = {},
     onBiometricChange: (Boolean) -> Unit = {},
     onExportFormatChange: (String) -> Unit = {},
@@ -135,6 +138,25 @@ fun SettingsScreen(
             }
             item {
                 PostNotificationsPermissionRow()
+            }
+            item {
+                // Entrada al diagnostico desde aqui, no solo desde el menu: cuando algo
+                // "no se registro" el usuario viene a Ajustes a revisar la captura, y es
+                // justo donde tiene que poder ver que llego y por que se ignoro.
+                SettingRow(
+                    icon = Icons.Outlined.Troubleshoot,
+                    iconTint = InfoBlue,
+                    title = "Diagnostico de captura",
+                    subtitle = "Ver que notificaciones llegaron y por que no se registraron",
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Outlined.ChevronRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    },
+                    onClick = onOpenCaptureLog
+                )
             }
             item {
                 SettingRow(
